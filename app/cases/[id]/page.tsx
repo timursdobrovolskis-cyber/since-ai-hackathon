@@ -6,6 +6,7 @@ import { useApp } from "@/components/AppProvider";
 import { CaseInbox } from "@/components/CaseInbox";
 import { DecisionPanel } from "@/components/DecisionPanel";
 import { EvidenceChart } from "@/components/EvidenceChart";
+import { ExplanationPanel } from "@/components/ExplanationPanel";
 import { CaseMark, classLabel } from "@/components/Marks";
 import { WhatIfPanel } from "@/components/WhatIfPanel";
 import { certainty } from "@/lib/cases";
@@ -66,6 +67,8 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
           <p className="text-lg font-medium">{alert.recommended_action}</p>
           {alert.what_would_settle_it && <p className="mt-1 text-ink-2">To settle it: {alert.what_would_settle_it}</p>}
         </section>
+
+        <ExplanationPanel item={item} />
 
         <section aria-labelledby="causes">
           <h2 id="causes" className="font-cond text-lg font-semibold">Possible causes</h2>

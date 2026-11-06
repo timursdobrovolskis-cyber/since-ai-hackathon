@@ -38,6 +38,7 @@
   ],
   "exclude": [
     "lib/*.test.ts",
-    "node_modules"
+    "node_modules",
+    "tools"
   ]
 }

@@ -41,6 +41,7 @@ Restart `npm run dev` after running `npm run build`. Building next to a running 
 - The Review view scores alerts with the organizers' scorer, and the data build stops if their published baseline scores do not reproduce.
 - The sensor comparison counts a fault as visible at a level when that level has a channel that carried the fault's earliest evidence. It comes from the labels, not a detector, because B1 cannot use wireless channels and its scoring credits unrelated alerts on long faults. Hardware totals come from the organizers' feasibility document, and the low-cost retrofit total is our own sum of its parts.
 - The payback calculator ports the organizers' business case, and `npm test` checks it against their published figures. It defaults to results from all labelled pumps. Their worked example uses only the 2 validation pumps, which gives a shorter payback. Results are illustrative, not a realised or expected saving.
+- AI explanations are generated in advance by `npm run explain` and stored, so the app needs no key and works offline. The model sees one alert and its pump sheet, never labels or later data, and any text containing a number that is not in its input is rejected.
 - The what-if panel shows pre-computed results from the organizers' sandbox, so it works offline. Its severity levels are our assumptions, not measurements, and it never touches a machine. An inspection is never shown as blocked, because it does not change the pump: a problem found there appears as a warning.
 
 **Real and placeholder:** all pump data is synthetic. Alerts currently come from the organizers' B1 baseline, regenerated for training pumps, as a placeholder until the team's detector is connected. B1 confidence values are not calibrated, so the app does not show them as certainty.
@@ -55,6 +56,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Styling | Tailwind CSS | MIT |
 | Charts | uPlot | MIT |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
+| AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
 | Simulator and baselines | `retrofit_sim` from the organizer pack | MIT |
@@ -63,7 +65,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 ## AI tools used
 
 - Main AI tools: Claude Code
-- Generative AI model or API used in the product: to be added with the AI explanation and voice features
+- Generative AI model or API used in the product: Claude Opus 5.5 through the Anthropic API, for stored alert explanations
 
 ## Pre-existing work
 
