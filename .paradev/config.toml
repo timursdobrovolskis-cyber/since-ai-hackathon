@@ -1,0 +1,5 @@
+# Paradev workspace config. No app code yet: only copy env into new workspaces.
+
+[setup]
+# Copy .env (Featherless keys) from the main checkout; fall back to the example.
+run = ['[ -f .env ] || cp "$SUPERSET_ROOT_PATH/.env" .env 2>/dev/null || cp .env.example .env']

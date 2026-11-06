@@ -14,6 +14,12 @@ Rules for long-running coding agents (Claude Code, OpenCode, etc.) working in th
 
 - API keys live in `.env` (gitignored). See `.env.example` for the variable names.
 - Never print, log, or commit secrets. Never commit `.env`.
+- New Paradev workspaces get `.env` copied from the main checkout (`.paradev/config.toml`).
+
+## OpenCode (Featherless)
+
+- `opencode.json` points OpenCode at Featherless using `FEATHERLESS_API_KEY`.
+- OpenCode reuses a background `opencode serve` process that keeps the env it started with. If you get "You must be signed in", run `pkill -f "opencode serve"`, then `set -a; source .env; set +a`, and start again.
 
 ## Skills
 
