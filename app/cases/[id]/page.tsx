@@ -7,6 +7,7 @@ import { CaseInbox } from "@/components/CaseInbox";
 import { DecisionPanel } from "@/components/DecisionPanel";
 import { EvidenceChart } from "@/components/EvidenceChart";
 import { CaseMark, classLabel } from "@/components/Marks";
+import { WhatIfPanel } from "@/components/WhatIfPanel";
 import { certainty } from "@/lib/cases";
 import { clock, faultLabel, formatUtc, TIER_LABEL } from "@/lib/labels";
 
@@ -179,6 +180,8 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
             </ul>
           )}
         </section>
+
+        <WhatIfPanel key={item.latest.alert_id} item={item} />
 
         <DecisionPanel item={item} />
       </article>

@@ -1,0 +1,39 @@
+{
+"alertIds": [
+"PUMP-01-A0002",
+"PUMP-01-A0004",
+"PUMP-01-A0005",
+"PUMP-02-A0005",
+"PUMP-03-A0001",
+"PUMP-03-A0002",
+"PUMP-03-A0003",
+"PUMP-04-A0001",
+"PUMP-04-A0002",
+"PUMP-04-A0003",
+"PUMP-04-A0004",
+"PUMP-04-A0006",
+"PUMP-04-A0008",
+"PUMP-04-A0009",
+"PUMP-04-A0010",
+"PUMP-04-A0011",
+"PUMP-06-A0001",
+"PUMP-06-A0002",
+"PUMP-06-A0004",
+"PUMP-07-A0002",
+"PUMP-07-A0005",
+"PUMP-07-A0007",
+"PUMP-08-A0001",
+"PUMP-08-A0002",
+"PUMP-09-A0002",
+"PUMP-09-A0008",
+"PUMP-09-A0009",
+"PUMP-09-A0010"
+],
+"caveats": [
+"Reduced-order steady-state model (affinity laws, quadratic system curve); not a validated digital twin.",
+"Machine condition is the user's hypothesis, not a measured or hidden state.",
+"Built from public nameplate data and profile defaults; per-asset vibration and thermal baselines are not public, so vibration and temperature predictions are indicative only.",
+"Costs are illustrative assumptions; replace with site data.",
+"Sandbox output only: not a set-point, not a work order, not connected to any controller."
+]
+}
