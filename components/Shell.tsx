@@ -10,9 +10,10 @@ const NAV = [
   { href: "/log", label: "Decision log" },
   { href: "/review", label: "Review" },
   { href: "/sensors", label: "Sensor levels" },
+  { href: "/payback", label: "Payback" },
 ];
 
-const OUTSIDE_REPLAY = new Set(["/review", "/sensors"]);
+const OUTSIDE_REPLAY = new Set(["/review", "/sensors", "/payback"]);
 
 const FACTS = ["Advisory only", "Read-only", "Simulated data"];
 
@@ -23,7 +24,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-full flex-col">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-line bg-panel px-4 py-2">
         <Link href="/" className="font-cond text-lg font-semibold">Retrofit Assist</Link>
-        <nav className="flex gap-4" aria-label="Main">
+        <nav className="flex flex-wrap gap-x-4 whitespace-nowrap" aria-label="Main">
           {NAV.map((n) => (
             <Link
               key={n.href}
