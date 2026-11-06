@@ -9,7 +9,10 @@ const NAV = [
   { href: "/", label: "Fleet" },
   { href: "/log", label: "Decision log" },
   { href: "/review", label: "Review" },
+  { href: "/sensors", label: "Sensor levels" },
 ];
+
+const OUTSIDE_REPLAY = new Set(["/review", "/sensors"]);
 
 const FACTS = ["Advisory only", "Read-only", "Simulated data"];
 
@@ -38,8 +41,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           ))}
         </ul>
       </header>
-      {/* Review shows the real answers, so it sits outside replay. */}
-      {path !== "/review" && <ReplayBar />}
+      {/* These screens use labelled faults, so they sit outside replay. */}
+      {!OUTSIDE_REPLAY.has(path) && <ReplayBar />}
       <main className="flex-1">
         {error ? (
           <p className="p-6">{error}. Run tools/build_ui_data.py to create the data, then reload.</p>

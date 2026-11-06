@@ -25,7 +25,10 @@ uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python numpy pandas pyarrow scipy scikit-learn pyyaml
 .venv/bin/python tools/build_ui_data.py
 .venv/bin/python tools/build_what_if.py
+.venv/bin/python tools/build_sensor_compare.py
 ```
+
+Restart `npm run dev` after running `npm run build`. Building next to a running dev server can leave it serving old pages.
 
 ## How it works
 
@@ -34,6 +37,7 @@ uv pip install --python .venv/bin/python numpy pandas pyarrow scipy scikit-learn
 - Live screens only draw data up to the replay time. Labelled faults are kept in `public/data/review`, and only the Review view may load them.
 - Repeat alerts merge into one case, and a person approves, rejects or keeps watching.
 - The Review view scores alerts with the organizers' scorer, and the data build stops if their published baseline scores do not reproduce.
+- The sensor comparison counts a fault as visible at a level when that level has a channel that carried the fault's earliest evidence. It comes from the labels, not a detector, because B1 cannot use wireless channels and its scoring credits unrelated alerts on long faults. Hardware totals come from the organizers' feasibility document, and the low-cost retrofit total is our own sum of its parts.
 - The what-if panel shows pre-computed results from the organizers' sandbox, so it works offline. Its severity levels are our assumptions, not measurements, and it never touches a machine. An inspection is never shown as blocked, because it does not change the pump: a problem found there appears as a warning.
 
 **Real and placeholder:** all pump data is synthetic. Alerts currently come from the organizers' B1 baseline, regenerated for training pumps, as a placeholder until the team's detector is connected. B1 confidence values are not calibrated, so the app does not show them as certainty.

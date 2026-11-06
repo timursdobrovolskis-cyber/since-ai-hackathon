@@ -144,7 +144,7 @@ Same app, simpler layout:
 
 - Toggle T0, T1 and T2. Show which fault types stay visible and the hardware cost.
 - Baseline version: a visibility table built from `RETROFIT_FEASIBILITY.md` section 1 and the label field `evidence_channels`. Mark it "documented".
-- Better version: teammates run the detector with channels removed. Mark those results "measured".
+- Better version: teammates run the detector with channels removed. Mark those results "measured". Do not use B1 for this: `tools/build_sensor_compare.py --detector` shows why its figures mislead.
 - Use PUMP-05 as an honest blind spot: its bearing wear cannot be seen with T0 sensors.
 - Costs: option B about EUR 2.1-2.4 k, option A about EUR 2.8-3.1 k, before cabling and installation. Mark them as assumptions.
 
@@ -216,6 +216,8 @@ Same app, simpler layout:
 Rules for the detector team:
 
 - Every alert uses only data at or before `alert_time_utc`.
+- **B1 cannot use wireless channels, so fix this in the detector.** Wireless vibration reports every 5 minutes, but B1 needs 15 minutes in a row of deviation. On PUMP-06 and PUMP-08, acceleration was over the limit for 633 and 774 minutes, yet the longest run was 1 minute. Count persistence in readings, or hold the last reading between reports. This likely explains B1 missing the PUMP-06 cavitation.
+- **Scoring counts any alert inside a fault's window as a catch.** A long bearing fault can be "caught" by an unrelated alert, so check the named cause as well as the catch count.
 - **Do not copy baseline B1's learning period as it is.** B1 learns normal from the first 24 hours of each pump, yet it raises alerts inside those 24 hours (PUMP-04 at hours 0.6 and 22.5, PUMP-09 at hour 12.8). Those alerts rely on later data. A detector built the same way could fail the organizers' truncation check, so stay silent until the learning data exists, or learn only from data before the alert.
 - The submission CSV takes the top cause only. **Never write alternative causes as extra rows**: the scorer treats alerts within 5 minutes as one burst, and a burst naming more than one fault type earns no fault-type credit.
 - `hypotheses` probabilities should be calibrated, or set `confidence_calibrated` to false.
