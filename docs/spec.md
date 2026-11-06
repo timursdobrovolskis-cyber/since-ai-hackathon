@@ -57,7 +57,7 @@ Required by the brief: show normal operation, developing faults, evidence, uncer
 |---|---|---|---|---|
 | **PUMP-08** (lead) | validation | T1 | Clogged strainer on a ferry, with a wrong operator suspicion | Baseline alert 10 Sep 12:38, limit reached 11 Sep 04:53, so **16 h early**. No plant alarm on the clog. Note says "suspected cavitation" |
 | **PUMP-03** | train | T0 | Same symptom, two causes, using only legacy sensors | Valve restriction: pressure up, current down. Calibration shift: pressure up, current unchanged |
-| PUMP-06 | train | T1 | Clog worsens into cavitation | Back-up story |
+| PUMP-06 | train | T1 | Clog worsens into cavitation | Back-up story, but avoid it on baseline alerts: plant alarms catch 5 of 7 faults and B1 catches 2, because B1 misses the cavitation episodes |
 | PUMP-04 | train | T2 | Bearing wear with no vibration alarm | Back-up story |
 
 Lead times above use baseline B1. The app must calculate them from the loaded alerts, so they update when the detector changes.

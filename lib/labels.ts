@@ -25,6 +25,7 @@ export const TIER_LABEL: Record<string, string> = {
 
 /** Day and hour on the aligned replay clock. Hour 0 is Day 1 00:00. */
 export function clock(hour: number) {
+  if (hour >= 168) return "End of week";
   const h = Math.max(0, hour);
   const day = Math.min(Math.floor(h / 24) + 1, 7);
   const inDay = h - (day - 1) * 24;

@@ -9,7 +9,7 @@ Output (public/data/):
   pumps/<id>.json       5-min series, expected bands, states, alarms, maintenance (safe for live screens)
   alerts.json           alerts in the docs/spec.md section 8 format (safe for live screens)
   review/<id>.json      labelled events and benign windows. LOADED ONLY BY THE REVIEW VIEW.
-  review/summary.json   baseline scores. LOADED ONLY BY THE REVIEW VIEW.
+  review/scorecard.json results from the official scorer. LOADED ONLY BY THE REVIEW VIEW.
 
 Test pumps (PUMP-10, 11, 12) are skipped until the submission is frozen. See docs/spec.md section 9.
 """
@@ -29,6 +29,7 @@ REPO = Path(__file__).resolve().parent.parent
 ROOT = Path(os.environ.get("RETROFIT_DATA_ROOT", REPO.parent / "RETROFIT_AI_PARTICIPANTS_2026"))
 sys.path.insert(0, str(ROOT / "src"))
 from retrofit_sim import baselines as B  # noqa: E402
+from retrofit_sim.scoring import score  # noqa: E402
 
 DATA = ROOT / "data" / "full"
 OUT = REPO / "public" / "data"
@@ -209,6 +210,83 @@ def to_alert(row: pd.Series, n: int, a: pd.Series, frame: pd.DataFrame) -> dict:
     }
 
 
+METRICS = ["composite_score", "event_recall", "alert_precision", "event_f1", "false_alerts_per_asset_day", "timeliness",
+           "fault_type_recall", "class_recall", "median_lead_time_h", "early_warning_rate", "events_scored",
+           "true_positive_events", "false_alert_episodes", "excess_repeat_episodes", "asset_days"]
+# Published values that our scoring run must reproduce, or the Review view would show numbers that are not the organizers'.
+PUBLISHED = {"plant": "B0_scada_alarms", "current": "B1_mode_aware_z"}
+
+
+def pick(result: dict) -> dict:
+    return {m: (round(result[m], 4) if isinstance(result[m], float) else result[m]) for m in METRICS}
+
+
+def scoring_windows(ev: pd.DataFrame, a: pd.Series) -> list:
+    """Same event windows as scoring.py: 6 h before detectable, and 30 min past events that end without a repair."""
+    ws, we = pd.Timestamp(a.window_start_utc), pd.Timestamp(a.window_end_utc)
+    out = []
+    for e in ev.itertuples():
+        start = max(e.onset_utc, ws)
+        if pd.notna(e.detectable_utc):
+            start = max(start, e.detectable_utc - pd.Timedelta(hours=6))
+        if pd.isna(e.end_utc):
+            end = we
+        else:
+            soft = e.fault_type in ("CAVITATION", "AIR_ENTRAINMENT") or e.event_class == "SENSOR"
+            end = min(e.end_utc + (pd.Timedelta(minutes=30) if soft else pd.Timedelta(0)), we)
+        out.append((start, end))
+    return out
+
+
+def build_scorecard(assets, events, alarms, pred, alerts, source) -> dict:
+    assets_csv = pd.read_csv(DATA / "assets.csv")
+    assets_csv = assets_csv[assets_csv["split"].isin(SPLITS)]
+    benign_csv = pd.read_csv(DATA / "benign_windows_train_validation.csv")
+    events_csv = pd.concat([pd.read_csv(DATA / "events_train.csv"), pd.read_csv(DATA / "events_validation.csv")], ignore_index=True)
+    streams = {"plant": B.b0_scada(alarms, list(assets.asset_id)), "current": pred}
+    published = json.loads((ROOT / "baselines" / "results" / "baseline_report.json").read_text())["results"]
+
+    totals = {}
+    for key, stream in streams.items():
+        totals[key] = {"all": pick(score(stream, events_csv, assets_csv, benign_csv, None))}
+        for split in SPLITS:
+            result = score(stream, events_csv, assets_csv, benign_csv, split)
+            totals[key][split] = pick(result)
+            want = published[f"{PUBLISHED[key]}|{split}"]["composite_score"]
+            print(f"{key} {split}: composite {result['composite_score']:.1f} (published {want:.1f})")
+            if abs(result["composite_score"] - want) > 0.05:
+                raise SystemExit(f"{key} {split} does not reproduce the published score: investigate before showing it")
+
+    pumps = {}
+    for a in assets.itertuples():
+        one = assets_csv[assets_csv.asset_id == a.asset_id]
+        start = pd.Timestamp(a.window_start_utc)
+        plant = score(streams["plant"], events_csv, one, benign_csv, None)
+        current = score(streams["current"], events_csv, one, benign_csv, None)
+        plant_by_id = {e["event_id"]: e for e in plant["per_event"]}
+        rows = []
+        for e in current["per_event"]:
+            pl = plant_by_id[e["event_id"]]
+            rows.append({
+                "eventId": e["event_id"], "detected": e["detected"],
+                "firstAlertHour": hours_from(pd.Timestamp(e["first_alert_utc"]), start) if e["detected"] else None,
+                "predictedType": e["predicted_fault_type"], "typeCorrect": e["type_correct"], "classCorrect": e["class_correct"],
+                "leadHours": clean(e["lead_time_to_deadline_h"], 1), "repeats": e["repeats"],
+                "plantDetected": pl["detected"], "plantLeadHours": clean(pl["lead_time_to_deadline_h"], 1),
+            })
+        windows = scoring_windows(events[events.asset_id == a.asset_id], a)
+        false_ids = [al["alert_id"] for al in alerts if al["asset_id"] == a.asset_id
+                     and not any(s <= pd.Timestamp(al["alert_time_utc"]) <= e for s, e in windows)]
+        pumps[a.asset_id] = {"perEvent": rows, "falseAlertIds": false_ids, "falseAlertEpisodes": current["false_alert_episodes"],
+                             "excessRepeatEpisodes": current["excess_repeat_episodes"],
+                             "currentCaught": current["true_positive_events"], "plantCaught": plant["true_positive_events"],
+                             "eventsScored": current["events_scored"]}
+    raw_false = score(streams["current"], events_csv, assets_csv, benign_csv, None)
+    marked = sum(len(p["falseAlertIds"]) for p in pumps.values())
+    print(f"false alerts: {raw_false['false_alerts_raw']} scorer bursts, {marked} marked alerts")
+    return {"alertSource": source, "totals": totals, "pumps": pumps}
+
+
 def main():
     assets = pd.read_csv(DATA / "assets.csv", parse_dates=["window_start_utc", "window_end_utc"])
     assets = assets[assets["split"].isin(SPLITS)].reset_index(drop=True)
@@ -268,8 +346,7 @@ def main():
     write(OUT / "fleet.json", {"pumps": fleet, "channelMeta": {k: {"label": v[0], "unit": v[1]} for k, v in CHANNEL_META.items()},
                                "windowHours": 168, "stepMinutes": STEP_MIN})
     write(OUT / "alerts.json", {"source": "B1 baseline, placeholder until the team detector is ready", "alerts": alerts})
-    report = json.loads((ROOT / "baselines" / "results" / "baseline_report.json").read_text())
-    write(OUT / "review" / "summary.json", {"results": report["results"]})
+    write(OUT / "review" / "scorecard.json", build_scorecard(assets, events, alarms, pred, alerts, "B1 baseline"))
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
     print(f"{len(sizes)} files, {sum(s for s, _ in sizes) / 1e6:.1f} MB total, largest {sizes[0][0] / 1e3:.0f} kB ({sizes[0][1]})")

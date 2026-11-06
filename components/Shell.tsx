@@ -8,6 +8,7 @@ import { ReplayBar } from "./ReplayBar";
 const NAV = [
   { href: "/", label: "Fleet" },
   { href: "/log", label: "Decision log" },
+  { href: "/review", label: "Review" },
 ];
 
 const FACTS = ["Advisory only", "Read-only", "Simulated data"];
@@ -37,7 +38,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           ))}
         </ul>
       </header>
-      <ReplayBar />
+      {/* Review shows the real answers, so it sits outside replay. */}
+      {path !== "/review" && <ReplayBar />}
       <main className="flex-1">
         {error ? (
           <p className="p-6">{error}. Run tools/build_ui_data.py to create the data, then reload.</p>
