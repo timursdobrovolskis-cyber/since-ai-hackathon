@@ -10,3 +10,5 @@ dist/
 build/
 .idea/
 .vscode/
+!.env.example
+.superset/
