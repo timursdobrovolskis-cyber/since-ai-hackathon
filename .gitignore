@@ -36,3 +36,6 @@ venv/
 # Next.js generated
 next-env.d.ts
 *.tsbuildinfo
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+.vercel

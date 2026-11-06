@@ -8,6 +8,8 @@ Early, explainable warnings for existing cooling-water pumps, with a human decid
 
 Old pumps on ships and in plants often give no warning until a fixed alarm limit is crossed, which can be too late to plan a repair. This app helps the duty engineer see a developing problem, understand the evidence, and decide what to check. It is advice only and has no way to control a machine.
 
+**Live demo:** https://since-ai-hackathon.vercel.app
+
 ## Run it
 
 Needs Node and [uv](https://docs.astral.sh/uv/). Keep the organizer data pack `RETROFIT_AI_PARTICIPANTS_2026` next to this repo, or set `RETROFIT_DATA_ROOT`.
@@ -53,6 +55,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Styling | Tailwind CSS | MIT |
 | Charts | uPlot | MIT |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
+| Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
 | Simulator and baselines | `retrofit_sim` from the organizer pack | MIT |
 | Data | RETROFIT AI 2026 synthetic pump benchmark, Since AI Hackathon 2026 | CC BY 4.0 |
