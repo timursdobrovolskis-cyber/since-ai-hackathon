@@ -216,6 +216,7 @@ Same app, simpler layout:
 Rules for the detector team:
 
 - Every alert uses only data at or before `alert_time_utc`.
+- **Do not copy baseline B1's learning period as it is.** B1 learns normal from the first 24 hours of each pump, yet it raises alerts inside those 24 hours (PUMP-04 at hours 0.6 and 22.5, PUMP-09 at hour 12.8). Those alerts rely on later data. A detector built the same way could fail the organizers' truncation check, so stay silent until the learning data exists, or learn only from data before the alert.
 - The submission CSV takes the top cause only. **Never write alternative causes as extra rows**: the scorer treats alerts within 5 minutes as one burst, and a burst naming more than one fault type earns no fault-type credit.
 - `hypotheses` probabilities should be calibrated, or set `confidence_calibrated` to false.
 - `UNKNOWN` is allowed and earns detection credit.

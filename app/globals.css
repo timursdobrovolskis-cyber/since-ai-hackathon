@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+/* Calm industrial, after ISA-101: greys carry everything, and colour means something needs attention.
+   Normal has no colour on purpose. */
+:root {
+  --deck: #d5d8da;
+  --panel: #e6e8e9;
+  --raised: #f1f2f3;
+  --ink: #1f2629;
+  --ink-2: #4a5358;
+  --ink-3: #68727a;
+  --line: #bcc2c6;
+  --line-soft: #cdd2d5;
+  --run: #c3c8cb;
+  --stop: #9aa2a7;
+  --band: #c9ced1;
+  --machine: #b0440c;
+  --sensor: #5a3fb0;
+  --unknown: #3d4a52;
+  --cursor: #1f2629;
+}
+
+@theme inline {
+  --color-deck: var(--deck);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-machine: var(--machine);
+  --color-sensor: var(--sensor);
+  --font-sans: var(--font-barlow);
+  --font-cond: var(--font-barlow-cond);
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--deck);
+  color: var(--ink);
+  font-family: var(--font-barlow), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+button { cursor: pointer; }
+
+input[type="range"] { accent-color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* uPlot hover readout */
+.uplot .u-legend { display: none; }
