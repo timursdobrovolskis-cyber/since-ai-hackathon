@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* Calm industrial, after ISA-101: greys carry everything, and colour means something needs attention.
    Normal has no colour on purpose. */
 :root {
@@ -18,6 +20,52 @@
   --sensor: #5a3fb0;
   --unknown: #3d4a52;
   --cursor: #1f2629;
+
+  /* Landing page (/welcome), after meuze.ai: ink and white, one accent blue. */
+  --mz-ink: #0b1014;
+  --mz-panel: #f6f6f8;
+  --mz-line: #e6e7ec;
+  --mz-muted: #6e7180;
+  --mz-accent: #2c63ff;
+  /* Site map lights, the only colours besides ink, white and the accent. */
+  --site-red: #e5484d;
+  --site-orange: #f08c00;
+  --site-green: #30a46c;
+  --chart-1: oklch(0.585 0.233 277.117);
+  --chart-2: oklch(0.852 0.199 91.936);
+  --chart-3: oklch(0.667 0.295 322.15);
+  --chart-4: oklch(0.56 0.021 213.5);
+  --chart-5: oklch(0 0 0);
+  --chart-positive: oklch(0.696 0.17 162.48);
+  --chart-negative: oklch(0.637 0.237 25.331);
+  --chart-background: oklch(1 0 0);
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: oklch(0.55 0.014 260);
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: var(--popover);
+  --chart-tooltip-foreground: var(--popover-foreground);
+  --chart-tooltip-muted: var(--muted-foreground);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: oklch(0.45 0.01 260);
+  --chart-scale-mix: oklch(1 0 0);
+  --chart-scale-01: oklch(0.922 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(1 0 0);
+  --chart-indicator-color: oklch(0.21 0.006 285);
+  --chart-indicator-secondary-color: oklch(0.913 0 0);
+  --chart-marker-badge-background: oklch(0 0 0);
+  --chart-marker-badge-foreground: oklch(0.84 0 0);
+  --chart-segment-background: oklch(0.756 0 0 / 0.06);
+  --chart-segment-line: oklch(0.5 0 0 / 0.25);
 }
 
 @theme inline {
@@ -30,8 +78,61 @@
   --color-line: var(--line);
   --color-machine: var(--machine);
   --color-sensor: var(--sensor);
+  --color-mz-ink: var(--mz-ink);
+  --color-mz-panel: var(--mz-panel);
+  --color-mz-line: var(--mz-line);
+  --color-mz-muted: var(--mz-muted);
+  --color-mz-accent: var(--mz-accent);
+  --color-site-red: var(--site-red);
   --font-sans: var(--font-barlow);
+  --font-geist: var(--ff-geist);
+  --font-mono: var(--ff-mono);
   --font-cond: var(--font-barlow-cond);
+  --color-chart-line-primary: var(--chart-line-primary);
+  --color-chart-line-secondary: var(--chart-line-secondary);
+  --color-chart-brush-border: var(--chart-brush-border);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-segment-line: var(--chart-segment-line);
+  --color-chart-segment-background: var(--chart-segment-background);
+  --color-chart-marker-badge-foreground: var(--chart-marker-badge-foreground);
+  --color-chart-marker-badge-background: var(--chart-marker-badge-background);
+  --color-chart-indicator-secondary-color: var(--chart-indicator-secondary-color);
+  --color-chart-indicator-color: var(--chart-indicator-color);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --chart-scale-05: var(--chart-scale-05);
+  --chart-scale-04: var(--chart-scale-04);
+  --chart-scale-03: var(--chart-scale-03);
+  --chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-scale-mix: var(--chart-scale-mix);
+  --color-chart-label: var(--chart-label);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --chart-tooltip-muted: var(--chart-tooltip-muted);
+  --chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --chart-tooltip-background: var(--chart-tooltip-background);
+  --chart-brush-border: var(--chart-brush-border);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --chart-line-secondary: var(--chart-line-secondary);
+  --chart-line-primary: var(--chart-line-primary);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --color-chart-negative: var(--chart-negative);
+  --color-chart-positive: var(--chart-positive);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
 }
 
 html, body { height: 100%; }
@@ -81,3 +182,203 @@ input[type="range"] { accent-color: var(--ink); }
 .case-board .slab[data-on="false"] { opacity: 0; }
 .case-board .board-led { fill: var(--ik-line); }
 .case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
+
+/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame.
+   --g is the ink-to-white fade, 0 until p = 0.6 and 1 from p = 0.72. It is kept short because the middle of any
+   fade is mid grey, where no line colour reads well. PumpStage uses the same window for the pump's lines. */
+.welcome-stage {
+  --g: clamp(0, (var(--p) - 0.6) * 8.333, 1);
+  background: color-mix(in srgb, var(--mz-ink), white calc(var(--g) * 100%));
+}
+.welcome-grid {
+  opacity: calc(1 - var(--g));
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: center;
+}
+.welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
+.welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
+.welcome-label { color: color-mix(in srgb, rgb(255 255 255 / 0.6), var(--mz-muted) calc(var(--g) * 100%)); }
+.welcome-cue { opacity: calc(1 - var(--r) * 8); }
+/* The realistic engine room hands over to the line work between room 0.86 and 0.97. */
+.welcome-room { opacity: calc(1 - (var(--r) - 0.86) * 9); }
+.welcome-map {
+  opacity: calc((var(--p) - 0.74) * 6);
+  transform: translateX(calc((1 - clamp(0, (var(--p) - 0.7) * 5, 1)) * -40px));
+}
+
+/* Site map (part 2). The label "01" fades out as the map arrives, so only one section number shows. */
+.welcome-label { opacity: calc(1 - (var(--p) - 0.74) * 6); }
+.site-zone { fill: var(--mz-panel); stroke: var(--mz-line); }
+.site-zone-label { font-family: var(--ff-mono); font-size: 13px; letter-spacing: 0.14em; fill: var(--mz-muted); }
+.site-name { font-family: var(--ff-geist); font-size: 18px; font-weight: 500; fill: var(--mz-ink); }
+.site-pipe { stroke: var(--mz-ink); stroke-opacity: 0.35; stroke-width: 1.5; }
+.site-light { stroke: white; stroke-width: 2; transition: fill 250ms ease; }
+.site-halo { opacity: 0.16; transition: fill 250ms ease; }
+.site-light-empty { fill: white; stroke: var(--mz-muted); stroke-dasharray: 3 3; }
+.site-test .site-name { fill: var(--mz-muted); }
+.site-red { fill: var(--site-red); background: var(--site-red); }
+.site-orange { fill: var(--site-orange); background: var(--site-orange); }
+.site-green { fill: var(--site-green); background: var(--site-green); }
+.site-swatch-empty { border: 1px dashed var(--mz-muted); }
+.site-burst { fill: none; stroke-width: 2; animation: site-burst 900ms ease-out both; }
+.site-burst.site-red { stroke: var(--site-red); }
+.site-burst.site-orange { stroke: var(--site-orange); }
+.site-halo.site-red { animation: site-pulse 2.2s ease-in-out infinite; }
+@keyframes site-burst { from { r: 10px; opacity: 0.7; } to { r: 32px; opacity: 0; } }
+@keyframes site-pulse { 50% { opacity: 0.32; } }
+@media (prefers-reduced-motion: reduce) {
+  .site-burst { display: none; }
+  .site-halo.site-red { animation: none; }
+}
+
+/* Site map pumps are buttons (part 3). */
+.site-pump { cursor: pointer; outline: none; }
+.site-pump .site-hit { fill: transparent; }
+.site-pump:hover .site-name { text-decoration: underline; text-underline-offset: 3px; }
+.site-pump:focus-visible .site-hit { stroke: var(--mz-accent); stroke-width: 2; }
+.site-selected { fill: none; stroke: var(--mz-accent); stroke-width: 2; }
+
+/* Pump card: slides in from the right when a pump is picked. */
+.pump-card {
+  opacity: 0;
+  transform: translateX(32px);
+  pointer-events: none;
+  transition: opacity 220ms ease-out, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pump-card[data-open="true"] { opacity: 1; transform: none; pointer-events: auto; }
+/* Keyboard users see where focus went when the card opens. A mouse click shows no ring. */
+.pump-card:focus-visible { outline: 1.5px solid var(--mz-accent); outline-offset: -1px; }
+.card-sensor-flagged { background: var(--mz-accent); }
+.card-sensor-has { background: var(--mz-ink); }
+.card-sensor-missing { border: 1px dashed var(--mz-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .pump-card { transition: opacity 150ms linear; transform: none; }
+}
+
+.dark {
+  --chart-1: oklch(0.585 0.233 277.117);
+  --chart-2: oklch(0.852 0.199 91.936);
+  --chart-3: oklch(0.667 0.295 322.15);
+  --chart-4: oklch(0.56 0.021 213.5);
+  --chart-5: oklch(1 0 0);
+  --chart-positive: oklch(0.765 0.177 163.223);
+  --chart-negative: oklch(0.704 0.191 22.216);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-mix: oklch(0.25 0 0);
+  --chart-scale-01: oklch(0.3 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
+  --chart-indicator-color: oklch(1 0 0);
+  --chart-indicator-secondary-color: oklch(0.145 0 0);
+  --chart-marker-badge-background: oklch(1 0 0);
+  --chart-marker-badge-foreground: oklch(0.15 0 0);
+  --chart-segment-background: oklch(0.41 0.0127 248.14 / 0.25);
+  --chart-segment-line: oklch(1 0 0 / 0.25);
+}
+
+/* Charts on the landing page (bklit-ui): its tokens mapped to the landing page palette. */
+.welcome {
+  --chart-1: var(--mz-accent);
+  --chart-line-primary: var(--mz-accent);
+  --chart-grid: var(--mz-line);
+  --chart-label: var(--mz-muted);
+  --chart-foreground: var(--mz-ink);
+  --chart-foreground-muted: var(--mz-muted);
+  --chart-crosshair: var(--mz-ink);
+  --chart-indicator-color: var(--mz-ink);
+  --chart-background: white;
+  --chart-tooltip-background: white;
+  --chart-tooltip-foreground: var(--mz-ink);
+  --chart-tooltip-muted: var(--mz-muted);
+  --chart-marker-background: white;
+  --chart-marker-border: var(--mz-accent);
+  --chart-marker-foreground: var(--mz-accent);
+  --popover: white;
+  --popover-foreground: var(--mz-ink);
+  --muted-foreground: var(--mz-muted);
+  /* The expected band behind a reading. */
+  --welcome-band: rgb(11 16 20 / 0.07);
+  --welcome-band-edge: rgb(11 16 20 / 0.28);
+}
+
+/* Phones: the pump card is a sheet that slides up from the bottom. */
+@media (max-width: 767px) {
+  .pump-card { transform: translateY(40px); }
+  .pump-card[data-open="true"] { transform: none; }
+}
+
+/* Site map alternative 1: piping schematic. */
+.schem-pipe { stroke: var(--mz-ink); stroke-opacity: 0.5; stroke-width: 1.5; fill: none; }
+.schem-main { stroke-opacity: 0.7; stroke-width: 2.25; }
+.schem-arrowhead { fill: var(--mz-ink); fill-opacity: 0.7; }
+.schem-rule { stroke: var(--mz-line); }
+.schem-system { font: 500 14px var(--ff-geist); fill: var(--mz-ink); }
+.schem-name { font: 500 13.5px var(--ff-geist); fill: var(--mz-ink); }
+.schem-fault { font: 400 12px var(--ff-geist); fill: var(--mz-ink); }
+.schem-quiet { font: 400 12px var(--ff-geist); fill: var(--mz-muted); }
+.schem-mark { font: 700 13px var(--ff-geist); fill: white; pointer-events: none; }
+.schem-body { fill: white; stroke: var(--mz-ink); stroke-width: 1.75; transition: fill 250ms ease, stroke 250ms ease; }
+.schem-needs .schem-body { fill: var(--site-red); stroke: var(--site-red); }
+.schem-check .schem-body { fill: var(--site-orange); stroke: var(--site-orange); }
+.schem-needs .schem-fault { fill: #b4232a; }
+.schem-check .schem-fault { fill: #9a5300; }
+.schem-nodata .schem-body { stroke-dasharray: 3 3; stroke: var(--mz-muted); }
+.schem-nodata .schem-name { fill: var(--mz-muted); }
+.schem-selected { fill: none; stroke: var(--mz-accent); stroke-width: 2; }
+.schem-pump { cursor: pointer; outline: none; }
+.schem-pump .site-hit { fill: transparent; }
+.schem-pump:hover .site-hit { fill: var(--mz-panel); }
+.schem-pump:focus-visible .site-hit { stroke: var(--mz-accent); stroke-width: 2; }
+.schem-pump:hover .schem-name { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Site map alternative 2: alarm panel. A lit window flashes three times when it lights, as annunciators do. */
+.ann-window { cursor: pointer; min-height: 6.25rem; border: 1px solid var(--mz-line); border-radius: 8px; background: var(--mz-panel); color: var(--mz-muted); padding: 10px 11px; transition: background-color 250ms ease, border-color 250ms ease; }
+.ann-window:hover { border-color: rgb(11 16 20 / 0.35); }
+.ann-window:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
+.ann-selected { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
+.ann-wait, .ann-normal { background: white; color: var(--mz-ink); }
+.ann-wait .ann-status, .ann-normal .ann-status { color: var(--mz-muted); }
+.ann-nodata { border-style: dashed; background: transparent; }
+.ann-needs { background: #fdecec; border-color: var(--site-red); color: #5c1014; }
+.ann-check { background: #fff3e0; border-color: var(--site-orange); color: #4d2a00; }
+.ann-needs .ann-status::before, .ann-check .ann-status::before { content: none; }
+.ann-needs .ann-face, .ann-check .ann-face { animation: ann-flash 1.2s steps(1, end) 1; }
+@keyframes ann-flash { 0%, 33%, 66% { opacity: 0.35; } 16%, 50%, 83%, 100% { opacity: 1; } }
+
+/* Site map alternative 3: week timeline. */
+.tl-row { cursor: pointer; }
+.tl-row:hover, .tl-selected { background: var(--mz-panel); }
+.tl-row:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: -2px; }
+.tl-selected { box-shadow: inset 0 0 0 1px var(--mz-accent); }
+.tl-tick { background: var(--mz-ink); }
+.tl-now { background: var(--mz-accent); }
+.tl-nodata { background: transparent; border-top: 1px dashed var(--mz-muted); height: 0; }
+.tl-needs { background: var(--site-red); }
+.tl-check { background: var(--site-orange); }
+.tl-wait { background: #c7cad3; }
+.tl-normal { background: var(--site-green); }
+.tl-dot.tl-nodata { border: 1px dashed var(--mz-muted); }
+.tl-bar { opacity: 0.85; }
+@media (prefers-reduced-motion: reduce) {
+  .ann-needs .ann-face, .ann-check .ann-face { animation: none; }
+}
+
+/* The map switch shows with the map. */
+.welcome-mapswitch { opacity: calc((var(--p) - 0.8) * 6); }

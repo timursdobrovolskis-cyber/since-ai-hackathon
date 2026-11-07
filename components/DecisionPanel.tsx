@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { clock } from "@/lib/labels";
+import { timeOf } from "@/lib/labels";
 import { PLAIN, pumpName } from "@/lib/plain";
 import type { Case, Finding } from "@/lib/types";
 import { useApp } from "./AppProvider";
@@ -37,7 +37,7 @@ export function DecisionPanel({ item }: { item: Case }) {
               <dt className="text-ink-2">Looks like</dt><dd>{words?.short ?? item.faultType}</dd>
               <dt className="text-ink-2">Evidence</dt><dd>{item.latest.evidence.summary}</dd>
               <dt className="text-ink-2">To do</dt><dd>{words?.check ?? item.latest.recommended_action}</dd>
-              <dt className="text-ink-2">Accepted</dt><dd>{clock(decided.atHour)}</dd>
+              <dt className="text-ink-2">Accepted</dt><dd>{timeOf(decided.decidedAt)}</dd>
             </dl>
             <div className="mt-3 border-t border-line pt-3">
               <h3 className="font-medium">{decided.finding ? `You recorded: ${FINDINGS.find((f) => f.id === decided.finding)?.label}` : "After checking, what did you find?"}</h3>
@@ -50,8 +50,9 @@ export function DecisionPanel({ item }: { item: Case }) {
             </div>
           </>
         )}
-        {decided.kind === "rejected" && <p>You marked this as not a problem at {clock(decided.atHour)}. Reason: {decided.reason}.</p>}
-        {decided.kind === "watching" && <p>Reminder set. This comes back at {clock(decided.followUpHour ?? hour)}.</p>}
+        {decided.kind === "rejected" && <p>You marked this as not a problem. Reason: {decided.reason}.</p>}
+        {decided.kind === "watching" && <p>Reminder set for {(decided.followUpHour ?? hour) - hour} hours from now.</p>}
+        {decided.kind === "escalated" && <p>You escalated this to the duty engineer. It stays open until they decide.</p>}
         <Link href="/log" className="mt-2 inline-block text-[13px] underline underline-offset-2">See my decisions</Link>
       </section>
     );

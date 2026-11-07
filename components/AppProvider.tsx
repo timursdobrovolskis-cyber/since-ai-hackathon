@@ -1,39 +1,33 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { buildCases } from "@/lib/cases";
 import { loadAlerts, loadFleet, loadPump, loadTrackRecord } from "@/lib/data";
+import { SHIFT_HOUR } from "@/lib/labels";
 import type { TrackRecord } from "@/lib/trust";
 import type { Alert, Case, Decision, Finding, Fleet, PumpData } from "@/lib/types";
 
 const STORE_KEY = "retrofit-assist-decisions-v1";
-const WINDOW_HOURS = 168;
-
-export const SPEEDS = [
-  { label: "1 h/s", hoursPerSecond: 1 },
-  { label: "6 h/s", hoursPerSecond: 6 },
-  { label: "24 h/s", hoursPerSecond: 24 },
-];
 
 type App = {
   fleet: Fleet | null;
   pumps: Record<string, PumpData>;
   alertSource: string;
   error: string | null;
+  /** The fixed shift the app shows. Nothing later than this is on a live screen. */
   hour: number;
-  setHour: (hour: number) => void;
-  playing: boolean;
-  setPlaying: (playing: boolean) => void;
-  speed: number;
-  setSpeed: (hoursPerSecond: number) => void;
-  /** Cases known at the current replay hour. Nothing later than `hour` is in here. */
+  /** Cases known at `hour`. */
   cases: Case[];
+  /** Alerts raised at or before `hour`, for screens that step through the week up to the shift. */
+  alertsToShift: Alert[];
   decisions: Record<string, Decision>;
   decide: (decision: Omit<Decision, "decidedAt" | "atHour">) => void;
   recordFinding: (caseId: string, finding: Finding) => void;
   /** How often each named cause has been right. Totals only. */
   record: TrackRecord | undefined;
-  resetDemo: () => void;
+  clearDecisions: () => void;
+  /** Takes back one decision, for an undo straight after it was made. */
+  undoDecision: (caseId: string) => void;
 };
 
 const Ctx = createContext<App | null>(null);
@@ -51,11 +45,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [alertSource, setAlertSource] = useState("");
   const [record, setRecord] = useState<TrackRecord>();
   const [error, setError] = useState<string | null>(null);
-  const [hour, setHourRaw] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(SPEEDS[1].hoursPerSecond);
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
-  const hourRef = useRef(0);
 
   useEffect(() => {
     (async () => {
@@ -72,13 +62,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setError(e instanceof Error ? e.message : "The pump data could not be loaded.");
       }
     })();
-    // A link can open at a replay time, for example /cases/PUMP-08-A0001?h=90
-    const start = Number(new URLSearchParams(window.location.search).get("h"));
-    if (start > 0) {
-      hourRef.current = Math.min(WINDOW_HOURS, start);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL is only available after mount
-      setHourRaw(hourRef.current);
-    }
     try {
       const saved = localStorage.getItem(STORE_KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only available after mount
@@ -88,53 +71,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setHour = useCallback((next: number) => {
-    const clamped = Math.min(WINDOW_HOURS, Math.max(0, next));
-    hourRef.current = clamped;
-    setHourRaw(clamped);
-  }, []);
-
-  useEffect(() => {
-    if (!playing) return;
-    let frame = 0;
-    let last = performance.now();
-    const tick = (now: number) => {
-      const next = hourRef.current + ((now - last) / 1000) * speed;
-      last = now;
-      setHour(next);
-      if (next >= WINDOW_HOURS) {
-        setPlaying(false);
-        return;
-      }
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [playing, speed, setHour]);
-
   const save = (next: Record<string, Decision>) => {
     setDecisions(next);
     localStorage.setItem(STORE_KEY, JSON.stringify(next));
   };
 
   const decide: App["decide"] = (decision) => {
-    save({ ...decisions, [decision.caseId]: { ...decision, atHour: hourRef.current, decidedAt: new Date().toISOString() } });
+    save({ ...decisions, [decision.caseId]: { ...decision, atHour: SHIFT_HOUR, decidedAt: new Date().toISOString() } });
   };
 
   const recordFinding: App["recordFinding"] = (caseId, finding) => {
     save({ ...decisions, [caseId]: { ...decisions[caseId], finding } });
   };
 
-  const resetDemo = () => {
-    save({});
-    setPlaying(false);
-    setHour(0);
+  const clearDecisions = () => save({});
+
+  const undoDecision = (caseId: string) => {
+    const rest = { ...decisions };
+    delete rest[caseId];
+    save(rest);
   };
 
-  const cases = useMemo(() => buildCases(alerts, hour), [alerts, hour]);
+  const cases = useMemo(() => buildCases(alerts, SHIFT_HOUR), [alerts]);
+  const alertsToShift = useMemo(() => alerts.filter((a) => a.offset_hours <= SHIFT_HOUR), [alerts]);
 
   return (
-    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour, setHour, playing, setPlaying, speed, setSpeed, cases, decisions, decide, recordFinding, record, resetDemo }}>
+    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, alertsToShift, decisions, decide, recordFinding, record, clearDecisions, undoDecision }}>
       {children}
     </Ctx.Provider>
   );

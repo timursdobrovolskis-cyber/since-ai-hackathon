@@ -25,7 +25,7 @@ const colX = (i: number) => SHELF.x + COL.inset + i * COL.gap;
 
 type DrawingProps = { counts: number[]; filter: Filter; setFilter: (f: Filter) => void };
 
-// Memoised on its numbers: replay updates every frame, and redrawing dozens of boxes each frame would make it stutter.
+// Memoised on its numbers: redrawing dozens of boxes on every render is wasteful.
 const Drawing = memo(
   function Drawing({ counts, filter, setFilter }: DrawingProps) {
     const total = counts.reduce((a, b) => a + b, 0);
@@ -95,7 +95,7 @@ const Drawing = memo(
   (a, b) => a.filter === b.filter && a.counts.join() === b.counts.join(),
 );
 
-/** One column per day of the replay and one slab per case raised that day, so the week builds up as it plays. */
+/** One column per day and one slab per case raised that day. */
 export function CaseBoard() {
   const { cases } = useApp();
   const [filter, setFilter] = useState<Filter>("all");

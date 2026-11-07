@@ -60,7 +60,7 @@ const inWords = (hours: number) => {
   return n >= 48 ? `in about ${Math.round(hours / 24)} days` : `in about ${n} ${n === 1 ? "hour" : "hours"}`;
 };
 
-/** The next time the schedule gives a chance to stop. A published timetable, so it may read ahead of the replay time. */
+/** The next time the schedule gives a chance to stop. A published timetable, so it may read ahead of this shift. */
 export function nextStop(pump: PumpData | undefined, hour: number) {
   const stops = pump?.stops ?? [];
   const now = stops.find(([start, end]) => hour >= start && hour < end);
@@ -69,7 +69,7 @@ export function nextStop(pump: PumpData | undefined, hour: number) {
   return next ? `Next chance to stop: ${next[2]}, ${inWords(next[0] - hour)}.` : null;
 }
 
-/** "Strainer last cleaned 15 days ago: Light debris." from the newest record at or before the replay time. */
+/** "Strainer last cleaned 15 days ago: Light debris." from the newest record at or before this shift. */
 export function lastDone(pump: PumpData | undefined, workType: string | undefined, hour: number) {
   if (!pump || !workType) return null;
   const during = pump.maintenance.filter((m) => m.workType === workType && m.startHour <= hour).at(-1);

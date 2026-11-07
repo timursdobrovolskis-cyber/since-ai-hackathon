@@ -8,7 +8,7 @@ type Stored = { detector: string; items: Record<string, { text: string }> };
 
 /**
  * Plain-language explanation stored by tools/build_explanations.ts. Most alerts have none, so the panel stays hidden.
- * A case only holds alerts up to the replay time, so the newest match can never come from the future.
+ * A case only holds alerts up to this shift, so the newest match can never come from the future.
  */
 export function ExplanationPanel({ item }: { item: Case }) {
   const { alertSource } = useApp();

@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { Activity, Calculator, ChevronRight, ClipboardCheck, ClipboardList, Gauge, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useApp } from "@/components/AppProvider";
 import { HandoverPlayer } from "@/components/HandoverPlayer";
+import { KeyNumbers } from "@/components/KeyNumbers";
 import { CaseMark } from "@/components/Marks";
 import { TrustLine } from "@/components/ui/trust-line";
 import { plainAlert, pumpName } from "@/lib/plain";
@@ -41,6 +42,14 @@ function Group({ title, lines }: { title: string; lines: PumpLine[] }) {
   );
 }
 
+const MORE: { href: string; label: string; about: string; icon: LucideIcon }[] = [
+  { href: "/week", label: "Week overview", about: "All cases and pumps so far this week", icon: Gauge },
+  { href: "/log", label: "My decisions", about: "What you have recorded, with an export", icon: ClipboardList },
+  { href: "/review", label: "Review", about: "Alerts compared with what really happened", icon: ClipboardCheck },
+  { href: "/sensors", label: "Sensor levels", about: "What each sensor upgrade can see", icon: Activity },
+  { href: "/payback", label: "Payback", about: "Costs and savings, with your own numbers", icon: Calculator },
+];
+
 export default function TodayPage() {
   const { cases, decisions, hour, pumps, record } = useApp();
   const { today, readings, wait, done } = groupByPump(cases, decisions, hour, record, pumps);
@@ -55,7 +64,7 @@ export default function TodayPage() {
     <div className="mx-auto max-w-3xl space-y-4 p-4 sm:py-6">
       <header>
         <h1 className="font-cond text-3xl leading-tight font-semibold">{headline}</h1>
-        {!nothing && <p className="text-ink-2">One line per pump, newest first. Open a line for the job card.</p>}
+        {!nothing && <p className="text-ink-2">Evening shift. One line per pump, newest first. Open a line for the job card.</p>}
       </header>
       <HandoverPlayer />
       <Group title="Needs you today" lines={today} />
@@ -67,6 +76,21 @@ export default function TodayPage() {
         </details>
       )}
       {done > 0 && <p className="text-[13px] text-ink-3">{done} already handled. <Link href="/log" className="underline underline-offset-2">See my decisions</Link></p>}
+      <KeyNumbers />
+      <nav aria-label="More detail">
+        <h2 className="mb-1.5 font-cond text-xl font-semibold">More detail</h2>
+        <ul className="grid divide-y divide-line rounded-md border border-line bg-panel">
+          {MORE.map((m) => (
+            <li key={m.href}>
+              <Link href={m.href} className="flex min-h-11 items-center gap-3 px-4 py-2 hover:bg-raised">
+                <m.icon aria-hidden className="size-4 shrink-0 text-ink-2" />
+                <span className="min-w-0 flex-1"><span className="font-medium">{m.label}</span> <span className="text-[13px] text-ink-2">{m.about}</span></span>
+                <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }

@@ -1,25 +1,35 @@
-# Progress: useful-for-workers
+# Progress: welcome-landing
+
+Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona before the next.
 
 ## Done
 
-- Today shows one line per pump, with the most reliable concern first.
-- Each line shows how often that cause was right before, whether the signal is getting worse, and the next chance to stop.
-- The case screen is a job card: steps, what you'd expect to find, what to do if not, estimated time stopped and last done.
-- After "I'll check it", the worker records what they found. It appears in My decisions and the CSV.
-- Corrective work done since the alert moves a pump to Can wait, and says what was done.
-- Voice is tucked away. Handovers are re-recorded with the new rules.
+- Part 1: `/welcome`, styled after meuze.ai: ink and white, one accent blue, Geist and JetBrains Mono, no logo and no headline.
+- The page fades from ink to white as the pump glides right, and the pump's lines flip from white to ink at the fade's middle.
+- The pump is the team's downloaded model, turned into line work by `tools/build_pump_edges.mjs`. Scrolling zooms in, turns it half way round, then moves it into the right column.
+- Part 2: the site map. 12 pumps in four zones of one fictional site, with test pumps dimmed. Scrolling runs the clock from hour 0 to the evening shift, and the lights, alert count and plant alarm count change with it.
+- The lights come from `lib/sitemap.ts`, which reuses Today's grouping. Tests check the map agrees with Today at the shift and never sees a later alert.
+- Part 3: click or press Enter on a pump on the map. The 3D pump shrinks to the top of the right column, and a card slides in with the problem, how sure it is, the trend, the next stop, the 14 kinds of reading, and a link to the job card. Escape or the close button closes it and returns focus to the pump.
+- The page now opens in a detailed seawater pump room on a ferry, drawn as a technical line drawing by an edge shader: outlines and folds in white on ink, hidden lines removed. Scrolling walks in to Pump 8, the room dims away around it, and the same hidden-line Pump 8 zooms, turns and moves beside the map. The see-through drawing is gone.
+- Part 4: what needs you. All 7 concerns at the evening shift, pinned on wide screens with one per scroll step, each with its reading drawn against its expected band and its alerts marked.
+- Part 5: results as counting figures, and four cards for detection, early warning, sensor levels and payback, with bklit-ui charts. Every figure comes from the app's data.
+- The pump card names and lights up the area of the 3D pump the concern is about, and shows the last 12 hours of the reading.
+- A blue call to action into Today, the first job card and Review. Header links jump to each section.
+- Phones: one column, pump above the map, pump card as a bottom sheet, step list as a plain list.
+- The pump dashboard replaced the step list: every pump, and one report at a time with what's wrong, evidence, how sure, what to do and Acknowledge, Dismiss or Escalate. Results, cards and closing are set aside for now.
+- The pump turn is shorter: a quarter turn at the same pace.
+- Three site map alternatives to compare, with a switch under the map (`?map=schematic`, `panel`, `timeline`, `current`): a piping schematic, an alarm panel and a week timeline. Each names what is wrong and since when.
+- `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing.
+Nothing. Waiting for Jona to pick a site map alternative. Then remove the others and the switch, and fit the chosen one to phones.
 
 ## Next
 
-- Joonas at Elomatic checks the job cards and time estimates.
-- A person tests hold-to-talk and the app on a real phone.
-- Merge the PRs in order, then set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel before deploying.
-- After swapping in detector alerts, rerun `tools/build_ui_data.py --alerts` and `npm run handover`, because the track record and handovers change with the detector.
+- The team's detector alerts, then rebuild the data and check the evening shift still tells the story.
 
 ## Blockers
 
-- No detector file yet.
+- The pump model's source and licence are unknown. The branch was pushed on Jona's instruction, and the README marks the licence as unconfirmed.
+- This branch starts from PR 7 (`one-home-screen`), so PR 7 must merge into `dashboard` first.
