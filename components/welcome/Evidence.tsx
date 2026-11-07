@@ -4,7 +4,7 @@
 //   one plain sentence per reading the alert names, worked out from the recorded rows up to the shift (lib/drift.ts)
 //   one small chart per named reading, stacked on one time axis, each headed with its name, unit, value now and normal
 //   range, and a legend for the band, the reading and the alerts
-//   a reading pointed at or picked under "Readings now" adds one more chart below, with a button to remove it
+//   a reading clicked under "Readings now" opens its own chart under that row (ReadingChart), with a button to close it
 //   "Replay the warning" sweeps a cursor through every chart together, reading out each value against its band
 //   the detector's own words, in small print
 // Everything comes from the recorded readings and alerts up to the shift. Nothing is predicted.
@@ -31,9 +31,6 @@ type Props = {
   pump: PumpData;
   meta: Meta;
   shiftHour: number;
-  /** A reading to add below the named ones, pointed at or picked under "Readings now". */
-  extra: string | null;
-  onRemoveExtra: () => void;
 };
 
 /** The readings the alert names that this pump records, at most two, else the concern's own reading. */
@@ -99,7 +96,17 @@ function ChartBlock({ s, c, t, last, stacked, onRemove }: { s: Series; c: Concer
   );
 }
 
-export function Evidence({ c, alert, pump, meta, shiftHour, extra, onRemoveExtra }: Props) {
+/** The chart for one reading clicked under "Readings now", on the same window as the evidence charts. */
+export function ReadingChart({ c, pump, meta, shiftHour, channel, onRemove }: { c: Concern; pump: PumpData; meta: Meta; shiftHour: number; channel: string; onRemove: () => void }) {
+  const s = useMemo<Series>(() => {
+    const w = concernWindow(c.lead.first.offset_hours, shiftHour);
+    return { channel, label: meta[channel]?.label ?? channel, unit: meta[channel]?.unit ?? "", rows: signalRows(pump, channel, w.from, w.to, shiftHour), extra: true };
+  }, [c, pump, meta, shiftHour, channel]);
+  if (s.rows.length < 2) return <p className="py-2 text-[13px] text-mz-muted">No readings recorded for this in the alert window.</p>;
+  return <ChartBlock s={s} c={c} t={null} last stacked onRemove={onRemove} />;
+}
+
+export function Evidence({ c, alert, pump, meta, shiftHour }: Props) {
   const named = useMemo(() => namedChannels(alert, pump, c.channel), [alert, pump, c.channel]);
   const series = useMemo<Series[]>(() => {
     const w = concernWindow(c.lead.first.offset_hours, shiftHour);
@@ -110,10 +117,8 @@ export function Evidence({ c, alert, pump, meta, shiftHour, extra, onRemoveExtra
       rows: ch === c.channel ? c.rows : signalRows(pump, ch, w.from, w.to, shiftHour),
       extra: isExtra,
     });
-    const list = named.map((ch) => make(ch, false));
-    if (extra && !named.includes(extra) && pump.series[extra]) list.push(make(extra, true));
-    return list.filter((s) => s.rows.length > 1);
-  }, [named, extra, c, pump, meta, shiftHour]);
+    return named.map((ch) => make(ch, false)).filter((s) => s.rows.length > 1);
+  }, [named, c, pump, meta, shiftHour]);
   const sentences = useMemo(
     () => series.filter((s) => !s.extra).map((s) => describeDrift(s.rows, s.label, s.unit)?.sentence).filter(Boolean) as string[],
     [series],
@@ -171,7 +176,7 @@ export function Evidence({ c, alert, pump, meta, shiftHour, extra, onRemoveExtra
       </div>
 
       {series.map((s, i) => (
-        <ChartBlock key={s.channel} s={s} c={c} t={t} last={i === series.length - 1} stacked={series.length > 1} onRemove={s.extra ? onRemoveExtra : undefined} />
+        <ChartBlock key={s.channel} s={s} c={c} t={t} last={i === series.length - 1} stacked={series.length > 1} />
       ))}
 
       <ul aria-label="Chart key" className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-mz-muted">

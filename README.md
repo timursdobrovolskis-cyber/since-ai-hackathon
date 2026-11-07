@@ -1,4 +1,4 @@
-# Retrofit Assist
+# Vahti
 
 Early, explainable warnings for existing cooling-water pumps, with a human deciding every action.
 

@@ -488,7 +488,12 @@ def main():
                                      "rightCauseAlarms": round(plant["fault_type_recall"] * plant["events_scored"]),
                                      "withLimit": len(limited),
                                      "beforeLimit": sum(1 for r in limited if before(r["leadHours"])),
-                                     "beforeLimitAlarms": sum(1 for r in limited if before(r["plantLeadHours"]))})
+                                     "beforeLimitAlarms": sum(1 for r in limited if before(r["plantLeadHours"])),
+                                     # Pump or sensor: sensor faults caught and named as sensor faults (no pump opened for
+                                     # nothing), and sensor faults wrongly sent to the pump as a machine fault.
+                                     "sensorFaults": sum(1 for r in rows if r["eventClass"] == "SENSOR"),
+                                     "sensorAsSensor": sum(1 for r in rows if r["eventClass"] == "SENSOR" and r["detected"] and r["classCorrect"]),
+                                     "sensorAsMachine": sum(1 for r in rows if r["eventClass"] == "SENSOR" and r["detected"] and not r["classCorrect"])})
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
     print(f"{len(sizes)} files, {sum(s for s, _ in sizes) / 1e6:.1f} MB total, largest {sizes[0][0] / 1e3:.0f} kB ({sizes[0][1]})")

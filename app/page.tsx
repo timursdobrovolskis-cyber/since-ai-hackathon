@@ -16,7 +16,9 @@ import { RoomStage } from "@/components/welcome/RoomStage";
 import { AlarmPanel } from "@/components/welcome/AlarmPanel";
 import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
+import { CrewValue } from "@/components/welcome/CrewValue";
 import { ProgressFrame, ProgressRail, useProgress } from "@/components/welcome/ScrollProgress";
+import { Logo } from "@/components/Logo";
 import { TopBar, type Place } from "@/components/welcome/TopBar";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
@@ -89,7 +91,9 @@ export default function Welcome() {
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
       <section ref={track} aria-label="Engine room and site map" className="relative h-[440vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
-        <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
+        {/* z-20 lifts the stage, and the pump card fixed inside it, above the phone alarm panel that follows it. Without
+            it, faded parts of that panel (filter counts, dimmed windows) paint over the card. */}
+        <div className="welcome-stage sticky top-0 z-20 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}
           <RoomStage phases={phases} />
@@ -100,6 +104,14 @@ export default function Welcome() {
 
 
           <ProgressFrame />
+          {/* The Vahti logo, just inside the frame's top-left corner: white on the engine room, ink once the stage turns
+              white. It scrolls away with the stage. On a phone the pump moves up into this corner beside the map, so
+              the logo fades out then. */}
+          <div
+            className={`welcome-logo pointer-events-none absolute top-20 left-4 p-5 transition-[color,opacity] duration-500 sm:left-10 sm:p-6 ${tone === "ink" ? "text-white" : "text-mz-ink"} ${compact && light ? "opacity-0" : ""}`}
+          >
+            <Logo className="h-[24px] w-auto sm:h-[30px]" />
+          </div>
           <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
 
@@ -119,10 +131,11 @@ export default function Welcome() {
         </section>
       )}
       <Results />
+      <CrewValue />
       {/* The retrofit cards and the closing call to action (MetricCards.tsx, Closing.tsx) are set aside for now. */}
       <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
         Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
-        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The engine room is an illustration, and the vessel and plant names are fictional.
+        RETROFIT AI 2026 benchmark, with alerts from the team&rsquo;s detector. The engine room is an illustration, and the vessel and plant names are fictional.
       </footer>
     </div>
   );

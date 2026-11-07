@@ -1,0 +1,109 @@
+{
+ "priceEurKwh": 0.15,
+ "uptoHour": 66,
+ "pumps": [
+  {
+   "id": "PUMP-06",
+   "method": "pump curve, from pressures",
+   "tier": "T1_RETROFIT",
+   "bepShare": 0.84,
+   "efficiencyVsBest": 0.97,
+   "powerKw": 9.7,
+   "wasteKw": 0.7,
+   "eurYear": 680.0,
+   "runningShare": 0.69,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-01",
+   "method": "pump curve, from pressures",
+   "tier": "T1_RETROFIT",
+   "bepShare": 0.83,
+   "efficiencyVsBest": 0.97,
+   "powerKw": 10.7,
+   "wasteKw": 0.4,
+   "eurYear": 470.0,
+   "runningShare": 0.97,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-02",
+   "method": "flow meter",
+   "tier": "T2_FULL",
+   "bepShare": 0.8,
+   "efficiencyVsBest": 0.96,
+   "powerKw": 7.3,
+   "wasteKw": 0.3,
+   "eurYear": 380.0,
+   "runningShare": 1.0,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-07",
+   "method": "flow meter",
+   "tier": "T2_FULL",
+   "bepShare": 0.87,
+   "efficiencyVsBest": 0.98,
+   "powerKw": 13.3,
+   "wasteKw": 0.2,
+   "eurYear": 220.0,
+   "runningShare": 0.72,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-08",
+   "method": "pump curve, from pressures",
+   "tier": "T1_RETROFIT",
+   "bepShare": 0.89,
+   "efficiencyVsBest": 0.99,
+   "powerKw": 13.0,
+   "wasteKw": 0.2,
+   "eurYear": 200.0,
+   "runningShare": 0.9,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-04",
+   "method": "flow meter",
+   "tier": "T2_FULL",
+   "bepShare": 1.0,
+   "efficiencyVsBest": 1.0,
+   "powerKw": 28.7,
+   "wasteKw": 0.1,
+   "eurYear": 190.0,
+   "runningShare": 1.0,
+   "throttled": false,
+   "valvePct": 87.0
+  },
+  {
+   "id": "PUMP-09",
+   "method": "flow meter",
+   "tier": "T2_FULL",
+   "bepShare": 0.97,
+   "efficiencyVsBest": 1.0,
+   "powerKw": 36.9,
+   "wasteKw": 0.0,
+   "eurYear": 40.0,
+   "runningShare": 0.92,
+   "throttled": false,
+   "valvePct": null
+  },
+  {
+   "id": "PUMP-03",
+   "method": null,
+   "tier": "T0_LEGACY",
+   "note": "Measures neither flow nor both pressures, so it cannot be placed on its curve. A suction pressure sensor would fix that."
+  },
+  {
+   "id": "PUMP-05",
+   "method": null,
+   "tier": "T0_LEGACY",
+   "note": "Measures neither flow nor both pressures, so it cannot be placed on its curve. A suction pressure sensor would fix that."
+  }
+ ]
+}

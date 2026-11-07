@@ -27,8 +27,27 @@ export type KeyNumbers = {
   withLimit: number;
   beforeLimit: number;
   beforeLimitAlarms: number;
+  /** Pump or sensor: labelled sensor faults, those caught and named a sensor fault, and those sent to the pump instead. */
+  sensorFaults?: number;
+  sensorAsSensor?: number;
+  sensorAsMachine?: number;
 };
 export const loadKeyNumbers = () => json<KeyNumbers>("/data/key-numbers.json");
+
+/** Energy watch, from tools/build_energy.py: each live pump against its best efficiency point, up to the shift. */
+export type EnergyPump = {
+  id: string;
+  method: string | null;
+  tier: string;
+  note?: string;
+  bepShare?: number;
+  efficiencyVsBest?: number;
+  powerKw?: number;
+  wasteKw?: number;
+  eurYear?: number;
+  throttled?: boolean;
+};
+export const loadEnergy = () => json<{ priceEurKwh: number; uptoHour: number; pumps: EnergyPump[] }>("/data/energy.json");
 export const loadTrackRecord = () => json<{ source: string; causes: TrackRecord }>("/data/track-record.json");
 
 // Labelled events live in public/data/review. Only the Review view may fetch them.

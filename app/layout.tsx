@@ -8,7 +8,7 @@ const geist = Geist({ subsets: ["latin"], weight: ["300", "400", "500"], variabl
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--ff-mono" });
 
 export const metadata: Metadata = {
-  title: "Pump alerts",
+  title: "Vahti",
   description: "Early, explainable warnings for existing cooling-water pumps. Advisory only, on simulated data.",
 };
 

@@ -39,6 +39,14 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Every shape is square: buttons, filter, cards, panel windows, tags, legend keys, the chart's tooltip ring and alert markers. Buttons give press feedback on pointer-down.
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
+- The project is named Vahti: in the top bar, the tab title, the README and package.json.
+- The Vahti logo (ring and wordmark), redrawn as a vector in `components/Logo.tsx` from the team's artwork, sits just inside the stage frame's top-left corner: white on the engine room, ink once the stage turns white. On phones it fades out when the pump moves up into that corner. The top bar has the section links only. The ring is the tab icon (`app/icon.svg`, replacing the old triangle).
+- `crew-decisions` is merged in: the team detector's v4 alerts, the pump card's time to act and cost of waiting, and the "What it saves the crew" section. Its labels were restyled to the site's headings (no numbered mono caps, no "·").
+- Phone card: the top part is about 120 px shorter, so Acknowledge, Dismiss and Escalate and the evidence button fit with the alarm panel showing above. On phones only: one header line (the panel gives the shift), a shorter How sure line without the detector score, the first-alert line moved to Evidence, no "Waiting risks" (it is in the cost table), and tighter spacing.
+- Readings now no longer adds a chart when you point at a reading. That moved the list under the pointer and made it jump back and forth. Clicking a reading opens its chart right under that row, and the clicked row stays where it is.
+- On phones the pump card sheet now paints above the alarm panel behind it. Before, the filter counts showed through the top of the sheet.
+- `dashboard` is merged in: the detector's "Why", sensor check and "To settle it" on the pump card, and the causes it weighed under How sure. The detector's Why and sensor check sit at the top of Evidence on every size, and To settle it moves there on phones, so the review buttons stay in view on every pump.
+
 ## In progress
 
 Nothing. Next: Jona's answers on more interactivity.
@@ -46,6 +54,7 @@ Nothing. Next: Jona's answers on more interactivity.
 ## Next
 
 - The team's detector alerts, then rebuild the data and check the evening shift still tells the story.
+
 
 ## Blockers
 
@@ -180,3 +189,24 @@ check on the spot). The case page shows a "Why this alert" block with these, rig
 with the explanation in view. Checked in the browser on PUMP-08's strainer case at replay hour 90.
 
 ## Done = beats B1 on train + validation combined (84.4 vs 63.4), is causal, and the app runs with our alerts.
+
+---
+
+# Crew decisions (branch `crew-decisions`, criterion A)
+
+Built on `dashboard` with `detector` merged in; app data rebuilt from the team detector (v4).
+
+- **Pump or sensor?** `key-numbers.json` gains `sensorFaults`, `sensorAsSensor`, `sensorAsMachine` (totals only). New
+  section "What it saves the crew" (`components/welcome/CrewValue.tsx`): 10 of 12 sensor faults sent to the sensor,
+  0 sent to the pump, at least €45,000 of needless pump stops avoided (3 h planned stop at €1,500/h, organizers').
+- **Energy watch.** `tools/build_energy.py` → `public/data/energy.json`: each live pump against its datasheet best
+  efficiency point up to the shift. Honest result: all run near their best point (under €680/yr lost per pump at an
+  assumed €0.15/kWh). Fixed-speed and valve-throttled pumps listed as speed-control candidates; legacy pumps 3 and 5
+  can't be placed on their curve without a suction pressure sensor.
+- **Time to act.** Pump card section between "What to do" and the review (`lib/timetoact.ts`): one decision from the
+  trend and the next stop, plus the cost of waiting (planned €8,500 vs breakdown €24,000, organizers' figures). Sensor
+  faults say "check the sensor first, no need to open the pump". No "hours to limit" figure: the data has no alarm
+  limit per reading.
+- Fix: `trendOf` now takes the concern's reading, so the trend works with the team detector's alerts.
+
+Checks: typecheck clean, 60 tests pass, checked in the browser at 1440x900 (Pump 4 machine fault, Pump 5 sensor fault).

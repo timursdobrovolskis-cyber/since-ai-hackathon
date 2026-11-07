@@ -1,6 +1,6 @@
 "use client";
 
-// The bar across the top of the site. It is always a solid bar, so the drawing and the sections never run under its
+// The bar across the top of the site. The Vahti logo sits in the stage's frame instead (app/page.tsx). It is always a solid bar, so the drawing and the sections never run under its
 // words: ink over the engine room, white once the stage has faded to white and over the sections below. The section
 // you are in is marked, and on wider screens the right side says how many pumps need you at the shift, from the same
 // site state as the alarm panel, and jumps there.
