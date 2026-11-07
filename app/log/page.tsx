@@ -1,10 +1,11 @@
 "use client";
 
 import { useApp } from "@/components/AppProvider";
-import { clock, faultLabel } from "@/lib/labels";
+import { clock } from "@/lib/labels";
+import { PLAIN, pumpName } from "@/lib/plain";
 import type { Decision } from "@/lib/types";
 
-const KIND: Record<Decision["kind"], string> = { approved: "Inspection approved", rejected: "Rejected", watching: "Keeping watch" };
+const KIND: Record<Decision["kind"], string> = { approved: "I'll check it", rejected: "Not a problem", watching: "Remind me later" };
 
 export default function LogPage() {
   const { decisions } = useApp();
@@ -23,7 +24,7 @@ export default function LogPage() {
   return (
     <div className="mx-auto max-w-4xl p-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-cond text-2xl font-semibold">Decision log</h1>
+        <h1 className="font-cond text-2xl font-semibold">My decisions</h1>
         <button type="button" disabled={rows.length === 0} onClick={exportCsv} className="min-h-9 border border-line bg-raised px-3 text-[13px] disabled:opacity-50">
           Export CSV
         </button>
@@ -37,7 +38,7 @@ export default function LogPage() {
             <tr className="border-b border-line">
               <th className="py-1 font-medium">Replay time</th>
               <th className="py-1 font-medium">Pump</th>
-              <th className="py-1 font-medium">Suspected cause</th>
+              <th className="py-1 font-medium">What it looked like</th>
               <th className="py-1 font-medium">Decision</th>
               <th className="py-1 font-medium">Detail</th>
             </tr>
@@ -46,8 +47,8 @@ export default function LogPage() {
             {rows.map((r) => (
               <tr key={r.caseId} className="border-b" style={{ borderColor: "var(--line-soft)" }}>
                 <td className="py-1">{clock(r.atHour)}</td>
-                <td className="py-1">{r.assetId}</td>
-                <td className="py-1">{faultLabel(r.faultType)}</td>
+                <td className="py-1">{pumpName(r.assetId)}</td>
+                <td className="py-1">{PLAIN[r.faultType]?.short ?? r.faultType}</td>
                 <td className="py-1">{KIND[r.kind]}</td>
                 <td className="py-1">{r.reason ?? (r.followUpHour !== undefined ? `Look again at ${clock(r.followUpHour)}` : "Draft work order")}</td>
               </tr>

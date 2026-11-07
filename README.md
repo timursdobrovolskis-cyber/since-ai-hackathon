@@ -49,7 +49,8 @@ Cases, lead times, the Review view and payback all update with no code change. S
 - The app replays each pump's week. All pumps are aligned to Day 1, because each pump's real 7-day window comes from a different month.
 - Live screens only draw data up to the replay time. Labelled faults are kept in `public/data/review`, and only the Review view may load them.
 - Repeat alerts merge into one case, and a person approves, rejects or keeps watching.
-- The fleet overview shows only live pump data at the replay time: open cases, pumps flagged, cases per day and recent activity. `npm test` checks that it holds nothing from the future.
+- Workers start on Today: a short list in plain words, grouped into Needs you today, Check the reading and Can wait. The wording is hand-written per fault type in `lib/plain.ts`, and the list rule in `lib/today.ts` means newest first, not true urgency.
+- The week overview shows only live pump data at the replay time: open cases, pumps flagged, cases per day and recent activity. `npm test` checks that it holds nothing from the future.
 - The Review view scores alerts with the organizers' scorer, and the data build stops if their published baseline scores do not reproduce.
 - The sensor comparison counts a fault as visible at a level when that level has a channel that carried the fault's earliest evidence. It comes from the labels, not a detector, because B1 cannot use wireless channels and its scoring credits unrelated alerts on long faults. Hardware totals come from the organizers' feasibility document, and the low-cost retrofit total is our own sum of its parts.
 - The payback calculator ports the organizers' business case, and `npm test` checks it against their published figures. It defaults to results from all labelled pumps. Their worked example uses only the 2 validation pumps, which gives a shorter payback. Results are illustrative, not a realised or expected saving.
