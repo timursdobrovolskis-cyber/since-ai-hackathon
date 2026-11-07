@@ -331,3 +331,11 @@ input[type="range"] { accent-color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .ann-needs .ann-face, .ann-check .ann-face { animation: none; }
 }
+
+/* The 3D pump flickers out when a pump card opens, like a display losing its picture, and fades back when it closes. */
+.pump-stage { transition: opacity 260ms ease-out; }
+.pump-stage[data-gone="true"] { opacity: 0; animation: pump-flicker 420ms steps(1, end) 1; }
+@keyframes pump-flicker { 0% { opacity: 1; } 14% { opacity: 0.25; } 28% { opacity: 0.9; } 42% { opacity: 0.1; } 60% { opacity: 0.55; } 78%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pump-stage[data-gone="true"] { animation: none; }
+}

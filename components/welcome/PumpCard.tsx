@@ -1,45 +1,65 @@
 "use client";
 
-// Part 3 of .plans/welcome-landing-spec.md: the small dashboard for the pump picked on the site map. It shows the
-// same moment as the map, so as you scroll the week on, the card changes with it. Wording comes from Today.
-// It names the area of the pump the concern is about, which also glows on the 3D pump, and shows the last 12 hours of the
-// reading behind it. On phones it opens as a sheet from the bottom.
-import { ArrowRight, X } from "lucide-react";
+// The pump card: opens from the alarm panel in place of the 3D pump, which flickers away. Everything on it comes from
+// the data, as the evening shift stands:
+//   the pump and its running state now (stateRuns), what the alert says is wrong and since when, the evidence (the
+//   alert's summary and readings, and the reading against its normal band), every reading now against its band, how
+//   sure (past record, and the detector's score with its calibration), the detector's recommended action and the next
+//   stop, the latest work from the maintenance log, and the readings this pump cannot measure.
+// The fault names come from the app's labels for each fault type. Nothing here is an estimate of ours.
+// On phones it opens as a sheet from the bottom.
+import { Cog, Gauge, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
-import { LineSparkline } from "@/components/charts/sparkline";
 import { useApp } from "@/components/AppProvider";
-import { ago, clock } from "@/lib/labels";
-import { plainAlert, pumpName } from "@/lib/plain";
-import { AMBIENT, TEST_PUMPS, type SiteState } from "@/lib/sitemap";
-import { nextStop, trendOf } from "@/lib/worker";
+import { stateAt } from "@/lib/cases";
+import { clock, faultLabel } from "@/lib/labels";
+import { PLAIN, pumpName } from "@/lib/plain";
+import { TEST_PUMPS, type SiteState } from "@/lib/sitemap";
+import type { MaintenanceNote, PumpData } from "@/lib/types";
+import { lastDone } from "@/lib/worker";
 import { useConcern } from "./concerns";
 import { LIGHT_WORDS } from "./mapParts";
+import { SignalChart } from "./SignalChart";
 
-type Reading = { id: string; label: string; state: "flagged" | "has" | "missing" };
+const RUNNING: Record<string, string> = { RUNNING: "Running", STOPPED: "Stopped", LOCKED_OUT: "Locked out", STOPPING: "Stopping", NO_DATA: "No data arriving" };
 
-function Sensors({ readings }: { readings: Reading[] }) {
-  const has = readings.filter((r) => r.state !== "missing").length;
+const num = (v: number) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2));
+const ago = (h: number) => (h < 36 ? `${Math.max(1, Math.round(h))} h ago` : `${Math.round(h / 24)} days ago`);
+const words = (s: string) => s.charAt(0) + s.slice(1).replaceAll("_", " ").toLowerCase();
+
+type Now = { channel: string; label: string; unit: string; value: number; lo: number | null; hi: number | null; state: "below" | "above" | "normal" | "noband" };
+
+/** Each reading's latest value at or before `hour`, against its normal band at that moment. */
+function readingsAt(pump: PumpData, meta: Record<string, { label: string; unit?: string }>, hour: number): Now[] {
+  const last = Math.floor((hour * 60) / pump.stepMinutes);
+  return pump.channels
+    .map((ch) => {
+      const s = pump.series[ch];
+      if (!s) return null;
+      let i = Math.min(last, s.obs.length - 1);
+      while (i >= 0 && (s.obs[i] === null || s.obs[i] === undefined)) i--;
+      if (i < 0) return null;
+      const value = s.obs[i] as number;
+      const lo = s.lo?.[i] ?? null;
+      const hi = s.hi?.[i] ?? null;
+      const state: Now["state"] = lo === null || hi === null ? "noband" : value < lo ? "below" : value > hi ? "above" : "normal";
+      return { channel: ch, label: meta[ch]?.label ?? ch, unit: meta[ch]?.unit ?? "", value, lo, hi, state };
+    })
+    .filter((r): r is Now => r !== null);
+}
+
+/** The newest entry in the maintenance log at or before `hour`, from this week or before it. */
+function latestWork(pump: PumpData, hour: number): MaintenanceNote | null {
+  return [...pump.history, ...pump.maintenance].filter((m) => m.startHour <= hour).sort((a, b) => b.startHour - a.startHour)[0] ?? null;
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
-        Measures {has} of {readings.length} kinds of reading
-      </p>
-      <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-[12.5px] lg:grid-cols-3">
-        {readings.map((r) => (
-          <li key={r.id} className={`flex items-center gap-1.5 ${r.state === "missing" ? "text-mz-muted line-through decoration-mz-muted/50" : ""}`}>
-            <span aria-hidden className={`card-sensor card-sensor-${r.state} size-2 shrink-0`} />
-            <span className="truncate">{r.label}</span>
-            <span className="sr-only">{r.state === "flagged" ? ", behind this alert" : r.state === "missing" ? ", cannot measure" : ""}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-2 flex flex-wrap gap-x-4 font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
-        <span className="flex items-center gap-1.5"><span aria-hidden className="card-sensor card-sensor-flagged size-2" />Behind this alert</span>
-        <span className="flex items-center gap-1.5"><span aria-hidden className="card-sensor card-sensor-has size-2" />Measured</span>
-        <span className="flex items-center gap-1.5"><span aria-hidden className="card-sensor card-sensor-missing size-2" />Cannot measure</span>
-      </p>
-    </div>
+    <section className="border-t border-mz-line py-4">
+      <h3 className="mb-1.5 text-[13px] text-mz-muted">{title}</h3>
+      {children}
+    </section>
   );
 }
 
@@ -47,14 +67,12 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const { fleet, pumps, record } = useApp();
   const cardRef = useRef<HTMLElement>(null);
 
-  // Move focus to the card itself when it opens, so a mouse click draws no focus ring, and let Escape close it.
-  // Closing hands focus back to the pump on the map.
+  // Focus moves to the card when it opens, and Escape closes it. Closing hands focus back to the pump's window.
   const close = () => {
     const from = id;
     onClose();
-    // The map has a desktop and a phone version, so return focus to the one on screen.
     requestAnimationFrame(() =>
-      [...document.querySelectorAll<HTMLElement | SVGElement>(`[data-pump="${from}"]`)].find((n) => n.getClientRects().length > 0)?.focus(),
+      [...document.querySelectorAll<HTMLElement>(`[data-pump="${from}"]`)].find((n) => n.getClientRects().length > 0)?.focus(),
     );
   };
   const closeRef = useRef(close);
@@ -73,28 +91,18 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const meta = id ? fleet?.pumps.find((p) => p.id === id) : undefined;
   const pump = id ? pumps[id] : undefined;
   const light = id ? site.lights[id] : "none";
-  const line = id ? site.lines[id] : undefined;
-  const lead = line?.lead;
-  const concern = lead && (light === "red" || light === "orange");
-  const words = lead ? plainAlert(lead.latest, fleet?.channelMeta ?? {}, record) : null;
-  const trend = concern ? trendOf(lead.latest, pump, site.hour) : null;
-  const stop = concern ? nextStop(pump, site.hour) : null;
-
-  const detail = useConcern(site, concern ? id : null);
-  // The last 12 hours of the reading behind the alert, ending at the hour the map shows.
-  const recent = useMemo(() => (detail ? detail.rows.filter((r) => r.hour >= site.hour - 12) : []), [detail, site.hour]);
-  const flagged = new Set(concern ? lead.latest.evidence?.channels?.map((c) => c.channel) ?? [] : []);
-  if (detail?.channel) flagged.add(detail.channel);
-  const readings: Reading[] = pump
-    ? [
-        ...Object.entries(fleet?.channelMeta ?? {}).map(([ch, m]) => ({
-          id: ch,
-          label: m.label,
-          state: (flagged.has(ch) ? "flagged" : pump.channels.includes(ch) ? "has" : "missing") as Reading["state"],
-        })),
-        { ...AMBIENT, state: "has" as const },
-      ]
-    : [];
+  const c = useConcern(site, id && (light === "red" || light === "orange") ? id : null);
+  const waiting = id ? site.lines[id] : undefined;
+  const channelMeta = fleet?.channelMeta ?? {};
+  const now = useMemo(() => (pump ? readingsAt(pump, channelMeta, site.hour) : []), [pump, channelMeta, site.hour]);
+  const running = pump ? stateAt(pump, site.hour) : null;
+  const alert = c?.lead.latest;
+  const evidence = alert?.evidence?.channels?.find((x) => x.observed !== null && x.expected !== null);
+  const cannot = pump ? Object.keys(channelMeta).filter((ch) => !pump.channels.includes(ch)).map((ch) => channelMeta[ch].label.toLowerCase()) : [];
+  const related = c && pump ? lastDone(pump, PLAIN[c.lead.faultType]?.lastWork, site.hour) : null;
+  const work = pump ? latestWork(pump, site.hour) : null;
+  const sensor = c?.lead.eventClass === "SENSOR";
+  const out = now.filter((r) => r.state === "below" || r.state === "above").length;
 
   return (
     <aside
@@ -104,103 +112,144 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
       aria-hidden={!open}
       inert={!open}
       data-open={open}
-      className="pump-card fixed inset-x-0 bottom-0 z-40 max-h-[80svh] overflow-y-auto rounded-t-2xl border border-mz-line bg-white p-5 shadow-[0_-12px_40px_-16px_rgb(11_16_20/0.35)] outline-none md:absolute md:inset-x-auto md:top-[31svh] md:right-10 md:bottom-auto md:left-1/2 md:z-auto md:ml-6 md:max-h-[calc(69svh-96px)] md:rounded-none md:shadow-[0_24px_48px_-24px_rgb(11_16_20/0.25)]"
+      className="pump-card fixed inset-x-0 bottom-0 z-40 max-h-[82svh] overflow-y-auto rounded-t-2xl bg-white px-5 pt-5 pb-2 shadow-[0_-12px_40px_-16px_rgb(11_16_20/0.35)] outline-none md:absolute md:inset-x-auto md:top-24 md:right-10 md:bottom-24 md:left-1/2 md:z-auto md:ml-8 md:max-h-none md:rounded-xl md:shadow-[0_0_0_1px_var(--mz-line),0_24px_48px_-28px_rgb(11_16_20/0.3)]"
     >
       {id && (
         <>
-          <div className="flex items-start gap-3">
+          <header className="flex items-start gap-3 pb-4">
             <div className="min-w-0 flex-1">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-mz-muted">
-                Pump detail &middot; {clock(site.hour)}
-              </p>
-              <h2 className="mt-1 flex items-center gap-2 text-[22px] leading-tight font-medium tracking-[-0.02em]">
+              <h2 className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[26px] leading-tight font-normal tracking-[-0.025em]">
                 {pumpName(id)}
-                <span className="flex items-center gap-1.5 font-mono text-[10px] font-normal uppercase tracking-[0.14em] text-mz-muted">
-                  <span aria-hidden className={`site-swatch size-2 ${light === "none" ? "site-swatch-empty" : `site-${light}`}`} />
-                  {LIGHT_WORDS[light]}
+                <span className="flex items-center gap-1.5 text-[13px] tracking-normal text-mz-muted">
+                  <span aria-hidden className={`size-2 rounded-full ${light === "none" ? "site-swatch-empty" : `site-${light}`}`} />
+                  {LIGHT_WORDS[light].charAt(0).toUpperCase() + LIGHT_WORDS[light].slice(1)}
                 </span>
               </h2>
-              {meta && <p className="mt-0.5 truncate text-[13px] text-mz-muted">{meta.system} &middot; {meta.site}</p>}
+              {meta && (
+                <p className="mt-1 text-[14px] text-mz-muted">
+                  {meta.system}, {meta.site.replace(" (fictional)", "")}. {clock(site.hour)}.
+                </p>
+              )}
             </div>
             <button
               type="button"
               onClick={close}
-              aria-label="Close details"
-              className="-mt-1 -mr-1 inline-flex size-9 shrink-0 items-center justify-center text-mz-muted hover:text-mz-ink focus-visible:outline-2 focus-visible:outline-mz-accent"
+              aria-label="Close and show the pump"
+              className="-mt-1 -mr-1 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-mz-muted hover:bg-mz-panel hover:text-mz-ink focus-visible:outline-2 focus-visible:outline-mz-accent"
             >
               <X aria-hidden className="size-4" />
             </button>
-          </div>
+          </header>
 
           {TEST_PUMPS.has(id) ? (
-            <p className="mt-4 text-[15px] leading-snug text-mz-muted">
-              This is a test pump. The organizers hold its answers, so the app shows no data for it until the submission is frozen.
-            </p>
+            <Section title="Data">
+              <p className="text-[15px] leading-snug">This is a test pump. The organizers hold its answers, so the app shows no data for it until the submission is frozen.</p>
+            </Section>
           ) : (
             <>
-              <div className="mt-4 border-t border-mz-line pt-4">
-                {concern && words ? (
+              <Section title="State now">
+                <p className="text-[16px]">
+                  {running ? RUNNING[running] ?? words(running) : "Unknown"}
+                  <span className="text-mz-muted">
+                    {" "}
+                    with {out === 0 ? "every reading inside its normal band" : `${out} ${out === 1 ? "reading" : "readings"} outside the normal band`}.
+                  </span>
+                </p>
+              </Section>
+
+              <Section title="What's wrong">
+                {c && alert ? (
                   <>
-                    <p className="text-[17px] leading-snug">{words.what}</p>
-                    <p className="mt-1 text-[15px] leading-snug text-mz-muted">
-                      {words.check}
-                      {line.others.length > 0 && ` Plus ${line.others.length} more on this pump.`}
+                    <p className="flex flex-wrap items-center gap-2.5 text-[20px] leading-tight tracking-[-0.015em]">
+                      {faultLabel(c.lead.faultType)}
+                      <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[13px] tracking-normal shadow-[inset_0_0_0_1px_var(--mz-line)]">
+                        {sensor ? <Gauge aria-hidden className="size-3.5" strokeWidth={1.75} /> : <Cog aria-hidden className="size-3.5" strokeWidth={1.75} />}
+                        {sensor ? "Sensor" : "Machine"}
+                      </span>
                     </p>
-                    <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-mz-line pt-3 text-[13px] leading-snug">
-                      <div>
-                        <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">First noticed</dt>
-                        <dd className="mt-1">{ago(site.hour - lead.first.offset_hours)}</dd>
-                      </div>
-                      <div>
-                        <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">How sure</dt>
-                        <dd className="mt-1">{words.trust ? words.trust.words : "No past cases yet"}</dd>
-                      </div>
-                      <div>
-                        <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">Trend</dt>
-                        <dd className={`mt-1 ${trend === "Getting worse" ? "font-medium text-site-red" : ""}`}>{trend ?? "Not measured"}</dd>
-                      </div>
-                    </dl>
-                    {stop && <p className="mt-3 text-[13px] text-mz-muted">{stop}</p>}
-                    {detail?.area && (
-                      <p className="mt-3 flex items-center gap-2 text-[13px]">
-                        <span aria-hidden className="size-2.5 bg-mz-accent/60 ring-1 ring-mz-accent" />
-                        <span className="text-mz-muted">Area of the pump:</span> {detail.area.label}
-                      </p>
-                    )}
-                    {recent.length > 1 && (
-                      <div className="mt-4 border-t border-mz-line pt-3">
-                        <div className="flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
-                          <span>
-                            {detail?.channelLabel} &middot; last 12 h
-                          </span>
-                          <span className="text-[13px] tracking-normal text-mz-ink normal-case">
-                            {recent[recent.length - 1].value.toFixed(1)} {detail?.unit}
-                          </span>
-                        </div>
-                        <div className="mt-2">
-                          <LineSparkline data={recent} dataKey="value" height={44} color="var(--mz-accent)" strokeWidth={1.5} />
-                        </div>
-                      </div>
-                    )}
+                    <p className="mt-1 text-[14px] text-mz-muted">
+                      First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
+                      {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
+                    </p>
                   </>
                 ) : (
-                  <p className="text-[15px] leading-snug text-mz-muted">
-                    {line ? `An earlier concern can wait: ${words?.what}` : "No alerts on this pump so far this week."}
+                  <p className="text-[15px]">
+                    {waiting ? `An earlier alert can wait: ${faultLabel(waiting.lead.faultType).toLowerCase()}.` : "Nothing. No alerts on this pump so far this week."}
                   </p>
                 )}
-              </div>
+              </Section>
 
-              <div className="mt-4 border-t border-mz-line pt-4">
-                <Sensors readings={readings} />
-              </div>
+              {c && alert && (
+                <Section title="Evidence">
+                  <p className="text-[16px] leading-snug">{alert.evidence?.summary}</p>
+                  {evidence && (
+                    <p className="mt-1 font-mono text-[12.5px] text-mz-muted tabular-nums">
+                      {channelMeta[evidence.channel]?.label} now {num(evidence.observed!)} {channelMeta[evidence.channel]?.unit}, expected {num(evidence.expected!)}{" "}
+                      {channelMeta[evidence.channel]?.unit}
+                    </p>
+                  )}
+                  <div className="mt-3 rounded-lg bg-mz-panel px-1 pt-1">
+                    <SignalChart rows={c.rows} unit={c.unit} alertHours={c.alertHours} replayKey={`card-${c.id}`} aspectRatio="2.8 / 1" ticks={3} />
+                  </div>
+                  <p className="mt-1.5 text-[12.5px] text-mz-muted">{c.channelLabel} up to now. The grey band is normal for this pump at its speed.</p>
+                </Section>
+              )}
 
-              {concern && (
-                <Link
-                  href={`/cases/${lead.id}`}
-                  className="mt-4 inline-flex min-h-10 items-center gap-2 bg-mz-accent px-4 text-[14px] font-medium text-white hover:bg-mz-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent"
-                >
-                  Open the full job card <ArrowRight aria-hidden className="size-4" />
-                </Link>
+              <Section title="Readings now">
+                <ul className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+                  {now.map((r) => {
+                    const flagged = r.channel === c?.channel;
+                    const off = r.state === "below" || r.state === "above";
+                    return (
+                      <li key={r.channel} className="flex items-baseline justify-between gap-3 border-b border-mz-line/70 py-1.5 text-[13.5px] last:border-b-0">
+                        <span className={`min-w-0 truncate ${flagged ? "font-medium" : ""}`}>{r.label}</span>
+                        <span className="flex shrink-0 items-baseline gap-2">
+                          <span className="font-mono text-[12.5px] tabular-nums">
+                            {num(r.value)} {r.unit}
+                          </span>
+                          <span className={`w-[5.5rem] text-right text-[12.5px] ${off ? "font-medium text-[#b42318]" : "text-mz-muted"}`}>
+                            {r.state === "below" ? "Below normal" : r.state === "above" ? "Above normal" : r.state === "normal" ? "Normal" : "No band"}
+                          </span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {cannot.length > 0 && <p className="mt-2 text-[12.5px] text-mz-muted">This pump cannot measure {cannot.join(", ")}.</p>}
+              </Section>
+
+              {c && alert && (
+                <Section title="How sure">
+                  <p className="text-[15px]">{c.trust ? `${c.trust.words}.` : "No past cases of this cause yet."}</p>
+                  <p className="mt-0.5 text-[13px] text-mz-muted">
+                    {alert.fault_type === "UNKNOWN"
+                      ? "The detector could not name a cause."
+                      : `Detector score ${alert.confidence.toFixed(2)}${alert.confidence_calibrated ? "" : ", not calibrated, so it is not a probability"}.`}
+                  </p>
+                </Section>
+              )}
+
+              {c && alert && (
+                <Section title="What to do">
+                  <p className="text-[16px] leading-snug">{alert.recommended_action}</p>
+                  <p className="mt-1 text-[13px] text-mz-muted">
+                    {c.stop ? `${c.stop} ` : ""}Advice only. Nothing is sent to the pump.{" "}
+                    <Link href={`/cases/${c.lead.id}`} className="text-mz-accent underline-offset-4 hover:underline">
+                      Open the job card
+                    </Link>
+                  </p>
+                </Section>
+              )}
+
+              {(related || work) && (
+                <Section title="Latest work">
+                  {related && <p className="text-[14px]">{related}</p>}
+                  {work && (!related || !related.includes(work.observation)) && (
+                    <p className={`text-[14px] ${related ? "mt-1 text-mz-muted" : ""}`}>
+                      {words(work.workType)} {ago(site.hour - work.startHour)}: {work.observation}
+                    </p>
+                  )}
+                </Section>
               )}
             </>
           )}

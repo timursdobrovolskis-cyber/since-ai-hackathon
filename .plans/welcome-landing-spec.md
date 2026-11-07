@@ -61,6 +61,10 @@ Like Meuze, which opens inside a restaurant, the page opens inside a ship's engi
 - **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then everything but Pump 8 dims away, in exactly the pose where the moving pump takes over (`heroPose.ts`).
 - **One style throughout:** the moving pump is drawn by the same hidden-line renderer (`lineRender.ts`), not as see-through line work, so it looks the same from the room to the site map. Jona rejected the see-through look on 7 Nov.
 
+## Pump card from data only (7 Nov, evening)
+
+The panel shows one moment, the evening shift, with no clock. Clicking a pump flickers the 3D pump away and shows the card in its place. Every line comes from the data: running state (stateRuns), the alert's fault, class, evidence, blind spots, score with calibration and recommended action, the past record (track-record.json), every reading now against its band, the next stop, and the maintenance log. Left out: job-card time estimates (unchecked assumptions), the area glow (our mapping), and the count of 14 readings (wrong, the data holds 13).
+
 ## Alarm panel (7 Nov, evening)
 
 Jona compared a piping schematic, an alarm panel and a week timeline, and chose the alarm panel, simpler and sleeker, with usefulness first. It replaces the site map.

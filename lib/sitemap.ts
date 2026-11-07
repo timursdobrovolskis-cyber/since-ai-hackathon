@@ -22,11 +22,6 @@ export const ZONES: Zone[] = [
 
 export const TEST_PUMPS = new Set(["PUMP-10", "PUMP-11", "PUMP-12"]);
 
-/**
- * The 14 kinds of reading across the fleet. The app's data holds 13 of them. Ambient temperature is the 14th: the
- * organizer assets file lists it for every pump, but the data build does not load it, so it is never behind an alert.
- */
-export const AMBIENT = { id: "ambient_temp_c", label: "Ambient temperature" };
 
 export type SiteState = {
   hour: number;

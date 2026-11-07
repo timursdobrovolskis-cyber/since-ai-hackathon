@@ -20,11 +20,13 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The pump turn is shorter: a quarter turn at the same pace.
 - The site map is now an alarm panel: one window per pump in number order, lit red or amber with an icon, saying which pump, for how long and what is wrong. The other alternatives and the switch are removed.
 - Results are back after the pump dashboard, restyled, with a link to Review.
+- The alarm panel shows the evening shift as it stands, with no clock running, and the scroll section is shorter.
+- Clicking a pump flickers the 3D pump away and shows its card in its place, built from data only: state now, what's wrong, evidence and chart, every reading now against its band, how sure, the detector's recommended action and next stop, latest work from the log, and what it cannot measure. The wrong "14 kinds of reading" count and the area glow are gone.
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona's look at the alarm panel and results.
+Nothing. Waiting for Jona's look at the pump card.
 
 ## Next
 

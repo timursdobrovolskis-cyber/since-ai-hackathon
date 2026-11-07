@@ -3,8 +3,8 @@
 // The landing page from .plans/welcome-landing-spec.md, a dashboard you scroll through, styled after meuze.ai:
 //   01  A ferry engine room in hidden-line work. The camera walks in to Pump 8, the room dims away, and Pump 8 zooms,
 //       turns and moves aside while the page fades from ink to white.
-//   02  The alarm panel: one window per pump. Scrolling runs the week's clock to the evening shift, and each window
-//       follows Today's rule. Clicking a pump opens its card and lights up the area of the 3D pump it concerns.
+//   02  The alarm panel: one window per pump, as the evening shift stands, following Today's rule. Clicking a pump
+//       flickers the 3D pump away and shows that pump's card in its place, built from real data only.
 //   03  The pump dashboard: every pump at the shift, and one pump's report: what's wrong, the evidence, how sure, what
 //       to do, and Acknowledge, Dismiss or Escalate.
 //   04  How well it works: faults caught against plant alarms, warning time and false alerts.
@@ -12,7 +12,6 @@
 // Live parts only use data up to the shift. Results use totals only.
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useConcern } from "@/components/welcome/concerns";
 import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
 import { RoomStage } from "@/components/welcome/RoomStage";
@@ -43,12 +42,12 @@ function useCompact() {
 
 export default function Welcome() {
   const track = useRef<HTMLElement>(null);
-  const { phases, hour, mapReady } = useScrollPhases(track, SHIFT_HOUR);
-  const site = useSite(hour, SHIFT_HOUR);
+  const { phases, mapReady } = useScrollPhases(track);
+  // The panel and the pump card show the evening shift as it stands. There is no clock running.
+  const site = useSite(SHIFT_HOUR, SHIFT_HOUR);
   const compact = useCompact();
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
-  const concern = useConcern(site, selected);
   // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
   const [solid, setSolid] = useState(false);
   useEffect(() => {
@@ -99,7 +98,7 @@ export default function Welcome() {
       </header>
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} aria-label="Engine room and site map" className="relative h-[670vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
+      <section ref={track} aria-label="Engine room and site map" className="relative h-[485vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}
@@ -113,7 +112,7 @@ export default function Welcome() {
             01 &middot; Engine room &middot; seawater cooling pumps
           </p>
 
-          <PumpStage phases={phases} selected={selected !== null} highlight={concern?.area?.x ?? null} compact={compact} />
+          <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
             Scroll
