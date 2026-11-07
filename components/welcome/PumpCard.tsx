@@ -407,6 +407,12 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                         <span className="text-mz-muted max-md:hidden"> Waiting risks {euros(BREAKDOWN_EUR - PLANNED_EUR)} more.</span>
                       </p>
                     )}
+                    {alert.what_would_settle_it && (
+                      <p className="mt-1.5 max-w-[60ch] text-[14px] leading-snug max-md:hidden">
+                        <span className="font-medium">To settle it: </span>
+                        {alert.what_would_settle_it}
+                      </p>
+                    )}
                     <p className="mt-1 text-[12.5px] text-mz-muted">Advice only. Nothing is sent to the pump.</p>
                   </Section>
                 )}
@@ -461,11 +467,28 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
 
               {c && alert && pump && (
                 <Section title="Evidence">
-                  {/* On a phone this line moves here from What's wrong, to keep the top part short. */}
-                  <p className="mb-2 text-[13.5px] text-mz-muted md:hidden">
-                    First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
-                    {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
-                  </p>
+                  {/* The detector's reasons, in its own words, for the engineer. They sit here rather than in the top part
+                      so the review buttons stay in view. */}
+                  <div className="mb-3 space-y-1.5">
+                    {alert.evidence?.summary && (
+                      <p className="max-w-[60ch] text-[14px] leading-snug">
+                        <span className="font-medium">Why: </span>
+                        {alert.evidence.summary}
+                      </p>
+                    )}
+                    {alert.evidence?.sensor_check && <p className="max-w-[60ch] text-[13.5px] leading-snug text-mz-muted">{alert.evidence.sensor_check}</p>}
+                    {/* On a phone these two also move here from the top part, to keep it short. */}
+                    {alert.what_would_settle_it && (
+                      <p className="text-[14px] leading-snug md:hidden">
+                        <span className="font-medium">To settle it: </span>
+                        {alert.what_would_settle_it}
+                      </p>
+                    )}
+                    <p className="text-[13.5px] text-mz-muted md:hidden">
+                      First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
+                      {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
+                    </p>
+                  </div>
                   <Evidence c={c} alert={alert} pump={pump} meta={channelMeta} shiftHour={site.hour} />
                 </Section>
               )}
@@ -546,9 +569,21 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                   )}
                   {alert.fault_type !== "UNKNOWN" && (
                     <p className="mt-2 text-[12.5px] text-mz-muted">
-                      Detector score {alert.confidence.toFixed(2)}
-                      {alert.confidence_calibrated ? "" : " (not a probability)"}.
+                      {alert.confidence_calibrated
+                        ? `Detector confidence ${Math.round(alert.confidence * 100)} %: how often this cause was right on the pumps it learned from.`
+                        : `Detector score ${alert.confidence.toFixed(2)} (not a probability).`}
                     </p>
+                  )}
+                  {alert.hypotheses && alert.hypotheses.length > 1 && (
+                    <ul className="mt-2 space-y-1 text-[13.5px]" aria-label="Causes the detector weighed">
+                      {alert.hypotheses.map((h) => (
+                        <li key={h.fault_type} className="flex items-center gap-2">
+                          <span className="w-44 truncate">{faultLabel(h.fault_type)}</span>
+                          <span className="h-1.5 w-28 bg-mz-line"><span className="block h-1.5 bg-mz-ink" style={{ width: `${Math.round(h.probability * 100)}%` }} /></span>
+                          <span className="tabular-nums text-mz-muted">{Math.round(h.probability * 100)} %</span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </Section>
               )}

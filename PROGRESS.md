@@ -44,6 +44,7 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Phone card: the top part is about 120 px shorter, so Acknowledge, Dismiss and Escalate and the evidence button fit with the alarm panel showing above. On phones only: one header line (the panel gives the shift), a shorter How sure line without the detector score, the first-alert line moved to Evidence, no "Waiting risks" (it is in the cost table), and tighter spacing.
 - Readings now no longer adds a chart when you point at a reading. That moved the list under the pointer and made it jump back and forth. Clicking a reading opens its chart right under that row, and the clicked row stays where it is.
 - On phones the pump card sheet now paints above the alarm panel behind it. Before, the filter counts showed through the top of the sheet.
+- `dashboard` is merged in: the detector's "Why", sensor check and "To settle it" on the pump card, and the causes it weighed under How sure. The detector's Why and sensor check sit at the top of Evidence on every size, and To settle it moves there on phones, so the review buttons stay in view on every pump.
 
 ## In progress
 
@@ -61,12 +62,9 @@ Nothing. Next: Jona's answers on more interactivity.
 - The pump model's source and licence are unknown. The branch was pushed on Jona's instruction, and the README marks the licence as unconfirmed.
 - This branch starts from PR 7 (`one-home-screen`), so PR 7 must merge into `dashboard` first.
 
-
 ---
 
-# Detector (merged from the `detector` branch)
-
-## Progress: detector
+# Progress: detector (merged into the site)
 
 Branch `detector`, cut from `dashboard`. The team's own fault detector, built in phases. Scores come from the organizers'
 scorer (`python detector/score_all.py <predictions.csv>`), always on train and validation together, because validation
@@ -179,6 +177,15 @@ One command: `.venv/bin/python detector/run.py` (mode `own`) writes `detector/re
   PUMP-10..12, official format, top cause only), `detector/results/predictions_team_v4.csv` (all pumps),
   `detector/results/final_scores.md`.
 - Causality: `detector/causality_check.py --cuts 3` passes on all 9 labelled pumps (27 cuts).
+
+## App mapping (done)
+
+The detector now fills every field the case screen expects (docs/spec.md section 8): ranked hypotheses with calibrated
+probabilities, `evidence.channels` (measured, expected, deviation for the signals the rule read), `evidence.sensor_check`
+(whether related signals moved together or one instrument moved alone) and `what_would_settle_it` (what the operator can
+check on the spot). The case page shows a "Why this alert" block with these, right above the operator's decision
+(I'll check it / Remind me later / Not a problem, then "what did you find"), so every alarm is confirmed or dismissed
+with the explanation in view. Checked in the browser on PUMP-08's strainer case at replay hour 90.
 
 ## Done = beats B1 on train + validation combined (84.4 vs 63.4), is causal, and the app runs with our alerts.
 

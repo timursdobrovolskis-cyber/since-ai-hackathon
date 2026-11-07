@@ -36,6 +36,76 @@ ACTION = {
     "UNKNOWN": "Walk down the pump and compare readings with local gauges; pattern is not clear yet.",
 }
 SENSOR_TYPES = {"SENSOR_DRIFT", "SENSOR_CALIBRATION_SHIFT", "SENSOR_STUCK", "SENSOR_NOISE_SPIKES", "COMMUNICATION_LOSS"}
+# what an operator can do on the spot to confirm or dismiss the alert
+SETTLE = {
+    "SUCTION_STRAINER_CLOGGING": "Read the strainer differential-pressure gauge or open the basket at the next stop. A clean strainer with the same low suction pressure points to the inlet valve, the level, or the transmitter.",
+    "CAVITATION": "Listen at the pump for a crackling, gravelly noise and check the suction valve is fully open and the tank or sea-chest level is normal.",
+    "DISCHARGE_RESTRICTION": "Walk the discharge line: check the valve positions and the differential pressure over the heat exchanger.",
+    "BEARING_WEAR": "Feel the bearing housing for heat and listen with a stethoscope or screwdriver; a spectrum reading will show the outer-race frequency.",
+    "MISALIGNMENT": "Check the coupling alignment with a dial or laser tool; the vibration sits at one and two times running speed.",
+    "IMBALANCE": "Inspect the impeller for fouling or damage; the vibration grows with the square of the speed.",
+    "IMPELLER_WEAR": "Run a head-flow check against the data sheet and inspect the impeller and wear rings at the next opening.",
+    "AIR_ENTRAINMENT": "Check the suction level for vortexing and the suction joints for an air leak; vent the pump.",
+    "SENSOR_DRIFT": "Compare the transmitter with a local gauge; if they agree, the change is real and it is a pump problem.",
+    "SENSOR_CALIBRATION_SHIFT": "Compare the transmitter with a local gauge; if they agree, the change is real and it is a pump problem.",
+    "SENSOR_STUCK": "Watch whether the reading moves at all when the load changes; check the cable and connector.",
+    "SENSOR_NOISE_SPIKES": "Check the cable screen, grounding and connector of the transmitter.",
+    "COMMUNICATION_LOSS": "Check that the gateway and network switch have power and that the wireless sensor battery is not flat.",
+    "UNKNOWN": "Walk past the pump: listen, look, feel, and compare the local gauges with the screen.",
+}
+# the signals each rule reads, for the evidence table in the app
+FAULT_CHANNELS = {
+    "SUCTION_STRAINER_CLOGGING": ["ps", "pd", "n", "pw", "q"], "CAVITATION": ["ps", "a", "v", "q", "tf"],
+    "DISCHARGE_RESTRICTION": ["pd", "pw", "i", "q"], "AIR_ENTRAINMENT": ["ps", "pd", "q", "pw"],
+    "IMPELLER_WEAR": ["ps", "pd", "q", "pw", "i"], "BEARING_WEAR": ["a", "c", "v", "bt"],
+    "MISALIGNMENT": ["v", "a", "bt", "wt"], "IMBALANCE": ["v", "a", "bt"],
+}
+COUPLED = {"ps": ["pd", "q", "pw", "n"], "pd": ["ps", "q", "pw", "i"], "q": ["pw", "pd", "ps"], "i": ["pw", "pd"], "pw": ["i", "q"],
+           "bt": ["v", "a", "wt"], "tf": ["bt", "pw"], "wt": ["i", "pw", "bt"]}
+
+
+def channel_row(s: pd.Series, k: str) -> dict | None:
+    """Observed, expected and deviation for one channel, from the residual the rules use."""
+    col = f"{CH[k]}__mean"
+    obs = s.get(col, np.nan)
+    if pd.isna(obs):
+        return None
+    for zkey, rkey in ((f"pz_sys_{k}", f"res_sys_{k}"), (f"pz_{k}", f"res_{k}")):
+        if zkey in s and pd.notna(s.get(zkey)) and pd.notna(s.get(rkey)):
+            return {"channel": CH[k], "observed": round(float(obs), 2), "expected": round(float(obs - s[rkey]), 2), "z": round(float(s[zkey]), 1)}
+    z = s.get(f"z_{k}", np.nan)
+    exp = s.get(f"exp_{k}", np.nan)
+    return {"channel": CH[k], "observed": round(float(obs), 2), "expected": None if pd.isna(exp) else round(float(exp), 2), "z": 0.0 if pd.isna(z) else round(float(z), 1)}
+
+
+def evidence_channels(s: pd.Series, pick: "Hyp") -> list[dict]:
+    chan = pick.extra.get("channel")
+    if pick.fault in FAULT_CHANNELS:
+        keys = FAULT_CHANNELS[pick.fault]
+    elif chan:
+        keys = [chan] + COUPLED.get(chan, [])
+    else:
+        keys = sorted((k for k in CH if pd.notna(s.get(f"z_{k}", np.nan)) or pd.notna(s.get(f"pz_{k}", np.nan))),
+                      key=lambda k: -abs(_v(s, f"pz_{k}", _v(s, f"z_{k}"))))[:3]
+    rows = [channel_row(s, k) for k in keys]
+    return [r for r in rows if r is not None]
+
+
+def sensor_check(s: pd.Series, pick: "Hyp", rows: list[dict]) -> str:
+    names = {r["channel"]: r for r in rows}
+    label = {CH[k]: LABEL[k] for k in CH}
+    if pick.fault == "COMMUNICATION_LOSS":
+        return "No readings are arriving, so nothing can be said about the pump itself until the link is back."
+    chan = pick.extra.get("channel")
+    if pick.cls == "SENSOR" and chan:
+        others = [label[c] for c in names if c != CH[chan] and abs(names[c]["z"]) < 2.0]
+        if others:
+            return f"Only the {LABEL[chan]} moved. {', '.join(others).capitalize()} agree with each other, so the instrument is the likely cause, not the pump."
+        return f"The {LABEL[chan]} reading misbehaves on its own; related signals were checked and are within normal."
+    moved = [label[c] for c, r in names.items() if abs(r["z"]) >= 2.0]
+    if len(moved) >= 2:
+        return f"Related signals moved together ({', '.join(moved)}), so a single bad sensor is unlikely."
+    return "The pattern spans more than one instrument, so a single bad sensor is unlikely."
 # thresholds (robust standard deviations unless noted); chosen on the training split
 T = dict(clog=3.0, restr=3.0, head=3.0, sudden_head_min=480, cav_sigma=1.3, accel=3.0, crest=3.0, vib=3.0,
          alone=4.0, promote=5.0, quiet=2.0, step_share=0.6, spike=3.0, lockout_h=36, flow_disagree=4.0, misalign_temp=1.5)
@@ -61,7 +131,7 @@ def state_at(g: pd.DataFrame, t: pd.Timestamp, minutes: int = 15) -> pd.Series |
          "since_lockout": float(last["since_lockout"]), "since_stop": float(last["since_stop"])}
     num = w.select_dtypes(include=[np.number]).columns
     for c in num:
-        if c.startswith(("pz_", "z_", "res_", "sigma", "q_", "head_", "r")) or c in ("sigma",):
+        if c.startswith(("pz_", "z_", "res_", "exp_", "sigma", "q_", "head_", "r")) or c in ("sigma",):
             s[c] = float(ws[c].mean()) if len(ws) and ws[c].notna().any() else np.nan
         elif c.startswith(("rise_", "same_", "samelim_", "since_", "jump_")):
             s[c] = float(last[c])
@@ -255,9 +325,11 @@ def diagnose(s: pd.Series, a: pd.Series, recent: dict | None = None, reminder_h:
         top = sorted(((abs(v), k) for k, v in s.items() if k.startswith(("pz_", "z_")) and pd.notna(v)), reverse=True)[:3]
         ev = "No clear physical pattern. Largest deviations: " + ", ".join(f"{k} z={v:.1f}" for v, k in top) + "."
         pick = Hyp("UNKNOWN", "MACHINE", min(s.get("zmax", 0.0), 6.0), ev)
+    rows = evidence_channels(s, pick)
     conf = float(np.clip(0.35 + 0.06 * min(pick.strength, 10.0), 0.3, 0.95))
     if pick.fault == "UNKNOWN":
         conf = 0.3
     return {"event_class": pick.cls, "fault_type": pick.fault, "confidence": round(conf, 2), "evidence": pick.evidence,
             "recommended_action": ACTION[pick.fault], "case": case_key(pick),
+            "channels": rows, "sensor_check": sensor_check(s, pick, rows), "what_would_settle_it": SETTLE[pick.fault],
             "hypotheses": [{"event_class": h.cls, "fault_type": h.fault, "strength": round(h.strength, 1)} for h in hyps[:3]]}

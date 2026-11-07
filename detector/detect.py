@@ -123,7 +123,8 @@ def detect_asset(g: pd.DataFrame, a: pd.Series, p: dict = P) -> list[dict]:
         recent[key] = t
         last_alert = t_alert
         rows.append({"asset_id": a["asset_id"], "alert_time_utc": t_alert,
-                     **{k: d[k] for k in ("event_class", "fault_type", "confidence", "evidence", "recommended_action", "hypotheses")}})
+                     **{k: d[k] for k in ("event_class", "fault_type", "confidence", "evidence", "recommended_action", "hypotheses",
+                                          "channels", "sensor_check", "what_would_settle_it")}})
     return rows
 
 
@@ -132,4 +133,4 @@ def detect(frames: dict[str, pd.DataFrame], assets: pd.DataFrame, p: dict = P) -
     for _, a in assets.iterrows():
         rows += detect_asset(frames[a["asset_id"]], a, p)
     from detector.common import COLS
-    return pd.DataFrame(rows, columns=COLS + ["hypotheses"])
+    return pd.DataFrame(rows, columns=COLS + ["hypotheses", "channels", "sensor_check", "what_would_settle_it"])
