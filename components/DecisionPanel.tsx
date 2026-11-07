@@ -16,7 +16,7 @@ export function DecisionPanel({ item }: { item: Case }) {
   const [followUp, setFollowUp] = useState(FOLLOW_UPS[1]);
   const decided = decisions[item.id];
   const base = { caseId: item.id, assetId: item.assetId, faultType: item.faultType };
-  const button = "min-h-10 border px-3 font-medium";
+  const button = "min-h-10 rounded-sm border px-3 font-medium";
 
   if (decided) {
     return (
@@ -48,7 +48,7 @@ export function DecisionPanel({ item }: { item: Case }) {
       <h2 id="decide" className="font-cond text-lg font-semibold">Your decision</h2>
       <p className="text-ink-2">This only records your decision. Nothing is sent to the machine.</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        <button type="button" className={`${button} border-ink bg-ink text-raised`} onClick={() => decide({ ...base, kind: "approved" })}>
+        <button type="button" className={`${button} border-accent bg-accent text-deck`} onClick={() => decide({ ...base, kind: "approved" })}>
           Approve inspection request
         </button>
         <button type="button" aria-expanded={mode === "watch"} className={`${button} border-line`} onClick={() => setMode(mode === "watch" ? "none" : "watch")}>

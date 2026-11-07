@@ -38,7 +38,7 @@ const Drawing = memo(
         aspect={1.15}
         pad={0.04}
         credit={false}
-        theme="light"
+        theme="dark"
       >
           <Box {...BASE} r={10} />
           <Box {...FOOT} r={6} />

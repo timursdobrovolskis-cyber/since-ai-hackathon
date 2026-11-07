@@ -7,6 +7,8 @@ import { useApp } from "./AppProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+// Canvas cannot read CSS variables, so resolve the mono stack before handing it to uPlot.
+const axisFont = () => `12px ${css("--font-mono") || "monospace"}`;
 const HEIGHT = 300;
 
 export function FlaggedChart() {
@@ -35,8 +37,8 @@ export function FlaggedChart() {
         legend: { show: false },
         cursor: { y: false, drag: { x: false, y: false } },
         axes: [
-          { stroke: css("--ink-3"), grid, ticks: { show: false }, splits: () => [0, 24, 48, 72, 96, 120, 144], values: (_u, s) => s.map((h) => `Day ${h / 24 + 1}`), font: "13px var(--font-barlow), sans-serif", size: 24 },
-          { stroke: css("--ink-3"), grid, ticks: { show: false }, incrs: [1, 3], font: "13px var(--font-barlow), sans-serif", size: 28 },
+          { stroke: css("--ink-3"), grid, ticks: { show: false }, splits: () => [0, 24, 48, 72, 96, 120, 144], values: (_u, s) => s.map((h) => `Day ${h / 24 + 1}`), font: axisFont(), size: 24 },
+          { stroke: css("--ink-3"), grid, ticks: { show: false }, incrs: [1, 3], font: axisFont(), size: 28 },
         ],
         series: [
           {},

@@ -21,6 +21,8 @@ type Props = {
 };
 
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+// Canvas cannot read CSS variables, so resolve the mono stack before handing it to uPlot.
+const axisFont = () => `12px ${css("--font-mono") || "monospace"}`;
 
 /** Cut every array at the replay hour. The band also stays hidden while normal behaviour is still being learned. */
 function slice(series: Series, stepMinutes: number, hour: number) {
@@ -70,10 +72,10 @@ export function EvidenceChart({ label, unit, series, stepMinutes, hour, alertHou
           ticks: { show: false },
           splits: () => [0, 24, 48, 72, 96, 120, 144],
           values: (_u, splits) => splits.map((h) => `Day ${h / 24 + 1}`),
-          font: "13px var(--font-barlow), sans-serif",
+          font: axisFont(),
           size: 24,
         },
-        { stroke: css("--ink-3"), grid, ticks: { show: false }, font: "13px var(--font-barlow), sans-serif", size: 52 },
+        { stroke: css("--ink-3"), grid, ticks: { show: false }, font: axisFont(), size: 52 },
       ],
       series: [
         {},
