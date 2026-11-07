@@ -1,0 +1,487 @@
+<title>Northfield Machine Works</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one fixed WebGL stage drawing the hall as lines on black, a tall scroll runway
+   that drives the camera, and numbered text panels that fade in beside each machine. */
+:root {
+  --ink: #000000;
+  --ink-2: #0b0d0f;
+  --steel: #d6dce0;
+  --mute: #7f8a91;
+  --line: rgba(214, 220, 224, 0.2);
+  --hv: #6fe3ff;          /* line accent: the colour the active machine lights up in */
+  --hv-ink: #021016;
+  --panel: rgba(0, 0, 0, 0.72);
+  --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --runway: 1000vh;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  margin: 0; background: var(--ink); color: var(--steel);
+  font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); overflow-x: hidden;
+}
+#runway { height: var(--runway); }
+#stage { position: fixed; inset: 0; z-index: 0; }
+#gl { display: block; width: 100%; height: 100%; }
+.vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(120% 90% at 50% 45%, transparent 60%, rgba(0, 0, 0, 0.6) 100%); }
+
+header.bar {
+  position: fixed; z-index: 20; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) var(--gutter-r) 14px var(--gutter-l);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+}
+.brand { font-family: var(--display); font-weight: 800; font-size: 1.35rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; line-height: 1; }
+.brand small { display: block; font-family: var(--mono); font-weight: 400; font-size: 0.62rem; letter-spacing: 0.18em; color: var(--mute); margin-top: 4px; }
+.btn {
+  display: inline-block; font-family: var(--display); font-weight: 700; font-size: 1.05rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--hv-ink); background: var(--hv); text-decoration: none; padding: 10px 20px; border: 1px solid var(--hv);
+}
+.btn:hover { background: #a6f0ff; border-color: #a6f0ff; }
+.btn.ghost { background: transparent; color: var(--steel); border-color: var(--steel); }
+.btn.ghost:hover { background: rgba(214, 220, 224, 0.12); }
+.btn:focus-visible, .rail button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.panels { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+.panel {
+  position: absolute; opacity: 0; will-change: opacity, transform; pointer-events: none;
+  left: var(--gutter-l); right: var(--gutter-r); bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  max-width: 31rem; padding: 22px 24px 24px;
+  background: var(--panel); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-top-color: var(--hv);
+}
+.panel[data-side="right"] { left: auto; right: calc(var(--gutter-r) + 110px); }
+.panel.hero { opacity: 1; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border: 0; padding: 0; max-width: 46rem; bottom: auto; top: 50%; transform: translateY(-50%); }
+.tag { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hv); margin: 0 0 12px; }
+.panel h1, .panel h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: 0.92; margin: 0 0 14px; color: #fff; text-wrap: balance; }
+.panel h2 { font-size: clamp(2.1rem, 5vw, 3.2rem); }
+.panel h1 { font-size: clamp(2.7rem, 8.5vw, 6.6rem); letter-spacing: -0.005em; overflow-wrap: break-word; }
+.panel p { margin: 0; color: var(--steel); max-width: 34rem; }
+.panel.hero p:not(.tag) { font-size: 1.1rem; max-width: 30rem; margin-top: 6px; }
+.panel .row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.panel.cta { max-width: 36rem; }
+.cue { position: fixed; z-index: 11; left: var(--gutter-l); bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--steel); }
+.cue i { display: block; width: 1px; height: 34px; background: linear-gradient(var(--hv), transparent); animation: drip 1.8s ease-in-out infinite; transform-origin: top; }
+@keyframes drip { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+.readout { position: fixed; z-index: 12; right: var(--gutter-r); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mute); text-align: right; line-height: 1.6; font-variant-numeric: tabular-nums; }
+.readout b { color: var(--hv); font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.rail { position: fixed; z-index: 12; right: var(--gutter-r); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.rail button { all: unset; cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); padding: 2px 0; }
+.rail button span { opacity: 0; transition: opacity 0.2s; }
+.rail button:hover span, .rail button:focus-visible span, .rail button[aria-current="true"] span { opacity: 1; }
+.rail button::after { content: ""; width: 14px; height: 1px; background: var(--mute); transition: width 0.2s, background 0.2s; }
+.rail button[aria-current="true"] { color: var(--steel); }
+.rail button[aria-current="true"]::after { width: 28px; background: var(--hv); }
+
+#loader { position: fixed; inset: 0; z-index: 50; background: var(--ink); display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 0 var(--gutter-r) 0 var(--gutter-l); transition: opacity 0.7s ease; }
+#loader.done { opacity: 0; pointer-events: none; }
+#loader .name { font-family: var(--display); font-weight: 800; font-size: clamp(2rem, 7vw, 4rem); text-transform: uppercase; color: #fff; line-height: 1; }
+#loader .meter { height: 1px; background: var(--line); max-width: 28rem; }
+#loader .meter i { display: block; height: 100%; width: 0; background: var(--hv); transition: width 0.2s; }
+#loader .msg { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+#fail { position: fixed; z-index: 60; left: var(--gutter-l); right: var(--gutter-r); top: 90px; max-width: 34rem; padding: 18px 20px; background: var(--ink-2); border: 1px solid var(--hv); font-size: 0.95rem; }
+
+@media (max-width: 720px) {
+  header.bar .btn { font-size: 0.9rem; padding: 8px 12px; white-space: nowrap; }
+  .tag { font-size: 0.66rem; }
+  .rail { display: none; }
+  .panel, .panel[data-side="right"] { max-width: none; left: var(--gutter-l); right: var(--gutter-r); padding: 18px 18px 20px; bottom: calc(env(safe-area-inset-bottom, 0px) + 72px); }
+  .panel.hero { top: 42%; }
+  .readout { left: var(--gutter-l); text-align: left; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); }
+  .cue { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .cue i { animation: none; transform: none; } }
+</style>
+
+<header class="bar">
+  <div class="brand">Northfield<small>Machine works · Digital twin</small></div>
+  <a class="btn" href="#demo">Request demo</a>
+</header>
+
+<div id="stage"><canvas id="gl" aria-label="Line model of the machine hall, flown through as you scroll"></canvas></div>
+<div class="vignette"></div>
+
+<div class="panels">
+  <section class="panel hero" data-a="-1" data-b="0.085" data-f="0.03">
+    <p class="tag">Digital twin · Machine hall · Line model</p>
+    <h1>The whole floor, drawn in lines.</h1>
+    <p>Every machine in one model you can walk through. Scroll to open the bay door and go in.</p>
+  </section>
+
+  <section class="panel" data-a="0.105" data-b="0.215" data-f="0.025">
+    <p class="tag">01 / 05 · Bay door</p>
+    <h2>Doors up. The floor appears.</h2>
+    <p>The roller shutter opens onto a single 18 by 18 metre hall. The model draws itself outward from where you stand.</p>
+  </section>
+
+  <section class="panel" data-side="right" data-a="0.3" data-b="0.43" data-f="0.03">
+    <p class="tag">02 / 05 · Milling and sawing</p>
+    <h2>Stock goes in square.</h2>
+    <p>The cut-off saw and bandsaw prepare bar and plate. The milling machine takes it from there.</p>
+  </section>
+
+  <section class="panel" data-a="0.455" data-b="0.585" data-f="0.03">
+    <p class="tag">03 / 05 · Turning</p>
+    <h2>Round parts, to size.</h2>
+    <p>An engine lathe and a bench lathe, with a pillar drill and a surface grinder close by for finishing.</p>
+  </section>
+
+  <section class="panel" data-side="right" data-a="0.615" data-b="0.725" data-f="0.025">
+    <p class="tag">04 / 05 · Forming</p>
+    <h2>Flat sheet becomes a part.</h2>
+    <p>The press brake and hydraulic press handle bending and forming, a few metres from where the part was cut.</p>
+  </section>
+
+  <section class="panel" data-a="0.745" data-b="0.86" data-f="0.025">
+    <p class="tag">05 / 05 · CNC machining</p>
+    <h2>Programmed once. Repeated exactly.</h2>
+    <p>The machining centre runs repeat work, so the manual machines stay free for one-offs and rush jobs.</p>
+  </section>
+
+  <section class="panel cta" data-a="0.9" data-b="2" data-f="0.04">
+    <p class="tag">The whole floor</p>
+    <h2>See your site this way.</h2>
+    <p>Send a floor plan or a drawing. We reply with a model walk-through and a price.</p>
+    <div class="row">
+      <a class="btn" href="#demo">Request demo</a>
+      <a class="btn ghost" href="#drawings">Send a drawing</a>
+    </div>
+  </section>
+</div>
+
+<div class="cue" id="cue"><i></i><span>Scroll</span></div>
+<ul class="rail" id="rail"></ul>
+<div class="readout" id="readout" aria-hidden="true"><b id="zone">Yard</b><br><span id="coords">X 0.00 Y 0.00 Z 0.00 m</span></div>
+
+<div id="runway"></div>
+
+<div id="loader" role="status">
+  <div class="name">Northfield</div>
+  <div class="meter"><i id="bar"></i></div>
+  <div class="msg" id="loadmsg">Loading the hall</div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+/* ---------- settings you can tune ---------- */
+const MODEL_URL = 'model.glb';
+const BASE_COLOR = 0xcfd6db;   // ordinary lines
+const ACCENT = 0x6fe3ff;       // the active machine and the drawing-in wave front
+const EDGE_ANGLE = 28;         // degrees; lower draws more detail on curved parts
+const LINE_OPACITY = 0.55;
+const SHUTTER_TOP_Y = 4.36;    // world height of the roller shutter's top edge (from the model)
+
+/* Camera path in metres, model coordinates (checked against every object's bounding box). */
+const CAM = [
+  [-21, 3.2, 10.5], [-16, 2.4, 5.0], [-12.6, 1.9, 1.4], [-10.2, 1.7, 1.17], [-7.4, 1.7, 1.17],
+  [-5.0, 1.7, 1.17], [-3.4, 1.7, 1.17], [-1.85, 1.9, 2.0], [-1.85, 1.9, 3.3], [0.2, 1.9, 3.3],
+  [2.0, 1.9, 2.5], [3.3, 1.75, 1.17], [3.4, 3.0, 1.8], [2.0, 4.6, 4.5], [-0.5, 5.4, 7.0]
+];
+const LOOK = [
+  [-9, 2.2, 0], [-9, 2.2, 0.2], [-8, 2.0, 0.6], [-5, 1.7, 1.17], [-3, 1.7, 1.3],
+  [-5.1, 1.5, 2.3], [-2.4, 1.2, 4.0], [-2.2, 1.3, 5.4], [-2.2, 1.2, 5.4], [4.2, 1.3, 4.0],
+  [5.0, 1.3, 4.2], [7.0, 1.5, 1.4], [6, 1.5, 2], [2, 1.5, 0], [0.5, 2.5, 0]
+];
+const ZONES = [[0, 'Yard'], [0.1, 'Bay door'], [0.25, 'West floor'], [0.3, 'Milling'], [0.45, 'Turning'], [0.61, 'Forming'], [0.74, 'CNC'], [0.88, 'Overview']];
+const STOPS = [[0, 'Yard'], [0.16, 'Door'], [0.36, 'Milling'], [0.53, 'Turning'], [0.67, 'Forming'], [0.79, 'CNC'], [0.96, 'Floor']];
+
+/* Which parts of the model light up with which panel (matched on the part's name). */
+const GROUPS = {
+  door:    { panel: 1, test: null },
+  milling: { panel: 2, test: /milling-machine|cut-off-saw|horizontal-bandsaw/ },
+  turning: { panel: 3, test: /engine-lathe|bench-lathe|pillar-drill|surface-grinder/ },
+  forming: { panel: 4, test: /press-brake|hydraulic-press|sheet-metal-shear/ },
+  cnc:     { panel: 5, test: /cnc-machining/ },
+  crane:   { panel: 6, test: /gantry-crane-bridge|crane-rail/ }
+};
+const SHELL = /hall-wall|hall-roof|skylight|truss|window|hall-column|corner-column|shutter-bay|door-bay/;
+const FLOOR = /floor-tile/;
+
+/* ---------- helpers ---------- */
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const tick1 = () => new Promise((r) => setTimeout(r, 0));
+
+function fail(msg) {
+  const d = document.createElement('div'); d.id = 'fail'; d.textContent = msg;
+  document.body.appendChild(d); $('loader').classList.add('done');
+}
+function setProgress(f, msg) {
+  const pct = Math.round(clamp(f) * 100);
+  $('bar').style.width = pct + '%';
+  $('loadmsg').textContent = (msg || 'Loading the hall') + ' ' + pct + '%';
+}
+
+/* ---------- renderer, scene ---------- */
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: $('gl'), antialias: true, powerPreference: 'high-performance' });
+} catch (e) {
+  fail('This browser could not start WebGL, so the 3D tour is unavailable.');
+  throw e;
+}
+const mobile = matchMedia('(max-width: 720px)').matches;
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2));
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.setClearColor(0x000000, 1);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.021);   // distant lines fade into the black
+
+const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
+
+/* ---------- line materials with a "draw outward from the camera" wave ---------- */
+const U = { uCam: { value: new THREE.Vector3() }, uR: { value: 30 }, uHi: { value: new THREE.Color(ACCENT) } };
+function lineMat(color, opacity) {
+  const m = new THREE.LineBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
+  m.onBeforeCompile = (s) => {
+    Object.assign(s.uniforms, U);
+    s.vertexShader = s.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vW;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    s.fragmentShader = s.fragmentShader
+      .replace('void main() {', 'uniform vec3 uCam; uniform float uR; uniform vec3 uHi; varying vec3 vW;\nvoid main() {\n  float rd = distance(vW, uCam); if (rd > uR) discard;')
+      .replace('#include <dithering_fragment>', 'float band = smoothstep(uR - 2.0, uR, rd); gl_FragColor.rgb = mix(gl_FragColor.rgb, uHi, band);\n#include <dithering_fragment>');
+  };
+  return m;
+}
+const baseC = new THREE.Color(BASE_COLOR), accC = new THREE.Color(ACCENT);
+const mats = {
+  base: lineMat(BASE_COLOR, LINE_OPACITY),
+  floor: lineMat(BASE_COLOR, 0.2),
+  shell: lineMat(BASE_COLOR, 0.42)
+};
+for (const k of Object.keys(GROUPS)) mats[k] = lineMat(BASE_COLOR, LINE_OPACITY);
+
+// solid black fill hides lines that sit behind a surface; pushed back a hair so edges win
+const occ = new THREE.MeshBasicMaterial({ color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1.5, polygonOffsetUnits: 1.5 });
+const shellOcc = occ.clone(); // walls and roof fade away as the door opens
+
+/* ---------- yard: grid and the lane in front of the shutter ---------- */
+const grid = new THREE.GridHelper(200, 100, 0x2a3640, 0x12181c);
+grid.position.y = -0.125; scene.add(grid);
+const lane = new THREE.LineLoop(
+  new THREE.BufferGeometry().setFromPoints([[-17.6, -0.11, -2.6], [-8.8, -0.11, -2.6], [-8.8, -0.11, 2.6], [-17.6, -0.11, 2.6]].map((p) => new THREE.Vector3(...p))),
+  new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.45 })
+);
+scene.add(lane);
+
+/* ---------- camera curves ---------- */
+const posCurve = new THREE.CatmullRomCurve3(CAM.map((p) => new THREE.Vector3(...p)), false, 'centripetal');
+const lookCurve = new THREE.CatmullRomCurve3(LOOK.map((p) => new THREE.Vector3(...p)), false, 'centripetal');
+
+/* ---------- model to lines ---------- */
+const shutterParts = [];
+
+function classify(name) {
+  for (const [k, g] of Object.entries(GROUPS)) if (g.test && g.test.test(name)) return k;
+  if (SHELL.test(name)) return 'shell';
+  if (FLOOR.test(name)) return 'floor';
+  return 'base';
+}
+
+async function buildLines(root) {
+  root.updateMatrixWorld(true);
+  const top = root.children[0] && root.children[0].children.length ? root.children[0].children : root.children;
+  const edgeCache = new Map();
+  const chunks = {}; // group -> [Float32Array]
+  const v = new THREE.Vector3();
+  let n = 0;
+
+  for (const child of top) {
+    const name = (child.name || '').toLowerCase();
+    const cls = classify(name);
+    child.traverse((m) => {
+      if (!m.isMesh || !m.geometry) return;
+      let pos = edgeCache.get(m.geometry.uuid);
+      if (!pos) {
+        const eg = new THREE.EdgesGeometry(m.geometry, EDGE_ANGLE);
+        pos = eg.attributes.position.array; edgeCache.set(m.geometry.uuid, pos); eg.dispose();
+      }
+      const flat = (m.name || '').replace(/[^a-z0-9-]/gi, '').toLowerCase();
+      if (flat.includes('shuttercast') || flat.includes('shuttercharcoal')) {
+        // the roller shutter keeps its own lines so they move with it
+        const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const ls = new THREE.LineSegments(g, mats.door); ls.renderOrder = 1; m.add(ls);
+        shutterParts.push({ o: m, y: m.position.y, sy: m.scale.y });
+        m.material = occ;
+        return;
+      }
+      const out = new Float32Array(pos.length);
+      for (let i = 0; i < pos.length; i += 3) {
+        v.set(pos[i], pos[i + 1], pos[i + 2]).applyMatrix4(m.matrixWorld);
+        out[i] = v.x; out[i + 1] = v.y; out[i + 2] = v.z;
+      }
+      (chunks[cls] = chunks[cls] || []).push(out);
+      m.material = cls === 'shell' ? shellOcc : occ;
+      m.renderOrder = cls === 'shell' ? 2 : 0;
+      m.castShadow = false; m.receiveShadow = false;
+    });
+    if (++n % 60 === 0) { setProgress(0.9 + 0.09 * n / top.length, 'Drawing lines'); await tick1(); }
+  }
+
+  for (const [cls, list] of Object.entries(chunks)) {
+    let len = 0; for (const c of list) len += c.length;
+    const all = new Float32Array(len); let o = 0;
+    for (const c of list) { all.set(c, o); o += c.length; }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(all, 3)); g.computeBoundingSphere();
+    const ls = new THREE.LineSegments(g, mats[cls] || mats.base);
+    ls.renderOrder = cls === 'shell' ? 3 : 1;
+    scene.add(ls);
+  }
+}
+
+/* ---------- loading ---------- */
+async function getModelBuffer() {
+  try {
+    const m = await import('./model-data.js');
+    setProgress(0.6);
+    const bin = atob(m.default);
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    return u8.buffer;
+  } catch (e) { /* no embedded copy, fetch the file */ }
+  const res = await fetch(MODEL_URL);
+  if (!res.ok) throw new Error('model.glb returned ' + res.status);
+  const total = +res.headers.get('content-length') || 7.9e6;
+  const reader = res.body.getReader(); const chunks = []; let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); got += value.length; setProgress(Math.min(0.95, got / total) * 0.6);
+  }
+  const out = new Uint8Array(got); let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out.buffer;
+}
+
+const gltfLoader = new GLTFLoader();
+getModelBuffer().then((buf) => {
+  setProgress(0.7, 'Reading the model');
+  gltfLoader.parse(buf, '', async (gltf) => {
+    try {
+      scene.add(gltf.scene);
+      await tick1();
+      await buildLines(gltf.scene);
+      resize(); dirty = true;
+      setProgress(1, 'Ready');
+      requestAnimationFrame(() => $('loader').classList.add('done'));
+    } catch (err) { console.error(err); fail('The line model could not be built.'); }
+  }, (err) => { console.error(err); fail('The 3D model could not be read.'); });
+}).catch((err) => { console.error(err); fail('The 3D model could not be loaded. Check that model.glb sits next to this page.'); });
+
+/* ---------- panels, rail, readout ---------- */
+const panels = [...document.querySelectorAll('.panel')].map((el) => ({ el, a: +el.dataset.a, b: +el.dataset.b, f: +el.dataset.f, last: -1 }));
+const railBtns = STOPS.map(([u, label]) => {
+  const li = document.createElement('li'); const b = document.createElement('button');
+  b.type = 'button'; b.innerHTML = '<span>' + label + '</span>'; b.setAttribute('aria-label', 'Go to ' + label);
+  b.addEventListener('click', () => scrollToU(u));
+  li.appendChild(b); $('rail').appendChild(li); return b;
+});
+function maxScroll() { return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function scrollToU(u) { scrollTo({ top: u * maxScroll(), behavior: reduced ? 'auto' : 'smooth' }); }
+const zoneEl = $('zone'), coordsEl = $('coords'), cueEl = $('cue');
+let lastZone = '', lastCoords = '';
+
+/* ---------- frame ---------- */
+let target = 0, u = 0, dirty = true, mx = 0, my = 0, smx = 0, smy = 0, lastU = -1;
+const tmpP = new THREE.Vector3(), tmpL = new THREE.Vector3();
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 1 ? Math.min(90, 55 + (1 - w / h) * 40) : 55;
+  camera.updateProjectionMatrix(); dirty = true;
+}
+addEventListener('resize', resize);
+if (!reduced) addEventListener('pointermove', (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+function apply(p) {
+  posCurve.getPoint(p, tmpP); lookCurve.getPoint(p, tmpL);
+  camera.position.copy(tmpP); camera.lookAt(tmpL);
+  camera.rotateY(-smx * 0.05); camera.rotateX(-smy * 0.03);
+
+  // roller shutter rolls up between 7% and 19% of the scroll
+  const s = 1 - smooth(0.07, 0.19, p) * 0.97;
+  for (const part of shutterParts) {
+    part.o.position.y = SHUTTER_TOP_Y + (part.y - SHUTTER_TOP_Y) * s;
+    part.o.scale.y = part.sy * s;
+  }
+
+  // walls and roof turn transparent so the hall can be seen from outside, then from within
+  const f = 1 - smooth(0.15, 0.26, p);
+  shellOcc.opacity = f; shellOcc.transparent = f < 0.999; shellOcc.depthWrite = f >= 0.999; shellOcc.visible = f > 0.01;
+
+  // lines draw outward from the camera
+  U.uCam.value.copy(tmpP);
+  U.uR.value = 24 + 120 * smooth(0.02, 0.5, p);
+
+  // panels
+  for (const pn of panels) {
+    const v = smooth(pn.a, pn.a + pn.f, p) * (1 - smooth(pn.b - pn.f, pn.b, p));
+    if (Math.abs(v - pn.last) > 0.004) {
+      pn.last = v;
+      pn.el.style.opacity = v.toFixed(3);
+      const dy = (1 - v) * 18;
+      pn.el.style.transform = pn.el.classList.contains('hero') ? `translateY(calc(-50% + ${dy}px))` : `translateY(${dy}px)`;
+      pn.el.style.pointerEvents = v > 0.6 ? 'auto' : 'none';
+    }
+  }
+  // the machine named in the visible panel lights up
+  for (const [k, g] of Object.entries(GROUPS)) {
+    const w = Math.max(0, panels[g.panel].last);
+    mats[k].color.copy(baseC).lerp(accC, w);
+    mats[k].opacity = LINE_OPACITY + (1 - LINE_OPACITY) * w;
+  }
+  cueEl.style.opacity = String(1 - smooth(0.01, 0.05, p));
+
+  let zone = ZONES[0][1]; for (const [z, name] of ZONES) if (p >= z) zone = name;
+  const c = `X ${tmpP.x.toFixed(2)}  Y ${tmpP.y.toFixed(2)}  Z ${tmpP.z.toFixed(2)} m`;
+  if (zone !== lastZone) { zoneEl.textContent = zone; lastZone = zone; }
+  if (c !== lastCoords) { coordsEl.textContent = c; lastCoords = c; }
+  let cur = 0; STOPS.forEach(([z], i) => { if (p >= z - 0.04) cur = i; });
+  railBtns.forEach((b, i) => b.setAttribute('aria-current', String(i === cur)));
+}
+
+let prev = performance.now(), frames = 0;
+function tick(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now;
+  target = clamp(scrollY / maxScroll());
+  u += (target - u) * (reduced ? 1 : 1 - Math.exp(-dt * 4.5));
+  if (Math.abs(target - u) < 0.00005) u = target;
+  smx += (mx - smx) * 0.06; smy += (my - smy) * 0.06;
+  if (dirty || Math.abs(u - lastU) > 1e-6 || Math.abs(mx - smx) > 1e-4 || Math.abs(my - smy) > 1e-4 || frames < 3) {
+    apply(u); renderer.render(scene, camera); lastU = u; dirty = false; frames++;
+  }
+  requestAnimationFrame(tick);
+}
+resize();
+requestAnimationFrame(tick);
+
+// the call-to-action targets are placeholders until real destinations exist
+document.querySelectorAll('a[href="#demo"], a[href="#drawings"]').forEach((a) => a.addEventListener('click', (e) => e.preventDefault()));
+</script>
