@@ -1,20 +1,19 @@
 "use client";
 
-// The opening: a realistic seawater pump room on a ferry. Over the room phase the camera walks in from the corner of the
-// room to Pump 8, then the room darkens and Pump 8 dissolves into its line work, in exactly the pose where the
-// line-work canvas above takes over.
+// The opening: a seawater pump room on a ferry, drawn as line work. Over the room phase the camera walks in from the
+// corner of the room to Pump 8. Then the room dims and Pump 8 turns into its see-through line work, in exactly the pose
+// where the line-work canvas above takes over.
+//
+// How the lines are drawn: the room is rendered once into a buffer, storing each pixel's surface direction, the line
+// weight of its part (equipment bright, structure faint) and its depth. An edge shader then draws a white line wherever
+// the depth jumps (outlines) or the surface folds (creases). Lines hidden behind other parts never appear, and lines
+// fade with distance. Pump 8's see-through line work is drawn on top for the hand-off.
 //
 //   room 0.00-0.80  walk in, with labels on the pumps, the strainer and the header from 0.04 to 0.6
-//   room 0.60-0.86  x-ray: lights dim, Pump 8's paint fades and its line work appears
+//   room 0.60-0.86  x-ray: the room dims and Pump 8's see-through line work appears
 //   room 0.86-0.97  this canvas fades out (CSS, --r), and the line-work pump fades in above it
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { toCreasedNormals } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { FOV, halfSize, heroCamera } from "./heroPose";
 import { buildRealRoom, type Anchor } from "./realRoom";
@@ -22,6 +21,12 @@ import type { Phases } from "./useScrollPhases";
 
 const MESH_URL = "/models/pump-mesh.bin";
 const EDGES_URL = "/models/pump-edges.bin";
+// The page's ink, #0b1014, as display values. The edge shader writes straight to the screen with no colour conversion,
+// so it takes the colour as is, and it matches the page background behind the canvas exactly.
+const INK = new THREE.Vector3(11 / 255, 16 / 255, 20 / 255);
+const INK_CLEAR = new THREE.Color().setRGB(INK.x, INK.y, INK.z, THREE.SRGBColorSpace);
+const NEAR = 0.05;
+const FAR = 40;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const ease = (a: number, b: number, x: number) => {
@@ -30,7 +35,7 @@ const ease = (a: number, b: number, x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-/** Reads "PMSH" from tools/build_pump_edges.mjs and gives the mesh creased normals, so hard edges stay crisp. */
+/** Reads "PMSH" from tools/build_pump_edges.mjs and gives the mesh creased normals, so its folds draw as lines. */
 function parseMesh(buf: ArrayBuffer) {
   const view = new DataView(buf);
   const vertices = view.getUint32(4, true);
@@ -56,6 +61,74 @@ function parseEdges(buf: ArrayBuffer) {
   return g;
 }
 
+/** Turns surface directions, weights and depth into white lines on ink. */
+const edgeShader = () =>
+  new THREE.ShaderMaterial({
+    uniforms: {
+      tNormal: { value: null },
+      tDepth: { value: null },
+      texel: { value: new THREE.Vector2() },
+      cameraNear: { value: NEAR },
+      cameraFar: { value: FAR },
+      ink: { value: INK.clone() },
+      strength: { value: 1 },
+      fade: { value: new THREE.Vector2(4.5, 17) },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+    `,
+    fragmentShader: /* glsl */ `
+      #include <packing>
+      uniform sampler2D tNormal;
+      uniform sampler2D tDepth;
+      uniform vec2 texel;
+      uniform float cameraNear;
+      uniform float cameraFar;
+      uniform vec3 ink;
+      uniform float strength;
+      uniform vec2 fade;
+      varying vec2 vUv;
+
+      float viewDepth(vec2 uv) {
+        float z = texture2D(tDepth, uv).x;
+        return -perspectiveDepthToViewZ(z, cameraNear, cameraFar);
+      }
+
+      void main() {
+        vec4 c = texture2D(tNormal, vUv);
+        float d = viewDepth(vUv);
+        vec3 n = c.xyz * 2.0 - 1.0;
+        float depthEdge = 0.0;
+        float foldEdge = 0.0;
+        float weight = c.a;
+        vec2 offs[4];
+        offs[0] = vec2(texel.x, 0.0);
+        offs[1] = vec2(-texel.x, 0.0);
+        offs[2] = vec2(0.0, texel.y);
+        offs[3] = vec2(0.0, -texel.y);
+        for (int i = 0; i < 4; i++) {
+          vec2 uv = vUv + offs[i];
+          vec4 ci = texture2D(tNormal, uv);
+          float di = viewDepth(uv);
+          // Outlines: a jump in depth, relative to how far away the surface is.
+          depthEdge = max(depthEdge, smoothstep(0.012, 0.035, abs(di - d) / min(d, di)));
+          // Folds: neighbours facing different ways on the same surface.
+          if (ci.a > 0.0 && c.a > 0.0) foldEdge = max(foldEdge, smoothstep(0.18, 0.45, 1.0 - dot(n, ci.xyz * 2.0 - 1.0)));
+          // The nearer part of an outline decides how bright it draws.
+          weight = (di < d || c.a == 0.0) ? max(weight, ci.a) : weight;
+        }
+        float edge = max(depthEdge, foldEdge) * weight;
+        // Far lines fade towards the ink, so the room has depth.
+        float near = 1.0 - smoothstep(fade.x, fade.y, min(d, cameraFar));
+        float line = edge * mix(0.3, 1.0, near) * strength;
+        gl_FragColor = vec4(mix(ink, vec3(1.0), clamp(line, 0.0, 1.0)), 1.0);
+      }
+    `,
+    depthTest: false,
+    depthWrite: false,
+  });
+
 /** The walk, in the pump's units: from the forward corner of the room, past the strainers, to Pump 8. */
 const WALK = [
   { at: new THREE.Vector3(6.0, 2.45, 5.3), look: new THREE.Vector3(-0.8, 0.35, -2.4) },
@@ -77,36 +150,30 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
     } catch {
       return; // The line-work pump still shows, so the page works without the room.
     }
-    const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
+    // The edge shader works per pixel, so a sharper buffer gives finer lines.
+    const pixelRatio = Math.min(window.devicePixelRatio, 2);
     renderer.setPixelRatio(pixelRatio);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
-    // Lights and objects never move against each other, so the shadow map is drawn once.
-    renderer.shadowMap.autoUpdate = false;
+    renderer.autoClear = false;
     el.appendChild(renderer.domElement);
     renderer.domElement.setAttribute("aria-hidden", "true");
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#0b1014");
-    scene.fog = new THREE.Fog("#1a1c1e", 9, 24);
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    const envScene = new RoomEnvironment();
-    scene.environment = pmrem.fromScene(envScene, 0.04).texture;
-    scene.environmentIntensity = 0.35;
+    const camera = new THREE.PerspectiveCamera(FOV, 1, NEAR, FAR);
 
-    const camera = new THREE.PerspectiveCamera(FOV, 1, 0.05, 60);
-    const target = new THREE.WebGLRenderTarget(1, 1, { samples: 4, type: THREE.HalfFloatType });
-    const composer = new EffectComposer(renderer, target);
-    composer.addPass(new RenderPass(scene, camera));
-    const ao = new GTAOPass(scene, camera, 1, 1);
-    ao.blendIntensity = 0.85;
-    ao.updateGtaoMaterial({ radius: 0.35, distanceExponent: 1.4, thickness: 1.2, scale: 1, samples: 16 });
-    composer.addPass(ao);
-    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 0.6, 1.0);
-    composer.addPass(bloom);
-    composer.addPass(new OutputPass());
+    // Buffer for the first pass: surface direction and line weight in colour, depth alongside.
+    const buffer = new THREE.WebGLRenderTarget(1, 1, {
+      depthTexture: new THREE.DepthTexture(1, 1),
+      magFilter: THREE.NearestFilter,
+      minFilter: THREE.NearestFilter,
+    });
+    const edges = edgeShader();
+    edges.uniforms.tNormal.value = buffer.texture;
+    edges.uniforms.tDepth.value = buffer.depthTexture;
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), edges);
+    quad.frustumCulled = false;
+    const quadScene = new THREE.Scene();
+    quadScene.add(quad);
+    const quadCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
     let room: ReturnType<typeof buildRealRoom> | null = null;
     let pumpGeometry: THREE.BufferGeometry | null = null;
@@ -123,7 +190,6 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
         edgeGeometry = parseEdges(lines);
         room = buildRealRoom(pumpGeometry, edgeGeometry);
         scene.add(room.group);
-        renderer.shadowMap.needsUpdate = true;
         setAnchors(room.anchors);
       })
       .catch(() => {});
@@ -139,7 +205,8 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
       width = el.clientWidth;
       height = el.clientHeight;
       renderer.setSize(width, height, false);
-      composer.setSize(width, height);
+      buffer.setSize(Math.round(width * pixelRatio), Math.round(height * pixelRatio));
+      edges.uniforms.texel.value.set(1 / (width * pixelRatio), 1 / (height * pixelRatio));
       camera.aspect = width / Math.max(height, 1);
       camera.updateProjectionMatrix();
       const { halfW, halfH } = halfSize(camera.aspect);
@@ -185,16 +252,12 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
       }
       camera.updateMatrixWorld();
 
-      // X-ray: dim the room, fade Pump 8's paint, and bring up its line work.
-      renderer.toneMappingExposure = lerp(1.05, 0.1, ease(0.6, 0.86, r));
-      bloom.strength = lerp(0.55, 0.15, ease(0.6, 0.86, r));
+      // X-ray: the room dims, and Pump 8 swaps its outline for its see-through line work.
+      edges.uniforms.strength.value = lerp(1, 0.22, ease(0.6, 0.86, r));
       if (room) {
-        room.update(t, reduced);
-        room.targetMaterial.opacity = 1 - ease(0.66, 0.84, r);
-        room.target.castShadow = room.targetMaterial.opacity > 0.99;
-        room.edgeMaterial.opacity = 0.9 * ease(0.6, 0.8, r);
+        room.target.visible = r < 0.74;
+        room.edgeMaterial.opacity = 0.88 * ease(0.6, 0.8, r);
 
-        // Labels follow their points on screen.
         const show = ease(0.04, 0.16, r) * (1 - ease(0.5, 0.62, r));
         for (const a of room.anchors) {
           const node = labelRefs.current[a.key];
@@ -205,7 +268,19 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
           node.style.transform = `translate(${((projected.x + 1) / 2) * width}px, ${((1 - projected.y) / 2) * height}px)`;
         }
       }
-      composer.render();
+
+      // Pass 1: surface directions, weights and depth. Pass 2: edges to the screen. Pass 3: Pump 8's line work.
+      camera.layers.set(0);
+      renderer.setRenderTarget(buffer);
+      renderer.setClearColor(0x000000, 0);
+      renderer.clear();
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+      renderer.setClearColor(INK_CLEAR, 1);
+      renderer.clear();
+      renderer.render(quadScene, quadCamera);
+      camera.layers.set(1);
+      renderer.render(scene, camera);
     };
     tick();
 
@@ -217,10 +292,10 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
       room?.dispose();
       pumpGeometry?.dispose();
       edgeGeometry?.dispose();
-      composer.dispose();
-      target.dispose();
-      pmrem.dispose();
-      scene.environment?.dispose();
+      buffer.depthTexture?.dispose();
+      buffer.dispose();
+      edges.dispose();
+      quad.geometry.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
@@ -228,9 +303,6 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
 
   return (
     <div ref={holder} className="welcome-room absolute inset-0 [&>canvas]:block [&>canvas]:size-full">
-      {/* Soft shade at the top and bottom, so the header, the section label and the scroll cue stay readable. */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-40 bg-gradient-to-b from-black/55 to-transparent" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-black/45 to-transparent" />
       {anchors.map((a) => (
         <div
           key={a.key}
@@ -240,11 +312,11 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
           aria-hidden
           className="pointer-events-none absolute top-0 left-0 opacity-0"
         >
-          <span className="absolute -top-1 -left-1 size-2 bg-white" />
+          <span className="absolute -top-1 -left-1 size-2 bg-mz-accent" />
           <span className="absolute top-0 left-0 h-px w-10 bg-white/70" />
-          <span className="absolute -top-5 left-11 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.14em] text-white [text-shadow:0_1px_3px_rgb(0_0_0/0.85)]">
+          <span className="absolute -top-5 left-11 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.14em] text-white">
             {a.label}
-            <span className="ml-2 text-white/60">{a.detail}</span>
+            <span className="ml-2 text-white/55">{a.detail}</span>
           </span>
         </div>
       ))}

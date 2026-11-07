@@ -53,12 +53,12 @@ From `profile` in the organizer `assets.csv`. Site names stay fictional.
 
 ## Machine room opening (7 Nov, evening)
 
-Like Meuze, which opens inside a restaurant, the page opens inside a ship's engine room, because 6 of the 12 pumps are ferry pumps and Pump 8 is the main demo. A line-work room and a halftone photo were tried first and rejected as not realistic enough. The opening is now a realistic render, built in code:
+Like Meuze, which opens inside a restaurant, the page opens inside a ship's engine room, because 6 of the 12 pumps are ferry pumps and Pump 8 is the main demo. A simple line-work room and a halftone photo were tried first and rejected as not realistic enough. A realistic render came next, and Jona then asked for it as line work. The opening is now that detailed room, drawn as a technical line drawing:
 
 - **Room:** a seawater cooling pump room on Vessel B. Chequer-plate deck, cream bulkheads with hull frames, deckhead beams, lagged pipes, fresh-water and fuel lines in ISO 14726 colours, cable trays, light fittings, starter panels with lamps and ammeters, a sign, a ladder, a handrail and a fire extinguisher.
 - **Pumps:** Pump 8 and Pump 7 (Vessel B's seawater cooling pumps No. 2 and No. 1), plus a fire and general service pump, all from the team's pump model as painted solid meshes. Each has a discharge drop with check valve, valve, handwheel and gauge to the seawater header, and a suction branch through a basket strainer from the suction main.
-- **Rendering:** physical materials, a shadow-casting key light, soft fill lights, reflections, ambient occlusion, bloom, fog and dust in the air. Runs at 60 frames per second on the development laptop.
-- **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then the room dims and Pump 8 dissolves into its line work, in exactly the pose where the line-work story starts (`heroPose.ts`).
+- **Rendering:** each part has a line weight instead of paint. The room is drawn once as surface directions, weights and depth, and an edge shader turns outlines and folds into white lines on ink. Hidden lines disappear on their own, equipment draws bright, structure faint, and far lines fade. Runs at 60 frames per second on the development laptop.
+- **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then the room dims and Pump 8 switches to its see-through line work, in exactly the pose where the line-work story starts (`heroPose.ts`).
 
 ## Parts
 

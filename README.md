@@ -77,7 +77,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Isometric case board | react-isokit | MIT |
 | 3D pump on the landing page | three.js | MIT |
 | Pump model on the landing page | `pump.obj`, downloaded by the team, stored as line work and a compact solid mesh in `public/models/` by `tools/build_pump_edges.mjs` | **Source and licence to confirm** |
-| Engine room on the landing page | Built in code with three.js: room, pipework, valves, gauges, panels and procedural textures. Post-processing (ambient occlusion, bloom) from the three.js examples | MIT |
+| Engine room on the landing page | Built in code with three.js: room, pipework, valves, gauges and panels, drawn as line work by our own edge shader | MIT |
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |

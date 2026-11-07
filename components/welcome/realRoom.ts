@@ -1,4 +1,7 @@
-// A seawater cooling pump room on a ferry, rendered with real materials for the opening of the landing page.
+// A seawater cooling pump room on a ferry, for the opening of the landing page, drawn as line work.
+// Every surface gets a line weight instead of paint: RoomStage renders the room's surface directions and depth, and an
+// edge shader turns outlines and folds into white lines, so lines hidden behind things disappear on their own.
+// Equipment draws bright, and the hull, deck and deckhead draw faint.
 // Units are the pump model's: it spans x -1 to 1 along the shaft, y -0.42 to 0.42, and z -0.33 to 0.33. The pump the
 // camera walks to, Pump 8, stands at the origin unrotated, so its pose matches the line-work pump exactly.
 //
@@ -8,7 +11,6 @@
 // Pipe colours follow ISO 14726: seawater green, fresh water blue, fuel brown. In the data, Pump 7 and Pump 8 are
 // seawater cooling pumps No. 1 and No. 2 on Vessel B, so this room holds both, plus a fire and general service pump.
 import * as THREE from "three";
-import { chequerPlate, dustSprite, gaugeFace, namePlate, paintedSteel } from "./roomTextures";
 
 const FLOOR = -0.62;
 const CEIL = 3.4;
@@ -40,35 +42,32 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
   const disposables: { dispose: () => void }[] = [];
   const keep = <T extends { dispose: () => void }>(x: T) => (disposables.push(x), x);
 
-  const std = (color: string, roughness: number, metalness: number, extra: Partial<THREE.MeshPhysicalMaterialParameters> = {}) =>
-    keep(new THREE.MeshPhysicalMaterial({ color, roughness, metalness, ...extra }));
+  /** A surface that draws its outline at `weight`, from 0 (none) to 1 (full white). Stored as the normal pass's alpha. */
+  const weighted = (weight: number) =>
+    keep(new THREE.MeshNormalMaterial({ opacity: weight, blending: THREE.NoBlending, side: THREE.DoubleSide }));
 
-  // Materials.
-  const deck = chequerPlate([(X1 - X0) / 1.3, (Z1 - Z0) / 1.3]);
-  Object.values(deck).forEach(keep);
-  const floorMat = std("#ffffff", 0.62, 0.55, { map: deck.map, normalMap: deck.normalMap, roughnessMap: deck.roughnessMap, normalScale: new THREE.Vector2(0.9, 0.9) });
-  const wallTex = keep(paintedSteel("#d9d4c3", [3, 1.4]));
-  const wallMat = std("#ffffff", 0.78, 0.08, { map: wallTex });
-  const frameMat = std("#cfc9b6", 0.72, 0.1, { map: wallTex });
-  const deckheadMat = std("#9c9a91", 0.85, 0.05);
-  const seawater = std("#2f6e43", 0.48, 0.15, { clearcoat: 0.25, clearcoatRoughness: 0.5 });
-  const freshwater = std("#2c5d9e", 0.45, 0.15, { clearcoat: 0.25 });
-  const fuel = std("#6a4a2c", 0.5, 0.15);
-  const cladding = std("#c9ccce", 0.32, 0.9);
-  const steel = std("#3c4044", 0.38, 0.85);
-  const bolts = std("#2a2c2e", 0.4, 0.9);
-  const handwheel = std("#b3261e", 0.42, 0.1, { clearcoat: 0.4 });
-  const yellow = std("#d9a400", 0.55, 0.05);
-  const plinthMat = std("#5c6660", 0.7, 0.2);
-  const panelMat = std("#c6c9c3", 0.42, 0.35);
-  const cable = std("#151617", 0.7, 0.0);
-  const pumpPaint = {
-    blue: std("#2c5f8c", 0.42, 0.35, { clearcoat: 0.45, clearcoatRoughness: 0.35 }),
-    red: std("#9c2a20", 0.42, 0.3, { clearcoat: 0.45, clearcoatRoughness: 0.35 }),
-  };
-  const tube = std("#ffffff", 0.3, 0, { emissive: new THREE.Color("#fff6e8"), emissiveIntensity: 5 });
-  const lampGreen = std("#1e3", 0.3, 0, { emissive: new THREE.Color("#2bdc5a"), emissiveIntensity: 3 });
-  const lampAmber = std("#fa0", 0.3, 0, { emissive: new THREE.Color("#ffad1f"), emissiveIntensity: 3 });
+  // Line weights: equipment bright, structure faint.
+  const floorMat = weighted(0.26);
+  const wallMat = weighted(0.2);
+  const frameMat = weighted(0.34);
+  const deckheadMat = weighted(0.3);
+  const seawater = weighted(0.9);
+  const freshwater = weighted(0.55);
+  const fuel = weighted(0.5);
+  const cladding = weighted(0.45);
+  const steel = weighted(0.78);
+  const bolts = weighted(0.7);
+  const handwheel = weighted(0.95);
+  const yellow = weighted(0.62);
+  const plinthMat = weighted(0.6);
+  const panelMat = weighted(0.55);
+  const cable = weighted(0.32);
+  const pumpPaint = { blue: weighted(0.92), red: weighted(0.92) };
+  const tube = weighted(0.6);
+  const lampGreen = weighted(0.7);
+  const lampAmber = weighted(0.7);
+  const gaugeMat = weighted(0.85);
+  const plateMat = weighted(0.6);
 
   const add = (geometry: THREE.BufferGeometry, material: THREE.Material, cast = true, receive = true) => {
     keep(geometry);
@@ -140,26 +139,31 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
     const n = facing.clone().normalize();
     cylinderAlong(0.012, at.clone().addScaledVector(n, -0.12), at.clone().addScaledVector(n, -0.03), steel, 10);
     cylinderAlong(0.075, at.clone().addScaledVector(n, -0.03), at, steel, 32);
-    const tex = keep(gaugeFace(value));
+    void value;
     const face = new THREE.CircleGeometry(0.066, 32);
     face.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), n));
     face.translate(at.x + n.x * 0.002, at.y + n.y * 0.002, at.z + n.z * 0.002);
-    add(face, keep(new THREE.MeshStandardMaterial({ map: tex, roughness: 0.15, metalness: 0 })), false);
+    add(face, gaugeMat, false);
   };
-  const plate = (lines: string[], at: THREE.Vector3, facing: THREE.Vector3, width: number, opts?: Parameters<typeof namePlate>[1]) => {
-    const tex = keep(namePlate(lines, opts));
+  // Name plates draw as plates. Their words are shown by the HTML labels instead.
+  const plate = (_lines: string[], at: THREE.Vector3, facing: THREE.Vector3, width: number, _opts?: unknown) => {
     const g = new THREE.PlaneGeometry(width, width * 0.28);
     g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), facing.clone().normalize()));
     g.translate(at.x, at.y, at.z);
-    add(g, keep(new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4, metalness: 0.2 })), false);
+    add(g, plateMat, false);
   };
 
   // Deck, bulkheads, deckhead.
   {
-    const floor = new THREE.PlaneGeometry(X1 - X0, Z1 - Z0);
-    floor.rotateX(-Math.PI / 2);
-    floor.translate((X0 + X1) / 2, FLOOR, (Z0 + Z1) / 2);
-    add(floor, floorMat, false);
+    // Floor plates with small gaps, so their seams draw as lines.
+    const PLATE = 1.3;
+    for (let x = X0; x < X1 - 1e-6; x += PLATE) {
+      for (let z = Z0; z < Z1 - 1e-6; z += PLATE) {
+        const w = Math.min(PLATE, X1 - x) - 0.025;
+        const d = Math.min(PLATE, Z1 - z) - 0.025;
+        box(w, 0.03, d, v(x + w / 2 + 0.0125, FLOOR - 0.015, z + d / 2 + 0.0125), floorMat, false);
+      }
+    }
     const wall = (w: number, h: number, at: THREE.Vector3, rotY: number, repeat: number) => {
       const g = new THREE.PlaneGeometry(w, h);
       const uv = g.attributes.uv;
@@ -195,9 +199,7 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
   }
 
   // Pumps, each on a plinth with a painted margin, a name plate, a discharge drop and a suction branch.
-  const targetMaterial = pumpPaint.blue.clone();
-  targetMaterial.transparent = true;
-  keep(targetMaterial);
+  const targetMaterial = weighted(1);
   let target: THREE.Mesh | null = null;
   for (const spot of PUMPS) {
     const { z } = spot;
@@ -273,31 +275,13 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
     }
   }
 
-  // Light fittings: housings with glowing tubes, each with a soft point light.
-  const lights: THREE.Light[] = [];
+  // Light fittings: housings with their tubes.
   for (const x of [-2.3, 1.7]) {
     for (const z of [4.6, 1.9, -1.1, -4.1]) {
       box(0.26, 0.08, 1.45, v(x, CEIL - 0.42, z), panelMat, false);
       for (const dx of [-0.06, 0.06]) cylinderAlong(0.022, v(x + dx, CEIL - 0.48, z - 0.66), v(x + dx, CEIL - 0.48, z + 0.66), tube, 12, false);
-      const p = new THREE.PointLight("#fff1dc", 3.2, 0, 2);
-      p.position.set(x, CEIL - 0.62, z);
-      group.add(p);
-      lights.push(p);
     }
   }
-  // The key light over the pumps casts the shadows.
-  const key = new THREE.SpotLight("#fff3e2", 34, 0, 1.05, 0.8, 2);
-  key.position.set(-0.4, CEIL - 0.45, 0.6);
-  key.target.position.set(0.1, FLOOR, -1.6);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.bias = -0.0003;
-  key.shadow.normalBias = 0.02;
-  key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 12;
-  group.add(key, key.target);
-  const hemi = new THREE.HemisphereLight("#fff6ea", "#2e2c28", 0.45);
-  group.add(hemi);
 
   // Starter panels on the aft bulkhead, with lamps, an ammeter and plates.
   ["SW PUMP 1", "SW PUMP 2", "FIRE & GS"].forEach((name, i) => {
@@ -319,7 +303,7 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
   for (let y = FLOOR + 0.3; y < CEIL; y += 0.3) cylinderAlong(0.016, v(3.98, y, Z0 + 0.3), v(4.42, y, Z0 + 0.3), steel, 8);
   for (let x = -2.6; x <= 1.0; x += 1.2) box(0.04, 1.05, 0.04, v(x, FLOOR + 0.525, 1.72), yellow);
   for (const y of [FLOOR + 0.55, FLOOR + 1.05]) cylinderAlong(0.022, v(-2.6, y, 1.72), v(1.0, y, 1.72), yellow, 12);
-  cylinderAlong(0.085, v(X0 + 0.5, FLOOR + 0.6, 2.4), v(X0 + 0.5, FLOOR + 1.12, 2.4), std("#b02418", 0.35, 0.1, { clearcoat: 0.6 }));
+  cylinderAlong(0.085, v(X0 + 0.5, FLOOR + 0.6, 2.4), v(X0 + 0.5, FLOOR + 1.12, 2.4), weighted(0.8));
   // Walkway lines on the deck.
   for (const z of [1.25, 3.6]) box(X1 - X0 - 1, 0.006, 0.07, v((X0 + X1) / 2, FLOOR + 0.003, z), yellow, false);
 
@@ -332,28 +316,12 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
     group.add(bolt);
   }
 
-  // Dust hanging in the light.
-  const DUST = 700;
-  const dustPos = new Float32Array(DUST * 3);
-  const dustSeed = new Float32Array(DUST);
-  for (let i = 0; i < DUST; i++) {
-    dustPos[i * 3] = -2.5 + Math.random() * 6.5;
-    dustPos[i * 3 + 1] = FLOOR + 0.2 + Math.random() * 3.2;
-    dustPos[i * 3 + 2] = -5 + Math.random() * 7.5;
-    dustSeed[i] = Math.random() * 100;
-  }
-  const dustGeo = keep(new THREE.BufferGeometry());
-  dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
-  const dustBase = dustPos.slice();
-  const dustTex = keep(dustSprite());
-  const dustMat = keep(new THREE.PointsMaterial({ size: 0.022, map: dustTex, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, color: "#fff1d6" }));
-  const dust = new THREE.Points(dustGeo, dustMat);
-  group.add(dust);
 
   // Line work over Pump 8, for the hand-off to the drawing. Drawn on top, like the line-work pump that follows.
-  const edgeMat = keep(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthTest: false, toneMapped: false }));
+  const edgeMat = keep(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthTest: false }));
   const edges = new THREE.LineSegments(pumpEdges, edgeMat);
   edges.renderOrder = 10;
+  edges.layers.set(1);
   group.add(edges);
 
   const anchors: Anchor[] = [
@@ -363,23 +331,14 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
     { key: "header", label: "Seawater header", detail: "To the coolers", at: v(DISCHARGE.x, HEADER_Y + 0.25, -2.8) },
   ];
 
-  const update = (t: number, still: boolean) => {
-    if (still) return;
-    for (let i = 0; i < DUST; i++) {
-      const s = dustSeed[i];
-      dustPos[i * 3] = dustBase[i * 3] + Math.sin(t * 0.11 + s) * 0.12;
-      dustPos[i * 3 + 1] = dustBase[i * 3 + 1] + Math.sin(t * 0.07 + s * 1.7) * 0.18;
-      dustPos[i * 3 + 2] = dustBase[i * 3 + 2] + Math.cos(t * 0.09 + s) * 0.12;
-    }
-    dustGeo.attributes.position.needsUpdate = true;
-  };
+  /** Nothing moves in the drawing itself; kept so the stage can call it. */
+  const update = (_t: number, _still: boolean) => {};
 
   return {
     group,
     target: target as THREE.Mesh,
     targetMaterial,
     edgeMaterial: edgeMat,
-    lights,
     anchors,
     update,
     dispose: () => disposables.forEach((d) => d.dispose()),
