@@ -7,6 +7,18 @@
       "skillPath": "skills/agentation/SKILL.md",
       "computedHash": "52812c1707e9cc8ca68d9dba1dda4e307bfb57b2b3ab0ded89602972808cc699"
     },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "9cdbb4b8f7a3aeaef82e6230c9e823500d4a8a1214c726cf342cf9829d34fc7d"
+    },
+    "grilling": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grilling/SKILL.md",
+      "computedHash": "e40cc1d348f6d935e28f1e24474302d7368f0a400429271a43b35fe154891dc5"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
