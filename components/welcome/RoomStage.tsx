@@ -143,7 +143,17 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
           projected.copy(a.at).project(camera);
           const visible = projected.z < 1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;
           node.style.opacity = visible ? String(show) : "0";
-          node.style.transform = `translate(${((projected.x + 1) / 2) * width}px, ${((1 - projected.y) / 2) * height}px)`;
+          const x = ((projected.x + 1) / 2) * width;
+          // A tag that would run off the right edge flips to the left of its point, and stays inside the screen.
+          const tag = node.lastElementChild as HTMLElement | null;
+          if (tag) {
+            const w = tag.offsetWidth;
+            const flip = x + 40 + w > width - 12 && x - 40 - w >= 12;
+            node.dataset.flip = String(flip);
+            const left = flip ? -40 - w : Math.min(40, width - 12 - w - x);
+            tag.style.left = `${left}px`;
+          }
+          node.style.transform = `translate(${x}px, ${((1 - projected.y) / 2) * height}px)`;
         }
       }
 
@@ -173,13 +183,14 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
             labelRefs.current[a.key] = node;
           }}
           aria-hidden
-          className="pointer-events-none absolute top-0 left-0 opacity-0"
+          className="group pointer-events-none absolute top-0 left-0 opacity-0"
         >
+          {/* The tag sits on its own ink plate with a hairline edge, so the drawing's lines never run through the words. */}
           <span className="absolute -top-1 -left-1 size-2 bg-mz-accent" />
-          <span className="absolute top-0 left-0 h-px w-10 bg-white/70" />
-          <span className="absolute -top-5 left-11 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.14em] text-white">
-            {a.label}
-            <span className="ml-2 text-white/55">{a.detail}</span>
+          <span className="absolute top-0 left-0 h-px w-10 bg-white/70 group-data-[flip=true]:-left-10" />
+          <span className="absolute top-0 left-10 flex -translate-y-1/2 items-baseline gap-2 whitespace-nowrap rounded-[4px] bg-mz-ink/95 px-2.5 py-1.5 text-[13px] leading-none text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.28)]">
+            <span className="font-medium">{a.label}</span>
+            <span className="hidden text-white/60 sm:inline">{a.detail}</span>
           </span>
         </div>
       ))}

@@ -31,6 +31,9 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Results rows open the faults behind them: each of the 35 faults, or the 11 that reached a limit, or the 4 false alerts, with what the alerts and the plant alarms did. Marked as a review of past faults with known answers. `lib/pastFaults.test.ts` checks each list adds up to its row.
 - After Acknowledge the card asks what the worker found: the named fault, something else (pick it), nothing wrong, or not sure. Saved on this device and shown on the pump's window. It does not change the results, which stay the organizers' scoring.
 - The evidence chart can show any reading: point at one under "Readings now", click to keep it. "Replay the warning" sweeps through the hours up to the shift and says when the reading left its band and how long before the shift the first alert came. Charts now always end on the reading the card lists as now.
+- The room's labels sit on their own ink plates, so the drawing never runs through the words. A label near the screen edge flips side, and phones show only the name.
+- The top bar is a solid bar: ink over the engine room, white from the fade on. It marks the section you are in, and on wider screens says how many pumps need you, with a jump to the panel.
+- The pump turn is a third shorter: 90 viewport heights of scrolling instead of 135, and the scroll section is 440vh.
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
 ## In progress

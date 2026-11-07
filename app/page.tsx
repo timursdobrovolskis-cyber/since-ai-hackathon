@@ -16,6 +16,7 @@ import { RoomStage } from "@/components/welcome/RoomStage";
 import { AlarmPanel } from "@/components/welcome/AlarmPanel";
 import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
+import { TopBar, type Place } from "@/components/welcome/TopBar";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
 
@@ -39,23 +40,27 @@ function useCompact() {
 
 export default function Welcome() {
   const track = useRef<HTMLElement>(null);
-  const { phases, mapReady } = useScrollPhases(track);
+  const { phases, mapReady, light } = useScrollPhases(track);
   // The panel and the pump card show the evening shift as it stands. There is no clock running.
   const site = useSite(SHIFT_HOUR, SHIFT_HOUR);
   const compact = useCompact();
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
-  // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
-  const [solid, setSolid] = useState(false);
+  // Past the pinned stage the bar turns white for good, and the section in view is marked in it.
+  const [past, setPast] = useState(false);
+  const [inResults, setInResults] = useState(false);
   useEffect(() => {
     const onScroll = () => {
       const el = track.current;
-      if (el) setSolid(el.getBoundingClientRect().bottom <= 64);
+      if (el) setPast(el.getBoundingClientRect().bottom <= 64);
+      const res = document.getElementById("results");
+      setInResults(!!res && res.getBoundingClientRect().top < window.innerHeight * 0.5);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  const place: Place = inResults ? "results" : mapReady || past ? "map" : "top";
   // Scrolling back up to the pump closes any open card.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
@@ -63,7 +68,7 @@ export default function Welcome() {
   }, [mapReady]);
 
   /** Header links: the top, the map at the evening shift, and the sections below. */
-  const jump = (to: "top" | "map" | "results") => {
+  const jump = (to: Place) => {
     const el = track.current;
     if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
     if (to === "map" && el) {
@@ -75,21 +80,10 @@ export default function Welcome() {
 
   return (
     <div className="welcome min-h-full bg-white font-geist text-mz-ink">
-      {/* Over the stage, difference blending keeps the header readable on both ink and white. Below it, a solid bar. */}
-      <header
-        className={`fixed inset-x-0 top-0 z-30 flex h-16 items-center px-5 transition-colors sm:px-10 ${
-          solid ? "border-b border-mz-line bg-white/92 text-mz-ink backdrop-blur" : "text-white mix-blend-difference"
-        }`}
-      >
-        <nav aria-label="Sections" className="flex gap-7 text-[15px]">
-          <button type="button" onClick={() => jump("top")} className="hover:underline underline-offset-4">Engine room</button>
-          <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Alarm panel</button>
-          <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
-        </nav>
-      </header>
+      <TopBar tone={light || past ? "white" : "ink"} place={place} site={site} onJump={jump} />
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} aria-label="Engine room and site map" className="relative h-[485vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
+      <section ref={track} aria-label="Engine room and site map" className="relative h-[440vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}

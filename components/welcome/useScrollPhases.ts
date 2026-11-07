@@ -1,9 +1,9 @@
 "use client";
 
 // Turns the scroll position inside one tall section into two phases, each 0 to 1:
-//   room  0 % to 49 %:  the engine room, walking in to Pump 8
-//   pump  49 % to 84 %: the pump zooms, turns a quarter of the way round and glides right, and the page fades to white
-// The last 16 % holds the alarm panel and the pump still, so there is time to use them before the page moves on.
+//   room  0 % to 56 %:  the engine room, walking in to Pump 8
+//   pump  56 % to 82 %: the pump zooms, turns a quarter of the way round and glides right, and the page fades to white
+// The last 18 % holds the alarm panel and the pump still, so there is time to use them before the page moves on.
 // The panel shows the evening shift as it stands, with no clock running.
 // Both phases are written to CSS variables on the section (--r, --p) on every scroll, so CSS can use them without
 // React re-rendering. Whether the panel can be used is React state, but it changes rarely.
@@ -12,15 +12,19 @@ import { useEffect, useRef, useState } from "react";
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const span = (r: number, a: number, b: number) => clamp01((r - a) / (b - a));
 
-// In scroll heights of the section's travel (385 viewport heights): room 190, pump 135, hold 60.
-const ROOM = [0, 0.494] as const;
-const PUMP = [0.494, 0.844] as const;
+// In scroll heights of the section's travel (340 viewport heights): room 190, pump 90, hold 60.
+// The pump used 135 until 7 Nov; Jona found the turn too long twice, so it is now two thirds of that.
+const ROOM = [0, 0.559] as const;
+const PUMP = [0.559, 0.824] as const;
+/** The stage reads as white from here on (the ink-to-white fade in globals.css passes its middle at pump 0.66). */
+const LIGHT_FROM = 0.66;
 
 export type Phases = { room: number; pump: number };
 
 export function useScrollPhases(track: React.RefObject<HTMLElement | null>) {
   const phases = useRef<Phases>({ room: 0, pump: 0 });
   const [mapReady, setMapReady] = useState(false);
+  const [light, setLight] = useState(false);
 
   useEffect(() => {
     let frame = 0;
@@ -37,6 +41,7 @@ export function useScrollPhases(track: React.RefObject<HTMLElement | null>) {
       section.style.setProperty("--p", next.pump.toFixed(4));
       // The panel fades in from pump 0.74. Below this it is too faint to click.
       setMapReady(next.pump >= 0.85);
+      setLight(next.pump >= LIGHT_FROM);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -51,5 +56,5 @@ export function useScrollPhases(track: React.RefObject<HTMLElement | null>) {
     };
   }, [track]);
 
-  return { phases, mapReady };
+  return { phases, mapReady, light };
 }
