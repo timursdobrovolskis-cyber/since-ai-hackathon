@@ -12,6 +12,7 @@ Output (public/data/):
   fleet.json            pump list, safe for live screens
   pumps/<id>.json       5-min series, expected bands, states, alarms, maintenance (safe for live screens)
   alerts.json           alerts in the docs/spec.md section 8 format (safe for live screens)
+  track-record.json     how often each named cause was right. Totals only, so it reveals no single fault.
   review/<id>.json      labelled events and benign windows. LOADED ONLY BY THE REVIEW VIEW.
   review/scorecard.json results from the official scorer. LOADED ONLY BY THE REVIEW VIEW.
 
@@ -129,7 +130,7 @@ def mode_runs(g: pd.DataFrame, start: pd.Timestamp) -> list:
     return runs
 
 
-def build_pump(a: pd.Series, g: pd.DataFrame, alarms: pd.DataFrame, maint: pd.DataFrame) -> dict:
+def build_pump(a: pd.Series, g: pd.DataFrame, alarms: pd.DataFrame, maint: pd.DataFrame, ctx: pd.DataFrame) -> dict:
     start = pd.Timestamp(a["window_start_utc"])
     g = g.sort_values("window_start_utc").reset_index(drop=True)
     runs = mode_runs(g, start)
@@ -171,6 +172,8 @@ def build_pump(a: pd.Series, g: pd.DataFrame, alarms: pd.DataFrame, maint: pd.Da
                     "value": clean(r.value_at_raise, 2), "limit": clean(r.limit, 2)} for r in al.itertuples()],
         "maintenance": [note(r) for r in in_w.itertuples()],
         "history": [note(r) for r in history.itertuples()],
+        "lastWork": last_work(mt, start),
+        "stops": stop_windows(ctx, start),
     }
 
 
@@ -271,6 +274,45 @@ def to_alert(row: pd.Series, n: int, a: pd.Series, frame: pd.DataFrame, source: 
         if isinstance(extra.get("evidence"), dict):
             alert["evidence"] = {**alert["evidence"], **extra["evidence"]}
     return alert
+
+
+# Times a pump could be worked on, by schedule state. A published timetable is known ahead, so showing the next one
+# reads ahead of the replay clock on purpose. Faults are still only shown once they have been noticed.
+STOPS = {"port": "port call", "planned stop": "planned stop", "between batches": "gap between batches", "night": "night", "weekend": "weekend", "shift end": "end of shift"}
+
+
+def stop_windows(ctx: pd.DataFrame, start: pd.Timestamp) -> list:
+    """Merge the 1-min schedule into [startHour, endHour, label] windows."""
+    rows = ctx.sort_values("timestamp_utc")
+    out = []
+    for t, state in zip(rows["timestamp_utc"], rows["schedule_state"]):
+        label = STOPS.get(state)
+        hour = round((t - start).total_seconds() / 3600, 3)
+        if label and out and out[-1][2] == label and hour - out[-1][1] <= 0.05:
+            out[-1][1] = hour
+        elif label:
+            out.append([hour, hour, label])
+    return [w for w in out if w[1] - w[0] >= 0.25]
+
+
+def last_work(maint: pd.DataFrame, start: pd.Timestamp) -> dict:
+    """The newest record of each kind of work before the data window starts."""
+    before = maint[maint["in_window"].astype(str) != "True"].sort_values("start_utc")
+    return {t: {"hour": hours_from(g.iloc[-1].start_utc, start), "observation": g.iloc[-1].operator_observation} for t, g in before.groupby("work_type")}
+
+
+def track_record(alerts: list, events: pd.DataFrame) -> dict:
+    """How often each named cause matched a fault active at that moment. Totals only."""
+    out = {}
+    for a in alerts:
+        t = pd.Timestamp(a["alert_time_utc"])
+        ev = events[events.asset_id == a["asset_id"]]
+        active = ev[(ev.onset_utc <= t) & (ev.end_utc.isna() | (ev.end_utc + pd.Timedelta(minutes=30) >= t))]
+        row = out.setdefault(a["fault_type"], {"right": 0, "total": 0, "wrongKind": 0})
+        row["total"] += 1
+        row["right"] += int(a["fault_type"] in set(active.fault_type))
+        row["wrongKind"] += int(len(active) > 0 and a["event_class"] not in set(active.event_class))
+    return out
 
 
 METRICS = ["composite_score", "event_recall", "alert_precision", "event_f1", "false_alerts_per_asset_day", "timeliness",
@@ -375,6 +417,7 @@ def main():
     for c in ("onset_utc", "detectable_utc", "action_deadline_utc", "end_utc"):
         events[c] = pd.to_datetime(events[c], utc=True, format="ISO8601")
     benign = pd.read_csv(DATA / "benign_windows_train_validation.csv", parse_dates=["start_utc", "end_utc"])
+    context = pd.read_csv(DATA / "operating_context.csv", usecols=["asset_id", "timestamp_utc", "schedule_state"], parse_dates=["timestamp_utc"])
 
     pred = B.b1_threshold(zf, k=B1_PARAMS["k"], persist=B1_PARAMS["persist"])
     print(f"B1 alerts: {len(pred)}")
@@ -394,7 +437,7 @@ def main():
     fleet, alerts = [], []
     for _, a in assets.iterrows():
         g = zf[zf.asset_id == a.asset_id]
-        write(OUT / "pumps" / f"{a.asset_id}.json", build_pump(a, g, alarms, maint))
+        write(OUT / "pumps" / f"{a.asset_id}.json", build_pump(a, g, alarms, maint, context[context.asset_id == a.asset_id]))
         frame = g.sort_values("window_start_utc")
         rows = current[current.asset_id == a.asset_id].sort_values("alert_time_utc")
         for i, r in enumerate(rows.itertuples(), 1):
@@ -421,6 +464,7 @@ def main():
     write(OUT / "fleet.json", {"pumps": fleet, "channelMeta": {k: {"label": v[0], "unit": v[1]} for k, v in CHANNEL_META.items()},
                                "windowHours": 168, "stepMinutes": STEP_MIN})
     write(OUT / "alerts.json", {"source": source, "alerts": alerts})
+    write(OUT / "track-record.json", {"source": source, "causes": track_record(alerts, events)})
     write(OUT / "review" / "scorecard.json", build_scorecard(assets, events, alarms, pred, current, alerts, source))
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
