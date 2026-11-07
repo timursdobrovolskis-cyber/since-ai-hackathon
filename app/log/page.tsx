@@ -3,8 +3,9 @@
 import { useApp } from "@/components/AppProvider";
 import { clock } from "@/lib/labels";
 import { PLAIN, pumpName } from "@/lib/plain";
-import type { Decision } from "@/lib/types";
+import type { Decision, Finding } from "@/lib/types";
 
+const FOUND: Record<Finding, string> = { found: "Found it", other: "Found something else", nothing: "Nothing wrong" };
 const KIND: Record<Decision["kind"], string> = { approved: "I'll check it", rejected: "Not a problem", watching: "Remind me later" };
 
 export default function LogPage() {
@@ -13,8 +14,8 @@ export default function LogPage() {
 
   const exportCsv = () => {
     const quote = (v: string | number | undefined) => `"${String(v ?? "").replaceAll('"', '""')}"`;
-    const head = ["case_id", "pump", "fault_type", "decision", "reason", "follow_up_hour", "replay_hour", "decided_at"];
-    const lines = rows.map((r) => [r.caseId, r.assetId, r.faultType, r.kind, r.reason, r.followUpHour, r.atHour.toFixed(2), r.decidedAt].map(quote).join(","));
+    const head = ["case_id", "pump", "fault_type", "decision", "finding", "reason", "follow_up_hour", "replay_hour", "decided_at"];
+    const lines = rows.map((r) => [r.caseId, r.assetId, r.faultType, r.kind, r.finding, r.reason, r.followUpHour, r.atHour.toFixed(2), r.decidedAt].map(quote).join(","));
     const url = URL.createObjectURL(new Blob([[head.join(","), ...lines].join("\n")], { type: "text/csv" }));
     const a = Object.assign(document.createElement("a"), { href: url, download: "decision-log.csv" });
     a.click();
@@ -50,7 +51,7 @@ export default function LogPage() {
                 <td className="py-1">{pumpName(r.assetId)}</td>
                 <td className="py-1">{PLAIN[r.faultType]?.short ?? r.faultType}</td>
                 <td className="py-1">{KIND[r.kind]}</td>
-                <td className="py-1">{r.reason ?? (r.followUpHour !== undefined ? `Look again at ${clock(r.followUpHour)}` : "Draft work order")}</td>
+                <td className="py-1">{r.finding ? FOUND[r.finding] : r.reason ?? (r.followUpHour !== undefined ? `Look again at ${clock(r.followUpHour)}` : "Not checked yet")}</td>
               </tr>
             ))}
           </tbody>

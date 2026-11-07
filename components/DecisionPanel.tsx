@@ -4,14 +4,19 @@ import Link from "next/link";
 import { useState } from "react";
 import { clock } from "@/lib/labels";
 import { PLAIN, pumpName } from "@/lib/plain";
-import type { Case } from "@/lib/types";
+import type { Case, Finding } from "@/lib/types";
 import { useApp } from "./AppProvider";
 
 const REASONS = ["It's normal for this situation", "Already known", "I checked and it's fine", "Too little to go on", "Something else"];
 const REMINDERS = [4, 12, 24];
+const FINDINGS: { id: Finding; label: string }[] = [
+  { id: "found", label: "Found it" },
+  { id: "other", label: "Found something else" },
+  { id: "nothing", label: "Nothing wrong" },
+];
 
 export function DecisionPanel({ item }: { item: Case }) {
-  const { decisions, decide, hour } = useApp();
+  const { decisions, decide, recordFinding, hour } = useApp();
   const [mode, setMode] = useState<"none" | "reject" | "later">("none");
   const [reason, setReason] = useState(REASONS[0]);
   const [later, setLater] = useState(REMINDERS[1]);
@@ -34,6 +39,15 @@ export function DecisionPanel({ item }: { item: Case }) {
               <dt className="text-ink-2">To do</dt><dd>{words?.check ?? item.latest.recommended_action}</dd>
               <dt className="text-ink-2">Accepted</dt><dd>{clock(decided.atHour)}</dd>
             </dl>
+            <div className="mt-3 border-t border-line pt-3">
+              <h3 className="font-medium">{decided.finding ? `You recorded: ${FINDINGS.find((f) => f.id === decided.finding)?.label}` : "After checking, what did you find?"}</h3>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                {FINDINGS.map((f) => (
+                  <button key={f.id} type="button" aria-pressed={decided.finding === f.id} onClick={() => recordFinding(item.id, f.id)} className={`min-h-11 rounded-md border px-3 ${decided.finding === f.id ? "border-ink bg-ink text-raised" : "border-line bg-panel"}`}>{f.label}</button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[13px] text-ink-3">Your answer builds a track record for this site.</p>
+            </div>
           </>
         )}
         {decided.kind === "rejected" && <p>You marked this as not a problem at {clock(decided.atHour)}. Reason: {decided.reason}.</p>}

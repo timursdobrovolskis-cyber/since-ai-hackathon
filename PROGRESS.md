@@ -1,10 +1,13 @@
-# Progress: voice-handover
+# Progress: useful-for-workers
 
 ## Done
 
-- Spoken shift handover recorded and playing from Today.
-- Ask about this pump, by voice or typing, behind an access code.
-- Typed tests: it hedges causes, refuses machine commands, sends emergencies to plant procedure and says when it doesn't know.
+- Today shows one line per pump, with the most reliable concern first.
+- Each line shows how often that cause was right before, whether the signal is getting worse, and the next chance to stop.
+- The case screen is a job card: steps, what you'd expect to find, what to do if not, estimated time stopped and last done.
+- After "I'll check it", the worker records what they found. It appears in My decisions and the CSV.
+- Corrective work done since the alert moves a pump to Can wait, and says what was done.
+- Voice is tucked away. Handovers are re-recorded with the new rules.
 
 ## In progress
 
@@ -12,10 +15,10 @@ Nothing.
 
 ## Next
 
-- A person tests hold-to-talk with a real microphone.
-- Set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel before deploying.
-- Run `npm run explain` once `ANTHROPIC_API_KEY` is available, which is optional now.
-- After swapping in detector alerts, rerun `npm run handover`.
+- Joonas at Elomatic checks the job cards and time estimates.
+- A person tests hold-to-talk and the app on a real phone.
+- Merge the PRs in order, then set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel before deploying.
+- After swapping in detector alerts, rerun `tools/build_ui_data.py --alerts` and `npm run handover`, because the track record and handovers change with the detector.
 
 ## Blockers
 

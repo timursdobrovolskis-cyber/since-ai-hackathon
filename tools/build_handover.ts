@@ -9,7 +9,8 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { buildCases } from "../lib/cases.ts";
 import { handoverScript, shiftLabel } from "../lib/handover.ts";
-import type { Alert, Fleet } from "../lib/types.ts";
+import type { TrackRecord } from "../lib/trust.ts";
+import type { Alert, Fleet, PumpData } from "../lib/types.ts";
 
 const VOICE = "onwK4e9ZLuTAKqWW03F9"; // Daniel, a stock ElevenLabs voice
 const MODEL = "eleven_v4";
@@ -20,7 +21,11 @@ const audio = (name = "") => new URL(`../public/audio/handover/${name}`, import.
 const { alerts, source } = JSON.parse(readFileSync(data("alerts.json"), "utf8")) as { alerts: Alert[]; source: string };
 const fleet = JSON.parse(readFileSync(data("fleet.json"), "utf8")) as Fleet;
 
-const scripts = HOURS.map((hour) => ({ hour, label: shiftLabel(hour), text: handoverScript(buildCases(alerts, hour), fleet.channelMeta, hour), file: `h${String(hour).padStart(3, "0")}.mp3` }));
+const { causes } = JSON.parse(readFileSync(data("track-record.json"), "utf8")) as { causes: TrackRecord };
+
+const pumps = Object.fromEntries(fleet.pumps.map((p) => [p.id, JSON.parse(readFileSync(data(`pumps/${p.id}.json`), "utf8")) as PumpData]));
+
+const scripts = HOURS.map((hour) => ({ hour, label: shiftLabel(hour), text: handoverScript(buildCases(alerts, hour), fleet.channelMeta, hour, causes, pumps), file: `h${String(hour).padStart(3, "0")}.mp3` }));
 const characters = scripts.reduce((sum, s) => sum + s.text.length, 0);
 
 if (process.argv.includes("--dry")) {
