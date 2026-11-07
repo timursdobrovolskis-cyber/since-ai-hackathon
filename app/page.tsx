@@ -93,14 +93,14 @@ export default function Welcome() {
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}
           <RoomStage phases={phases} />
+          {/* The pump sits under the frame and its progress trace, like the room, so it never draws over them when it zooms past them. */}
+          <PumpStage phases={phases} gone={selected !== null} compact={compact} />
           <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-4 inset-y-20 border sm:inset-x-10">
             <Corner className="-left-[3.5px] -top-[3.5px]" />
             <Corner className="-right-[3.5px] -bottom-[3.5px]" />
           </div>
 
-
           <ProgressFrame />
-          <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
 
           {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
