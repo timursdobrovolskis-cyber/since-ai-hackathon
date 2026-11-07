@@ -24,7 +24,7 @@ const PROBLEMS: Record<string, string> = {
 
 /** Ask about the pump in view. Answers are spoken, and always shown as text so they work in a loud room. */
 export function AskPump({ item, meta }: { item: Case; meta: PumpMeta }) {
-  const { cases, fleet, pumps, hour } = useApp();
+  const { cases, fleet, pumps, hour, record } = useApp();
   const session = useRef<Conversation | null>(null);
   const [mode, setMode] = useState<Mode | null>(null);
   const [state, setState] = useState<"idle" | "code" | "connecting" | "ready">("idle");
@@ -79,7 +79,7 @@ export function AskPump({ item, meta }: { item: Case; meta: PumpMeta }) {
         signedUrl: data.signedUrl,
         textOnly: how === "text",
         overrides: how === "text" ? { conversation: { textOnly: true } } : undefined,
-        dynamicVariables: { pump_name: pumpName(meta.id), pump_brief: pumpBrief(item, cases, meta, pumps[meta.id], fleet?.channelMeta ?? {}, hour) },
+        dynamicVariables: { pump_name: pumpName(meta.id), pump_brief: pumpBrief(item, cases, meta, pumps[meta.id], fleet?.channelMeta ?? {}, hour, record) },
         onMessage: ({ message, source }) => {
           if (source === "ai") setLines((l) => [...l, { who: "assistant", text: message }]);
           else if (how === "voice" && message.trim()) setLines((l) => [...l, { who: "you", text: message }]);
@@ -115,12 +115,11 @@ export function AskPump({ item, meta }: { item: Case; meta: PumpMeta }) {
   };
 
   return (
-    <section aria-label="Ask about this pump" className="rounded-md border border-line bg-panel p-3">
+    <details aria-label="Ask about this pump" className="rounded-md border border-line bg-panel">
+      <summary className="min-h-11 cursor-pointer px-4 py-2.5 font-medium">Ask about this pump</summary>
+      <div className="border-t border-line p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="font-medium">Ask about this pump</h2>
-          <p className="text-[13px] text-ink-2">Answers come only from this pump&rsquo;s data. Needs internet.</p>
-        </div>
+        <p className="text-[13px] text-ink-2">Answers come only from this pump&rsquo;s data. Needs internet.</p>
         {state === "idle" && (
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => start("voice")} className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-ink px-3 font-medium text-raised"><Mic aria-hidden className="size-4" />Talk</button>
@@ -171,6 +170,7 @@ export function AskPump({ item, meta }: { item: Case; meta: PumpMeta }) {
         </ol>
       )}
       {lines.length > 0 && <p className="mt-2 text-[13px] text-ink-3">Advice only. In an emergency, follow plant procedure.</p>}
-    </section>
+      </div>
+    </details>
   );
 }

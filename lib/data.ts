@@ -1,3 +1,4 @@
+import type { TrackRecord } from "./trust";
 import type { Alert, Fleet, PumpData } from "./types";
 
 const json = async <T,>(path: string): Promise<T> => {
@@ -9,5 +10,6 @@ const json = async <T,>(path: string): Promise<T> => {
 export const loadFleet = () => json<Fleet>("/data/fleet.json");
 export const loadAlerts = () => json<{ source: string; alerts: Alert[] }>("/data/alerts.json");
 export const loadPump = (id: string) => json<PumpData>(`/data/pumps/${id}.json`);
+export const loadTrackRecord = () => json<{ source: string; causes: TrackRecord }>("/data/track-record.json");
 
 // Labelled events live in public/data/review. Only the Review view may fetch them.

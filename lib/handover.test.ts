@@ -8,13 +8,13 @@ const alert = (id: string, asset: string, hour: number, cls: "MACHINE" | "SENSOR
   ({ alert_id: id, asset_id: asset, offset_hours: hour, event_class: cls, fault_type: type, evidence: { summary: "", channels: [], blind_spots: [] }, hypotheses: [] }) as unknown as Alert;
 
 test("a quiet shift says so", () => {
-  assert.equal(handoverScript([], {}, 42), "Handover for Day 2, evening shift. No pump problems need you right now.");
+  assert.equal(handoverScript([], {}, 42), "Handover for Day 2, evening shift. No pumps need you right now.");
 });
 
 test("only the top three are spoken, and the rest are counted", () => {
   const alerts = ["PUMP-01", "PUMP-02", "PUMP-03", "PUMP-04"].map((p, i) => alert(p, p, 40 + i, "MACHINE", "BEARING_WEAR"));
   const script = handoverScript(buildCases(alerts, 50), {}, 50);
-  assert.match(script, /^Handover for Day 3, morning shift\. 4 pump problems need you today\./);
+  assert.match(script, /^Handover for Day 3, morning shift\. 4 pumps need you today\./);
   assert.match(script, /Pump 4\. Bearing is probably wearing out\./);
   assert.doesNotMatch(script, /Pump 1\./);
   assert.match(script, /1 more is on your list\./);

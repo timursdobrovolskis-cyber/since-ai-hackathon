@@ -57,14 +57,13 @@ export function HandoverPlayer() {
   };
 
   return (
-    <section aria-label="Shift handover" className="rounded-md border border-line bg-raised p-3">
+    <section aria-label="Shift handover" className="rounded-md border border-line bg-panel px-3 py-1.5">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={toggle} aria-label={playing ? "Pause shift handover" : "Play shift handover"} className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-raised">
-          {playing ? <Pause aria-hidden className="size-5" /> : <Play aria-hidden className="size-5" />}
+        <button type="button" onClick={toggle} aria-label={playing ? "Pause shift handover" : "Play shift handover"} className="flex size-9 shrink-0 items-center justify-center rounded-full border border-ink">
+          {playing ? <Pause aria-hidden className="size-4" /> : <Play aria-hidden className="size-4" />}
         </button>
         <div className="min-w-0 flex-1">
-          <p className="font-medium">Hear your shift handover</p>
-          <p className="text-[13px] text-ink-2">{item.label}, about 30 seconds</p>
+          <p className="text-[13px] text-ink-2">Hear this as a 30-second handover ({item.label.toLowerCase()})</p>
         </div>
         <button type="button" aria-expanded={showText} onClick={() => setShowText(!showText)} className="min-h-9 shrink-0 text-[13px] text-ink-2 underline underline-offset-2">
           {showText ? "Hide words" : "Read it"}

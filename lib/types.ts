@@ -91,6 +91,10 @@ export type PumpData = {
   alarms: PlantAlarm[];
   maintenance: MaintenanceNote[];
   history: MaintenanceNote[];
+  /** Newest record of each kind of work from before the data window. */
+  lastWork?: Record<string, { hour: number; observation: string }>;
+  /** Times the schedule gives a chance to stop: [startHour, endHour, label]. */
+  stops?: [number, number, string][];
 };
 
 export type Case = {
@@ -105,6 +109,8 @@ export type Case = {
 
 export type DecisionKind = "approved" | "rejected" | "watching";
 
+export type Finding = "found" | "other" | "nothing";
+
 export type Decision = {
   caseId: string;
   assetId: string;
@@ -112,6 +118,8 @@ export type Decision = {
   kind: DecisionKind;
   reason?: string;
   followUpHour?: number;
+  /** What the worker found when they checked. */
+  finding?: Finding;
   /** Replay hour when the decision was made. */
   atHour: number;
   decidedAt: string;

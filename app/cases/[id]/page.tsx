@@ -9,12 +9,14 @@ import { CaseEvidence } from "@/components/CaseEvidence";
 import { DecisionPanel } from "@/components/DecisionPanel";
 import { ExplanationPanel } from "@/components/ExplanationPanel";
 import { CaseMark, classLabel } from "@/components/Marks";
+import { TrustLine } from "@/components/ui/trust-line";
 import { clock } from "@/lib/labels";
-import { plainAlert, pumpName } from "@/lib/plain";
+import { JOB_HOURS, plainAlert, pumpName } from "@/lib/plain";
+import { lastDone, nextStop, workSince } from "@/lib/worker";
 
 export default function CasePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { cases, fleet, hour } = useApp();
+  const { cases, decisions, fleet, hour, pumps, record } = useApp();
   const [why, setWhy] = useState(false);
   const item = cases.find((c) => c.id === id);
 
@@ -29,7 +31,12 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
   }
 
   const meta = fleet.pumps.find((p) => p.id === item.assetId)!;
-  const words = plainAlert(item.latest, fleet.channelMeta);
+  const pump = pumps[item.assetId];
+  const words = plainAlert(item.latest, fleet.channelMeta, record);
+  const job = words.job ? JOB_HOURS[words.job] : null;
+  const previous = lastDone(pump, words.lastWork, hour);
+  const fixed = workSince(item, pump, hour);
+  const alsoHere = cases.filter((c) => c.assetId === item.assetId && c.id !== item.id && !decisions[c.id]);
   const edge = item.eventClass === "SENSOR" ? "var(--sensor)" : "var(--machine)";
 
   return (
@@ -45,10 +52,32 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
         </div>
       </header>
 
+      <TrustLine trust={words.trust} alert={item.latest} pump={pump} hour={hour} showStop={false} />
+
+      {fixed && <p role="status" className="rounded-md border border-line bg-raised px-4 py-2 font-medium">{fixed}</p>}
+
       <section aria-label="What to do" className="border-l-4 bg-raised px-4 py-3" style={{ borderColor: edge }}>
-        <h2 className="text-[13px] text-ink-2">What to do</h2>
-        <p className="text-xl font-medium">{words.check}</p>
+        <h2 className="font-cond text-lg font-semibold">What to do</h2>
+        <ol className="mt-1 list-decimal space-y-1 pl-5 text-[17px] leading-snug">
+          {words.steps.map((step) => <li key={step}>{step}</li>)}
+        </ol>
+        <dl className="mt-3 space-y-1">
+          <div><dt className="inline font-medium">You&rsquo;d expect to find: </dt><dd className="inline">{words.ifRight}</dd></div>
+          <div><dt className="inline font-medium">If not: </dt><dd className="inline">{words.ifNot}</dd></div>
+        </dl>
+        {job && <p className="mt-3 text-ink-2">{job.words} takes about {job.stop} h with the pump stopped, and {job.labour} h of work. Estimate, not a site figure.</p>}
+        <p className="text-ink-2">{nextStop(pump, hour)}</p>
+        {previous && <p className="text-ink-2">{previous}</p>}
       </section>
+
+      {alsoHere.length > 0 && (
+        <section aria-label="Also on this pump">
+          <h2 className="font-medium">Also on this pump</h2>
+          <ul>
+            {alsoHere.map((c) => <li key={c.id}><Link href={`/cases/${c.id}`} className="underline underline-offset-2">{plainAlert(c.latest, fleet.channelMeta, record).what}</Link></li>)}
+          </ul>
+        </section>
+      )}
 
       <DecisionPanel item={item} />
 

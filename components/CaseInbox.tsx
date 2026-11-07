@@ -15,7 +15,7 @@ const DECISION_LABEL: Record<Decision["kind"], string> = {
 };
 
 export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
-  const { fleet, hour, decisions } = useApp();
+  const { fleet, hour, decisions, record } = useApp();
   const decided = decisions[item.id];
   const level = certainty(item.latest.confidence, item.latest.confidence_calibrated);
   const edge = item.eventClass === "SENSOR" ? "var(--sensor)" : "var(--machine)";
@@ -33,7 +33,7 @@ export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
             <span className="font-cond font-semibold">{pumpName(item.assetId)}</span>
             <span className="text-[13px] text-ink-2">{age(hour - item.first.offset_hours)}</span>
           </div>
-          <p className="font-medium">{plainAlert(item.latest, fleet?.channelMeta ?? {}).what}</p>
+          <p className="font-medium">{plainAlert(item.latest, fleet?.channelMeta ?? {}, record).what}</p>
           <p className="text-[13px] text-ink-2">
             {classLabel(item.eventClass)}{level ? `, ${level.toLowerCase()} certainty` : ""}
             {item.alerts.length > 1 ? `, ${item.alerts.length} updates` : ""}
