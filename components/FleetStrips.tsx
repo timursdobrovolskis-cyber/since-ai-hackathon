@@ -82,7 +82,7 @@ export function FleetStrips() {
             <li key={meta.id} className="grid grid-cols-[13rem_1fr] items-center gap-0 border-b border-line-soft py-1" style={{ borderColor: "var(--line-soft)" }}>
               <div className="pr-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-cond font-semibold">{meta.id}</span>
+                  <span className="font-mono text-[13px] font-semibold tracking-[0.04em]">{meta.id}</span>
                   <StateBadge state={state} />
                 </div>
                 <div className="truncate text-[13px] text-ink-3" title={`${meta.site}, ${meta.system}`}>

@@ -31,7 +31,7 @@ export function ActivityFeed() {
               <li key={item.key} className="flex items-start gap-2.5">
                 <span className="mt-1 flex w-4 justify-center"><Mark item={item} /></span>
                 <div className="min-w-0 flex-1 leading-snug">
-                  <p><span className="font-cond font-semibold">{item.assetId}</span> <span className="text-ink-2">{item.text}</span></p>
+                  <p><span className="font-mono text-[13px] font-semibold tracking-[0.04em]">{item.assetId}</span> <span className="text-ink-2">{item.text}</span></p>
                   <p className="text-[13px] text-ink-3">{age(hour - item.hour)}</p>
                 </div>
               </li>
