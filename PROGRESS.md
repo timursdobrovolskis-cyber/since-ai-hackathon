@@ -39,6 +39,10 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Every shape is square: buttons, filter, cards, panel windows, tags, legend keys, the chart's tooltip ring and alert markers. Buttons give press feedback on pointer-down.
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
+- The project is named Vahti: in the top bar, the tab title, the README and package.json.
+- Readings now no longer adds a chart when you point at a reading. That moved the list under the pointer and made it jump back and forth. Clicking a reading opens its chart right under that row, and the clicked row stays where it is.
+- On phones the pump card sheet now paints above the alarm panel behind it. Before, the filter counts showed through the top of the sheet.
+
 ## In progress
 
 Nothing. Next: Jona's answers on more interactivity.

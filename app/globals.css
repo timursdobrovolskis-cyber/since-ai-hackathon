@@ -325,7 +325,7 @@ input[type="range"] { accent-color: var(--ink); }
 /* Pump card: a reading under "Readings now" that can be shown in the evidence chart. */
 .reading-pick { cursor: pointer; transition: background-color 120ms ease; padding-inline: 6px; margin-inline: -6px; width: calc(100% + 12px); }
 .reading-pick:hover, .reading-pick:focus-visible { background: var(--mz-panel); }
-.reading-pick[aria-pressed="true"] { background: var(--mz-panel); box-shadow: inset 2px 0 0 var(--mz-accent); }
+.reading-pick[aria-expanded="true"] { background: var(--mz-panel); box-shadow: inset 2px 0 0 var(--mz-accent); }
 .reading-pick:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 0; }
 
 /* Alarm panel filter: pumps that do not match are dimmed, not hidden, so each pump keeps its place. */

@@ -89,7 +89,9 @@ export default function Welcome() {
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
       <section ref={track} aria-label="Engine room and site map" className="relative h-[440vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
-        <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
+        {/* z-20 lifts the stage, and the pump card fixed inside it, above the phone alarm panel that follows it. Without
+            it, faded parts of that panel (filter counts, dimmed windows) paint over the card. */}
+        <div className="welcome-stage sticky top-0 z-20 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}
           <RoomStage phases={phases} />

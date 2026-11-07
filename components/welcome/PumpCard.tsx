@@ -11,7 +11,7 @@
 // On phones it is a bottom sheet with two stops: it opens to the top part, and pulls up for the rest.
 import { ChevronLeft, ChevronRight, Cog, Gauge, X } from "lucide-react";
 import { animate, type AnimationPlaybackControls } from "motion";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "@/components/AppProvider";
 import { stateAt } from "@/lib/cases";
 import { amount } from "@/lib/drift";
@@ -21,7 +21,7 @@ import { TEST_PUMPS, type SiteState } from "@/lib/sitemap";
 import type { MaintenanceNote, PumpData } from "@/lib/types";
 import { lastDone } from "@/lib/worker";
 import { useConcern } from "./concerns";
-import { Evidence, namedChannels } from "./Evidence";
+import { Evidence, namedChannels, ReadingChart } from "./Evidence";
 import { LIGHT_WORDS } from "./mapParts";
 import { PumpReview } from "./PumpReview";
 
@@ -168,18 +168,29 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const past = c ? record?.[c.lead.faultType] : undefined;
   const named = useMemo(() => (c && alert && pump ? namedChannels(alert, pump, c.channel) : []), [c, alert, pump]);
 
-  // A reading pointed at or picked under "Readings now" is added to the evidence as one more chart.
-  const [hovered, setHovered] = useState<string | null>(null);
+  // A reading clicked under "Readings now" opens its chart directly under that row. Clicking, not pointing, so the list
+  // never moves under the pointer.
   const [pinned, setPinned] = useState<string | null>(null);
+  // The row clicked, and where it was on screen. When opening one chart closes another above it, the scroll moves by
+  // the same amount so the clicked row stays under the pointer.
+  const anchor = useRef<{ el: HTMLElement; top: number } | null>(null);
+  useLayoutEffect(() => {
+    const a = anchor.current;
+    anchor.current = null;
+    if (!a || !a.el.isConnected) return;
+    const delta = a.el.getBoundingClientRect().top - a.top;
+    if (Math.abs(delta) < 1) return;
+    let box: HTMLElement | null = a.el.parentElement;
+    while (box && !(box.scrollHeight > box.clientHeight && /auto|scroll/.test(getComputedStyle(box).overflowY))) box = box.parentElement;
+    (box ?? document.scrollingElement ?? document.documentElement).scrollTop += delta;
+  }, [pinned]);
   const [expanded, setExpanded] = useState(false);
   const [lastId, setLastId] = useState(id);
   if (lastId !== id) {
     setLastId(id);
-    setHovered(null);
     setPinned(null);
     setExpanded(false);
   }
-  const extra = hovered ?? pinned;
 
   // Phone sheet: two stops, the top part (collapsed) and full height (expanded). y is the sheet's offset down.
   const y = useRef(0);
@@ -391,13 +402,13 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
 
               {c && alert && pump && (
                 <Section title="Evidence">
-                  <Evidence c={c} alert={alert} pump={pump} meta={channelMeta} shiftHour={site.hour} extra={extra && !named.includes(extra) ? extra : null} onRemoveExtra={() => setPinned(null)} />
+                  <Evidence c={c} alert={alert} pump={pump} meta={channelMeta} shiftHour={site.hour} />
                 </Section>
               )}
 
               <Section title="Readings now">
-                {c && <p className="mb-2 text-[12.5px] text-mz-muted">Outside the band first. The grey middle of each bar is normal. A blue edge marks a reading already charted above. Point at any other to add its chart, or click to keep it.</p>}
-                <ul className="grid grid-cols-1 gap-x-6 sm:grid-cols-2" onMouseLeave={() => setHovered(null)}>
+                {c && <p className="mb-2 text-[12.5px] text-mz-muted">Outside the band first. The grey middle of each bar is normal. A blue edge marks a reading already charted above. Click any other to open its chart.</p>}
+                <ul className="grid grid-flow-row-dense grid-cols-1 gap-x-6 sm:grid-cols-2">
                   {sorted.map((r) => {
                     const off = r.state === "below" || r.state === "above";
                     const isNamed = named.includes(r.channel);
@@ -417,16 +428,18 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                       </>
                     );
                     const row = "block w-full py-2 text-left text-[13.5px]";
+                    const open = c && alert && pump && pinned === r.channel;
                     return (
-                      <li key={r.channel} className="border-b border-mz-line/70">
+                      <Fragment key={r.channel}>
+                      <li className="border-b border-mz-line/70">
                         {c && !isNamed ? (
                           <button
                             type="button"
-                            aria-pressed={pinned === r.channel}
-                            onMouseEnter={() => setHovered(r.channel)}
-                            onFocus={() => setHovered(r.channel)}
-                            onBlur={() => setHovered(null)}
-                            onClick={() => setPinned(pinned === r.channel ? null : r.channel)}
+                            aria-expanded={pinned === r.channel}
+                            onClick={(e) => {
+                              anchor.current = { el: e.currentTarget, top: e.currentTarget.getBoundingClientRect().top };
+                              setPinned(pinned === r.channel ? null : r.channel);
+                            }}
                             className={`${row} reading-pick`}
                           >
                             {inner}
@@ -435,6 +448,13 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                           <div className={`${row} ${isNamed ? "reading-named" : ""}`}>{inner}</div>
                         )}
                       </li>
+                      {/* Spans both columns. Dense flow lets the next reading fill the place beside the clicked one. */}
+                      {open && (
+                        <li className="reading-chart border-b border-mz-line/70 pb-3 sm:col-span-2">
+                          <ReadingChart c={c} pump={pump} meta={channelMeta} shiftHour={site.hour} channel={r.channel} onRemove={() => setPinned(null)} />
+                        </li>
+                      )}
+                      </Fragment>
                     );
                   })}
                 </ul>
