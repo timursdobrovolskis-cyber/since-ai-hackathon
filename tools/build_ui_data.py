@@ -366,6 +366,7 @@ def build_scorecard(assets, events, alarms, baseline, pred, alerts, source) -> d
                 raise SystemExit(f"{key} {split} does not reproduce the published score: investigate before showing it")
 
     pumps = {}
+    label = {e.event_id: e for e in events.itertuples()}
     for a in assets.itertuples():
         one = assets_csv[assets_csv.asset_id == a.asset_id]
         start = pd.Timestamp(a.window_start_utc)
@@ -381,6 +382,10 @@ def build_scorecard(assets, events, alarms, baseline, pred, alerts, source) -> d
                 "predictedType": e["predicted_fault_type"], "typeCorrect": e["type_correct"], "classCorrect": e["class_correct"],
                 "leadHours": clean(e["lead_time_to_deadline_h"], 1), "repeats": e["repeats"],
                 "plantDetected": pl["detected"], "plantLeadHours": clean(pl["lead_time_to_deadline_h"], 1),
+                "plantTypeCorrect": pl["type_correct"],
+                # The labelled fault and whether it reached a conventional limit, so the results rows can list them.
+                "faultType": label[e["event_id"]].fault_type, "eventClass": label[e["event_id"]].event_class,
+                "hasLimit": bool(pd.notna(label[e["event_id"]].action_deadline_utc)),
             })
         windows = scoring_windows(events[events.asset_id == a.asset_id], a)
         false_ids = [al["alert_id"] for al in alerts if al["asset_id"] == a.asset_id

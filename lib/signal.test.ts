@@ -46,3 +46,12 @@ test("machine faults light up their part, sensor faults the place the sensor sit
   assert.equal(areaFor(alert("SENSOR", "SENSOR_DRIFT", []), "motor_winding_temp_c")?.key, "motor");
   assert.equal(areaFor(alert("MACHINE", "UNKNOWN", []), null), null);
 });
+
+test("chart rows end on the newest reading at the shift, even when thinning would skip it", () => {
+  const obs = Array.from({ length: 100 }, (_, i) => i);
+  const pump = { stepMinutes: 60, series: { x: { obs, lo: obs, hi: obs } } } as unknown as Parameters<typeof signalRows>[0];
+  const rows = signalRows(pump, "x", 0, 50, 50, 3);
+  assert.equal(rows[rows.length - 1].hour, 50);
+  assert.equal(new Set(rows.map((r) => r.hour)).size, rows.length);
+  assert.ok(rows.every((r) => r.hour <= 50));
+});

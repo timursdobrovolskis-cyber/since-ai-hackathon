@@ -88,6 +88,19 @@ Jona asked to step back and work on a dashboard where you can see the different 
 
 The pump turn was shortened: a little over a quarter turn at the same pace, ending at a three-quarter view.
 
+## Interactivity (7 Nov, night)
+
+Research on maintenance products (Amazon Monitron, Siemens Senseye, Augury, AVEVA) and the ElevAI Junction 2021 winner
+backed four of the candidates. Built:
+
+- Results rows open the faults behind each figure, from the scorer's per-fault results. Labelled, so loaded only on click and marked as a review of past faults.
+- After Acknowledge, record what was found: as it said, something else, nothing wrong, not sure. Local only, never fed into the results.
+- Point at a reading to show it in the evidence chart, and replay the warning up to the shift.
+- Filter the alarm panel by state and review, dimming instead of hiding.
+
+Not built: an "act within" window and an owner per alert. The data has no response windows for the live view, and owners would be invented.
+The engine room stays the intro, with no clickable pumps.
+
 ## Parts
 
 1. **Hero and scroll.** Built on 7 Nov: ferry engine room in hidden-line work, walk-in to Pump 8, zoom, turn, fade to white.

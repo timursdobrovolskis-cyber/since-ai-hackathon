@@ -135,7 +135,7 @@ export function MapHead({ site, shiftHour, panelBelow = false }: { site: SiteSta
         )}
       </p>
       <p className="mt-1 text-[13px] text-mz-muted">
-        {clock(site.hour)} of each pump&rsquo;s simulated test week, as on Today. {atShift ? (panelBelow ? "The alarm panel for it follows." : "Pick a pump for its details.") : ""}
+        {clock(site.hour)} of each pump&rsquo;s simulated test week. {atShift ? (panelBelow ? "The alarm panel for it follows." : "Pick a pump for its details.") : ""}
       </p>
     </div>
   );

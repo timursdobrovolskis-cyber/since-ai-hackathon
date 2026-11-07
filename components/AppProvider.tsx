@@ -22,7 +22,8 @@ type App = {
   alertsToShift: Alert[];
   decisions: Record<string, Decision>;
   decide: (decision: Omit<Decision, "decidedAt" | "atHour">) => void;
-  recordFinding: (caseId: string, finding: Finding) => void;
+  /** Saves what the worker found on an acknowledged alert. No finding clears it, so they can change their answer. */
+  recordFinding: (caseId: string, finding?: Finding, foundType?: string) => void;
   /** How often each named cause has been right. Totals only. */
   record: TrackRecord | undefined;
   clearDecisions: () => void;
@@ -80,8 +81,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     save({ ...decisions, [decision.caseId]: { ...decision, atHour: SHIFT_HOUR, decidedAt: new Date().toISOString() } });
   };
 
-  const recordFinding: App["recordFinding"] = (caseId, finding) => {
-    save({ ...decisions, [caseId]: { ...decisions[caseId], finding } });
+  const recordFinding: App["recordFinding"] = (caseId, finding, foundType) => {
+    if (!decisions[caseId]) return;
+    save({ ...decisions, [caseId]: { ...decisions[caseId], finding, foundType: finding === "other" ? foundType : undefined } });
   };
 
   const clearDecisions = () => save({});

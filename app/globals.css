@@ -27,6 +27,8 @@
   --mz-line: #e6e7ec;
   --mz-muted: #6e7180;
   --mz-accent: #2c63ff;
+  /* The accent lightened for small text on the ink background, where #2c63ff falls below 4.5:1. */
+  --mz-accent-soft: #86a6ff;
   /* Site map lights, the only colours besides ink, white and the accent. */
   --site-red: #e5484d;
   --site-orange: #f08c00;
@@ -83,6 +85,7 @@
   --color-mz-line: var(--mz-line);
   --color-mz-muted: var(--mz-muted);
   --color-mz-accent: var(--mz-accent);
+  --color-mz-accent-soft: var(--mz-accent-soft);
   --color-site-red: var(--site-red);
   --font-sans: var(--ff-geist);
   --font-geist: var(--ff-geist);
@@ -278,7 +281,7 @@ input[type="range"] { accent-color: var(--ink); }
 .ann {
   cursor: pointer; min-height: 5.25rem; padding: 11px 12px; border-radius: 10px;
   background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line);
-  transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease;
+  transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease, opacity 160ms ease;
 }
 .ann:hover { box-shadow: inset 0 0 0 1px rgb(11 16 20 / 0.32); }
 .ann:focus-visible, .ann-on { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
@@ -314,3 +317,23 @@ input[type="range"] { accent-color: var(--ink); }
 }
 .ann-decided { color: var(--mz-accent); }
 .ann-needs .ann-decided { color: white; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Results: the faults behind a row open in place. */
+.results-detail { animation: results-open 220ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes results-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .results-detail { animation: none; } }
+
+/* Pump card: a reading under "Readings now" that can be shown in the evidence chart. */
+.reading-pick { cursor: pointer; transition: background-color 120ms ease; padding-inline: 6px; margin-inline: -6px; width: calc(100% + 12px); }
+.reading-pick:hover, .reading-pick:focus-visible { background: var(--mz-panel); }
+.reading-pick[aria-pressed="true"] { background: var(--mz-panel); box-shadow: inset 2px 0 0 var(--mz-accent); }
+.reading-pick:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 0; }
+
+/* Alarm panel filter: pumps that do not match are dimmed, not hidden, so each pump keeps its place. */
+.ann[data-dim] { opacity: 0.22; }
+.ann[data-dim]:hover, .ann[data-dim]:focus-visible, .ann[data-dim].ann-on { opacity: 0.6; }
+.ann-filter { box-shadow: inset 0 0 0 1px rgb(11 16 20 / 0.18); transition: background-color 120ms ease, box-shadow 120ms ease, color 120ms ease; }
+.ann-filter:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--mz-ink); }
+.ann-filter-on { background: var(--mz-ink); color: white; box-shadow: none; }
+.ann-filter-on:hover:not(:disabled) { box-shadow: none; }
+.ann-filter:disabled { cursor: default; }

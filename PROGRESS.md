@@ -28,6 +28,10 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The old app (Today, job cards, My decisions, Week overview, Review, Sensor levels, Payback, the voice route) is removed. The landing page is now the whole site, at `/`, and `/welcome` redirects there.
 - The product name is gone from the page for now. It was a placeholder from our own spec, not from the data.
 - Results stay as one table. Every other page is unchanged.
+- Results rows open the faults behind them: each of the 35 faults, or the 11 that reached a limit, or the 4 false alerts, with what the alerts and the plant alarms did. Marked as a review of past faults with known answers. `lib/pastFaults.test.ts` checks each list adds up to its row.
+- After Acknowledge the card asks what the worker found: the named fault, something else (pick it), nothing wrong, or not sure. Saved on this device and shown on the pump's window. It does not change the results, which stay the organizers' scoring.
+- The evidence chart can show any reading: point at one under "Readings now", click to keep it. "Replay the warning" sweeps through the hours up to the shift and says when the reading left its band and how long before the shift the first alert came. Charts now always end on the reading the card lists as now.
+- The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
 ## In progress
 

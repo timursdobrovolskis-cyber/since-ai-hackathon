@@ -33,14 +33,23 @@ export function signalRows(pump: PumpData, channel: string, fromHour: number, to
   const step = pump.stepMinutes / 60;
   const end = Math.min(toHour, shiftHour);
   const rows: SignalRow[] = [];
-  for (let i = Math.max(0, Math.floor(fromHour / step)); i < s.obs.length; i += stride) {
-    const hour = i * step;
-    if (hour > end) break;
+  const push = (i: number) => {
     const value = s.obs[i];
-    if (value === null || value === undefined) continue;
+    if (value === null || value === undefined) return;
+    const hour = i * step;
     const lo = s.lo?.[i] ?? value;
     const hi = s.hi?.[i] ?? value;
     rows.push({ date: new Date(BASE + hour * 3600e3), hour, value, lo: Math.min(lo, hi), hi: Math.max(lo, hi), label: clock(hour) });
+  };
+  const first = Math.max(0, Math.floor(fromHour / step));
+  const last = Math.min(s.obs.length - 1, Math.floor(end / step + 1e-9));
+  let i = first;
+  for (; i <= last; i += stride) push(i);
+  // Thinning can skip the newest reading. Keep it, so the chart ends on the value the card lists as "now".
+  if (last >= first && i - stride !== last) {
+    let j = last;
+    while (j > i - stride && (s.obs[j] === null || s.obs[j] === undefined)) j--;
+    if (j > i - stride) push(j);
   }
   return rows;
 }
