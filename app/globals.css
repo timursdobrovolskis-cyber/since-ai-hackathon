@@ -19,7 +19,7 @@
   /* Data marks */
   --run: #3d3d3d;
   --stop: #737373;
-  --band: #2e2e2e;
+  --band: #363636;
   --cursor: #f2f2f2;
   /* Meaning. Orange = machine problem / the one primary action. Ice blue = sensor or data problem. */
   --machine: #ff5a1f;
@@ -179,4 +179,4 @@ html.lenis, html.lenis body { height: auto; }
 .case-board .slab { transition: opacity 180ms var(--ease-out); transition-delay: calc(var(--day) * 20ms); }
 .case-board .slab[data-on="false"] { opacity: 0; }
 .case-board .board-led { fill: var(--ik-line); }
-.case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
+.case-board .board-key[data-on="true"] .board-led { fill: var(--ink); }

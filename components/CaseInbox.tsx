@@ -56,7 +56,7 @@ export function CaseInbox({ activeId, scroll = false }: { activeId?: string; scr
       {sorted.length === 0 ? (
         <p className="px-3 py-3 text-ink-2">No alerts yet. Press Play to run the week.</p>
       ) : (
-        <ul className={`reveal ${scroll ? "max-h-[26rem] overflow-y-auto lg:max-h-[33rem]" : ""}`}>
+        <ul className={scroll ? "max-h-[26rem] overflow-y-auto lg:max-h-[33rem]" : undefined}>
           {sorted.map((c) => (
             <li key={c.id}><CaseCard item={c} active={c.id === activeId} /></li>
           ))}
