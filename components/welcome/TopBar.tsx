@@ -1,10 +1,11 @@
 "use client";
 
-// The bar across the top of the site, with the name, Vahti, on the left. It is always a solid bar, so the drawing and the sections never run under its
+// The bar across the top of the site, with the Vahti logo on the left. It is always a solid bar, so the drawing and the sections never run under its
 // words: ink over the engine room, white once the stage has faded to white and over the sections below. The section
 // you are in is marked, and on wider screens the right side says how many pumps need you at the shift, from the same
 // site state as the alarm panel, and jumps there.
 import { TriangleAlert } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import type { SiteState } from "@/lib/sitemap";
 
 export type Place = "top" | "map" | "results";
@@ -21,8 +22,8 @@ export function TopBar({ tone, place, site, onJump }: { tone: "ink" | "white"; p
     <header data-tone={tone} className="top-bar fixed inset-x-0 top-0 z-30 h-14 sm:h-16">
       <div className="flex h-full items-stretch justify-between gap-4 px-5 sm:px-10">
         <div className="flex items-stretch gap-5 sm:gap-10">
-        <button type="button" onClick={() => onJump("top")} className="flex items-center text-[16px] font-medium tracking-[-0.01em]">
-          Vahti
+        <button type="button" onClick={() => onJump("top")} aria-label="Vahti, back to the engine room" className="flex items-center">
+          <Logo className="h-[17px] w-auto sm:h-[21px]" />
         </button>
         <nav aria-label="Sections" className="flex items-stretch gap-4 text-[15px] sm:gap-8">
           {LINKS.map((l) => {

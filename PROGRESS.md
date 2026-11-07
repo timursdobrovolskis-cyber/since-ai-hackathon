@@ -40,6 +40,7 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
 - The project is named Vahti: in the top bar, the tab title, the README and package.json.
+- The Vahti logo (ring and wordmark) is in the top bar, redrawn as a vector in `components/Logo.tsx` from the team's artwork, and the ring is the tab icon (`app/icon.svg`, replacing the old triangle).
 - `crew-decisions` is merged in: the team detector's v4 alerts, the pump card's time to act and cost of waiting, and the "What it saves the crew" section. Its labels were restyled to the site's headings (no numbered mono caps, no "·").
 - Phone card: the top part is about 120 px shorter, so Acknowledge, Dismiss and Escalate and the evidence button fit with the alarm panel showing above. On phones only: one header line (the panel gives the shift), a shorter How sure line without the detector score, the first-alert line moved to Evidence, no "Waiting risks" (it is in the cost table), and tighter spacing.
 - Readings now no longer adds a chart when you point at a reading. That moved the list under the pointer and made it jump back and forth. Clicking a reading opens its chart right under that row, and the clicked row stays where it is.
