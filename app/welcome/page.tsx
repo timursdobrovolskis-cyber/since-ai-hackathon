@@ -1,17 +1,26 @@
 "use client";
 
-// Landing page, parts 1 and 2 of .plans/welcome-landing-spec.md, styled after meuze.ai: ink and white sections,
-// Geist and JetBrains Mono, one accent blue. The pump zooms and turns as you scroll, then glides right while the
-// page fades from ink to white. Then the site map appears, and further scrolling runs its clock to the shift.
-// Part 3: clicking a pump on the map shrinks the 3D pump and opens that pump's card below it.
-// The page opens in a realistic seawater pump room on a ferry. Scrolling walks in to Pump 8, which dissolves into the
-// line-work pump.
+// The landing page from .plans/welcome-landing-spec.md, a dashboard you scroll through, styled after meuze.ai:
+//   01  A ferry engine room in hidden-line work. The camera walks in to Pump 8, the room dims away, and Pump 8 zooms,
+//       turns and moves aside while the page fades from ink to white.
+//   02  The site map. Scrolling runs the week's clock to the evening shift, and each light follows Today's rule.
+//       Clicking a pump opens its card and lights up the area of the 3D pump it concerns.
+//   03  What needs you: every concern at the shift, with its reading drawn against its expected band.
+//   04  How well it works, as counting figures.
+//   05  The case for a retrofit, as four cards with charts.
+//   06  A call to action into the working app.
+// Live parts only use data up to the shift. Results use totals only.
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Closing } from "@/components/welcome/Closing";
+import { useConcern } from "@/components/welcome/concerns";
+import { MetricCards } from "@/components/welcome/MetricCards";
 import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
+import { Results } from "@/components/welcome/Results";
 import { RoomStage } from "@/components/welcome/RoomStage";
 import { SiteMap, useSite } from "@/components/welcome/SiteMap";
+import { StepList } from "@/components/welcome/StepList";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
 
@@ -20,27 +29,73 @@ function Corner({ className }: { className: string }) {
   return <span aria-hidden className={`welcome-corner absolute size-1.5 ${className}`} />;
 }
 
+/** True on phone-sized screens, where the pump ends above the map instead of beside it. */
+function useCompact() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const set = () => setCompact(mq.matches);
+    set();
+    mq.addEventListener("change", set);
+    return () => mq.removeEventListener("change", set);
+  }, []);
+  return compact;
+}
+
 export default function Welcome() {
   const track = useRef<HTMLElement>(null);
   const { phases, hour, mapReady } = useScrollPhases(track, SHIFT_HOUR);
   const site = useSite(hour, SHIFT_HOUR);
+  // The sections after the map always show the evening shift, whatever hour the map is at.
+  const shift = useSite(SHIFT_HOUR, SHIFT_HOUR);
+  const compact = useCompact();
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
+  const concern = useConcern(site, selected);
+  // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
+  const [solid, setSolid] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = track.current;
+      if (el) setSolid(el.getBoundingClientRect().bottom <= 64);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   // Scrolling back up to the pump closes any open card.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
     if (!mapReady) setSelected(null);
   }, [mapReady]);
 
+  /** Header links: the top, the map at the evening shift, and the sections below. */
+  const jump = (to: "top" | "map" | "needs-you" | "results") => {
+    const el = track.current;
+    if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
+    if (to === "map" && el) {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      return window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * 0.95, behavior: "smooth" });
+    }
+    const id = to === "needs-you" && compact ? "needs-you-list" : to;
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="welcome min-h-full bg-white font-geist text-mz-ink">
-      {/* Difference blending keeps the header readable on both ink and white. */}
-      <header className="fixed inset-x-0 top-0 z-20 flex h-16 items-center px-6 text-white mix-blend-difference sm:px-10">
-        <span className="text-lg font-medium tracking-[-0.02em]">Retrofit Assist</span>
-        <nav className="ml-10 hidden gap-8 font-mono text-[12px] uppercase tracking-[0.14em] md:flex">
-          <span>Pump</span>
-          <span>Site map</span>
-          <span>Results</span>
+      {/* Over the stage, difference blending keeps the header readable on both ink and white. Below it, a solid bar. */}
+      <header
+        className={`fixed inset-x-0 top-0 z-30 flex h-16 items-center px-5 transition-colors sm:px-10 ${
+          solid ? "border-b border-mz-line bg-white/92 text-mz-ink backdrop-blur" : "text-white mix-blend-difference"
+        }`}
+      >
+        <button type="button" onClick={() => jump("top")} className="text-lg font-medium tracking-[-0.02em]">
+          Retrofit Assist
+        </button>
+        <nav aria-label="Sections" className="ml-10 hidden gap-7 font-mono text-[12px] uppercase tracking-[0.14em] md:flex">
+          <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Site map</button>
+          <button type="button" onClick={() => jump("needs-you")} className="hover:underline underline-offset-4">What needs you</button>
+          <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
         </nav>
         <Link href="/" className="ml-auto font-mono text-[12px] uppercase tracking-[0.14em] underline-offset-4 hover:underline">
           Today&rsquo;s shift
@@ -48,12 +103,12 @@ export default function Welcome() {
       </header>
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} className="relative h-[780vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
+      <section ref={track} aria-label="Engine room and site map" className="relative h-[780vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
-          {/* The realistic room covers the grid until it fades out at the hand-off. */}
+          {/* The engine room covers the grid until it fades out at the hand-off. */}
           <RoomStage phases={phases} />
-          <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-6 inset-y-20 border sm:inset-x-10">
+          <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-4 inset-y-20 border sm:inset-x-10">
             <Corner className="-left-[3.5px] -top-[3.5px]" />
             <Corner className="-right-[3.5px] -bottom-[3.5px]" />
           </div>
@@ -62,15 +117,15 @@ export default function Welcome() {
             01 &middot; Engine room &middot; seawater cooling pumps
           </p>
 
-          <PumpStage phases={phases} selected={selected !== null} />
+          <PumpStage phases={phases} selected={selected !== null} highlight={concern?.area?.x ?? null} compact={compact} />
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
             Scroll
           </p>
 
-          {/* Left column: the site map. Scrolling on runs its clock to the shift. */}
-          <div className="welcome-map absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center px-10 pt-16 sm:px-16">
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted">02 &middot; Site map</p>
+          {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
+          <div className="welcome-map absolute inset-x-0 top-[34svh] bottom-0 flex flex-col px-5 pt-2 md:inset-y-0 md:top-0 md:right-auto md:w-1/2 md:justify-center md:px-10 md:pt-16 lg:px-16">
+            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted md:mb-4">02 &middot; Site map</p>
             <SiteMap site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />
           </div>
 
@@ -78,9 +133,10 @@ export default function Welcome() {
         </div>
       </section>
 
-      <footer className="border-t border-mz-line px-6 py-5 font-mono text-[11px] uppercase tracking-[0.12em] text-mz-muted sm:px-10">
-        Advisory only and read-only &middot; Simulated data from the RETROFIT AI 2026 benchmark, not measured on any real ship or plant
-      </footer>
+      <StepList site={shift} />
+      <Results />
+      <MetricCards site={shift} />
+      <Closing site={shift} />
     </div>
   );
 }

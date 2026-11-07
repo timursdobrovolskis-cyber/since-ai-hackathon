@@ -172,7 +172,7 @@ export function SiteMap({ site, shiftHour, ready, selected, onSelect }: Props) {
         })}
       </svg>
 
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
+      <ul className="mt-3 hidden flex-wrap gap-x-5 gap-y-1 md:flex font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
         {(["red", "orange", "green", "none"] as Light[]).map((l) => (
           <li key={l} className="flex items-center gap-1.5">
             <span aria-hidden className={`site-swatch size-2 ${l === "none" ? "site-swatch-empty" : `site-${l}`}`} />
@@ -181,7 +181,7 @@ export function SiteMap({ site, shiftHour, ready, selected, onSelect }: Props) {
         ))}
       </ul>
 
-      <div className="mt-6 grid grid-cols-4 border-t border-mz-line pt-4">
+      <div className="mt-3 grid grid-cols-4 border-t border-mz-line pt-3 md:mt-6 md:pt-4">
         <Stat value={site.alerts} label="Alerts so far" />
         <Stat value={site.red} label="Need you" swatch="site-red" />
         <Stat value={site.orange} label="Check reading" swatch="site-orange" />

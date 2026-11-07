@@ -27,7 +27,7 @@ Built in parts. Each part is shown to Jona before the next starts.
 | Alerts | No separate alert list. The light is the alert. Clicking a pump shows its alerts |
 | Click | The 3D pump shrinks and moves up in the right column, and a small dashboard card slides in under it. The map does not change except the selected pump is marked. A close button restores the pump |
 | 14 sensors | The 14 kinds of reading across the fleet show in the clicked pump's dashboard: which it has, which it cannot measure, and which one the alert is about. Nothing about sensors on the map |
-| Phone | Desktop first. The phone layout is a later part |
+| Phone | Works at phone width: one column, pump above the map, pump card as a bottom sheet, step list as a plain list |
 | Video | Out of scope for now |
 
 ## Map zones
@@ -63,12 +63,13 @@ Like Meuze, which opens inside a restaurant, the page opens inside a ship's engi
 
 ## Parts
 
-1. **Hero and scroll.** Built on 7 Nov. Restyled the same day: Meuze colours and fonts, bigger pump, ink-to-white fade.
-2. **Map with time.** Built on 7 Nov: lights come from `lib/sitemap.ts`, tested to agree with Today at the shift and to see nothing later. Zones, labels, pipe lines and lights, with scroll running the clock to `SHIFT_HOUR`. Test pumps dimmed.
-3. **Click and dashboard.** Built on 7 Nov. Pumps on the map are buttons, keyboard included. The card shows the same hour as the map, the plain wording from Today, first noticed, how sure, trend, next stop, the 14 kinds of reading, and a link to the job card. Pump shrinks, card slides in with the problem, what to do and the sensor list.
-4. **Step list** with drawing signal charts.
-5. **Results counter and cards.**
-6. **Later, not agreed yet.** The "estimate" in the dashboard and the phone layout.
+1. **Hero and scroll.** Built on 7 Nov: ferry engine room in hidden-line work, walk-in to Pump 8, zoom, turn, fade to white.
+2. **Map with time.** Built on 7 Nov: lights from `lib/sitemap.ts`, tested to agree with Today at the shift and to see nothing later.
+3. **Click and dashboard.** Built on 7 Nov: the card shows Today's wording, first noticed, how sure, trend, next stop, the area of the pump (which glows blue on the 3D pump, from `lib/pumpArea.ts`), the last 12 hours of the reading, the 14 kinds of reading and a link to the job card.
+4. **Step list.** Built on 7 Nov: all 7 concerns at the shift, in Today's order and groups. Pinned on wide screens, one concern per scroll step, each with its reading drawn against its expected band and its alerts marked (bklit-ui line chart, rows from `lib/signal.ts`, tested to stop at the shift).
+5. **Results and cards.** Built on 7 Nov: counting figures on ink (faults caught, median warning, false alerts per pump per day), then four cards in Meuze's operations style: detection, early warning, sensor levels and payback, each linking to its full screen.
+6. **Closing.** A blue call to action into Today, the first job card and Review, and a footer with limits and sources.
+7. **Phones.** The opening and map play at phone width with the pump above the map. The pump card is a bottom sheet, and the step list becomes a plain list.
 
 ## 3D pump (first version, replaced by the downloaded model)
 

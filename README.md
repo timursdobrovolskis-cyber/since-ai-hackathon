@@ -81,6 +81,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
+| Landing page charts | bklit-ui (copied into `components/charts/` by the shadcn CLI), with d3-array, d3-scale, d3-shape, Motion, NumberFlow, clsx and tailwind-merge | MIT |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |

@@ -33,6 +33,8 @@ export type SiteState = {
   lights: Record<string, Light>;
   /** The pump's line on Today at this hour, when it has one: the leading concern and any others. */
   lines: Record<string, PumpLine>;
+  /** Pumps in Today's order: needs you today, then check the reading, newest first in each. */
+  order: { red: string[]; orange: string[] };
   /** Alerts raised so far, and pumps in each group. */
   alerts: number;
   red: number;
@@ -69,6 +71,7 @@ export function siteAt(
     hour: h,
     lights,
     lines,
+    order: { red: today.map((l) => l.assetId), orange: readings.map((l) => l.assetId) },
     alerts: alerts.filter((a) => a.offset_hours <= h).length,
     red: today.length,
     orange: readings.length,

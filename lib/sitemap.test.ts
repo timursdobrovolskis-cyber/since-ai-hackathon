@@ -61,3 +61,10 @@ test("each lit pump carries the case that leads its line", () => {
   assert.equal(s.lines["PUMP-07"].lead.id, "b");
   assert.equal(s.lines["PUMP-04"], undefined);
 });
+
+test("the order matches Today's list", () => {
+  const s = siteAt(ALERTS, SHIFT, SHIFT, {});
+  const today = groupByPump(buildCases(ALERTS, SHIFT), {}, SHIFT);
+  assert.deepEqual(s.order.red, today.today.map((l) => l.assetId));
+  assert.deepEqual(s.order.orange, today.readings.map((l) => l.assetId));
+});

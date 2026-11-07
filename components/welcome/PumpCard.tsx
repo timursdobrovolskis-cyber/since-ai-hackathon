@@ -2,14 +2,18 @@
 
 // Part 3 of .plans/welcome-landing-spec.md: the small dashboard for the pump picked on the site map. It shows the
 // same moment as the map, so as you scroll the week on, the card changes with it. Wording comes from Today.
+// It names the area of the pump the concern is about, which also glows on the 3D pump, and shows the last 12 hours of the
+// reading behind it. On phones it opens as a sheet from the bottom.
 import { ArrowRight, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { LineSparkline } from "@/components/charts/sparkline";
 import { useApp } from "@/components/AppProvider";
 import { ago, clock } from "@/lib/labels";
 import { plainAlert, pumpName } from "@/lib/plain";
 import { AMBIENT, TEST_PUMPS, type SiteState } from "@/lib/sitemap";
 import { nextStop, trendOf } from "@/lib/worker";
+import { useConcern } from "./concerns";
 import { LIGHT_WORDS } from "./SiteMap";
 
 type Reading = { id: string; label: string; state: "flagged" | "has" | "missing" };
@@ -48,7 +52,10 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const close = () => {
     const from = id;
     onClose();
-    requestAnimationFrame(() => document.querySelector<SVGElement>(`[data-pump="${from}"]`)?.focus());
+    // The map has a desktop and a phone version, so return focus to the one on screen.
+    requestAnimationFrame(() =>
+      [...document.querySelectorAll<HTMLElement | SVGElement>(`[data-pump="${from}"]`)].find((n) => n.getClientRects().length > 0)?.focus(),
+    );
   };
   const closeRef = useRef(close);
   useEffect(() => {
@@ -73,7 +80,11 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const trend = concern ? trendOf(lead.latest, pump, site.hour) : null;
   const stop = concern ? nextStop(pump, site.hour) : null;
 
+  const detail = useConcern(site, concern ? id : null);
+  // The last 12 hours of the reading behind the alert, ending at the hour the map shows.
+  const recent = useMemo(() => (detail ? detail.rows.filter((r) => r.hour >= site.hour - 12) : []), [detail, site.hour]);
   const flagged = new Set(concern ? lead.latest.evidence?.channels?.map((c) => c.channel) ?? [] : []);
+  if (detail?.channel) flagged.add(detail.channel);
   const readings: Reading[] = pump
     ? [
         ...Object.entries(fleet?.channelMeta ?? {}).map(([ch, m]) => ({
@@ -93,14 +104,14 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
       aria-hidden={!open}
       inert={!open}
       data-open={open}
-      className="pump-card absolute top-[31svh] right-6 left-1/2 ml-6 max-h-[calc(69svh-96px)] overflow-y-auto border border-mz-line bg-white p-5 shadow-[0_24px_48px_-24px_rgb(11_16_20/0.25)] outline-none sm:right-10"
+      className="pump-card fixed inset-x-0 bottom-0 z-40 max-h-[80svh] overflow-y-auto rounded-t-2xl border border-mz-line bg-white p-5 shadow-[0_-12px_40px_-16px_rgb(11_16_20/0.35)] outline-none md:absolute md:inset-x-auto md:top-[31svh] md:right-10 md:bottom-auto md:left-1/2 md:z-auto md:ml-6 md:max-h-[calc(69svh-96px)] md:rounded-none md:shadow-[0_24px_48px_-24px_rgb(11_16_20/0.25)]"
     >
       {id && (
         <>
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-mz-muted">
-                03 &middot; {clock(site.hour)}
+                Pump detail &middot; {clock(site.hour)}
               </p>
               <h2 className="mt-1 flex items-center gap-2 text-[22px] leading-tight font-medium tracking-[-0.02em]">
                 {pumpName(id)}
@@ -150,6 +161,27 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                       </div>
                     </dl>
                     {stop && <p className="mt-3 text-[13px] text-mz-muted">{stop}</p>}
+                    {detail?.area && (
+                      <p className="mt-3 flex items-center gap-2 text-[13px]">
+                        <span aria-hidden className="size-2.5 bg-mz-accent/60 ring-1 ring-mz-accent" />
+                        <span className="text-mz-muted">Area of the pump:</span> {detail.area.label}
+                      </p>
+                    )}
+                    {recent.length > 1 && (
+                      <div className="mt-4 border-t border-mz-line pt-3">
+                        <div className="flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-mz-muted">
+                          <span>
+                            {detail?.channelLabel} &middot; last 12 h
+                          </span>
+                          <span className="text-[13px] tracking-normal text-mz-ink normal-case">
+                            {recent[recent.length - 1].value.toFixed(1)} {detail?.unit}
+                          </span>
+                        </div>
+                        <div className="mt-2">
+                          <LineSparkline data={recent} dataKey="value" height={44} color="var(--mz-accent)" strokeWidth={1.5} />
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-[15px] leading-snug text-mz-muted">

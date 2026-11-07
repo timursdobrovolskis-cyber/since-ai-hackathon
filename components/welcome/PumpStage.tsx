@@ -28,16 +28,22 @@ const ease = (a: number, b: number, x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-/**
- * `selected` is true while a pump card is open: the pump then eases to about half size at the top of the right column,
- * making room for the card below it.
- */
-export function PumpStage({ phases, selected = false }: { phases: React.RefObject<Phases>; selected?: boolean }) {
+type Props = {
+  phases: React.RefObject<Phases>;
+  /** True while a pump card is open: the pump eases to about half size above the card. */
+  selected?: boolean;
+  /** The area of the pump the open card is about, along the shaft in model units. It glows in the accent blue. */
+  highlight?: [number, number] | null;
+  /** Phones: the pump ends centred at the top, above the site map, instead of in the right column. */
+  compact?: boolean;
+};
+
+export function PumpStage({ phases, selected = false, highlight = null, compact = false }: Props) {
   const holder = useRef<HTMLDivElement>(null);
-  const selectedRef = useRef(selected);
+  const live = useRef({ selected, highlight, compact });
   useEffect(() => {
-    selectedRef.current = selected;
-  }, [selected]);
+    live.current = { selected, highlight, compact };
+  }, [selected, highlight, compact]);
   const [problem, setProblem] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,6 +59,7 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
     }
     const pixelRatio = Math.min(window.devicePixelRatio, 2);
     renderer.setPixelRatio(pixelRatio);
+    renderer.localClippingEnabled = true;
     el.appendChild(renderer.domElement);
     renderer.domElement.setAttribute("aria-hidden", "true");
 
@@ -66,6 +73,22 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
     const lines = createLineRenderer(renderer, { clearBackground: true, near: NEAR, far: FAR });
     let geometry: THREE.BufferGeometry | null = null;
 
+    // The highlighted area: the same pump in translucent blue on layer 1, cut to a slice of the shaft by two clipping
+    // planes that follow the pump as it moves. Drawn after the line work, so the lines show through it.
+    const sliceStart = new THREE.Plane();
+    const sliceEnd = new THREE.Plane();
+    const glow = new THREE.MeshBasicMaterial({
+      color: new THREE.Color("#2c63ff"),
+      transparent: true,
+      opacity: 0,
+      depthTest: false,
+      depthWrite: false,
+      side: THREE.FrontSide,
+      clippingPlanes: [sliceStart, sliceEnd],
+    });
+    let glowMesh: THREE.Mesh | null = null;
+    let glowLevel = 0;
+
     const controller = new AbortController();
     fetch(MODEL_URL, { signal: controller.signal })
       .then((r) => {
@@ -75,6 +98,9 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
       .then((buf) => {
         geometry = parsePumpMesh(buf);
         pump.add(new THREE.Mesh(geometry, material));
+        glowMesh = new THREE.Mesh(geometry, glow);
+        glowMesh.layers.set(1);
+        pump.add(glowMesh);
       })
       .catch((e) => {
         if (e.name !== "AbortError") setProblem("The pump drawing did not load. Everything else on the page still works.");
@@ -127,7 +153,8 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       // Ease towards the selected size, about 0.3 s to settle. Reduced motion jumps straight there.
-      const target = selectedRef.current ? 1 : 0;
+      const { selected: isSelected, highlight: area, compact: small } = live.current;
+      const target = isSelected ? 1 : 0;
       shrink = reduced ? target : shrink + (target - shrink) * (1 - Math.exp(-dt * 9));
       const zoom = ease(0, 0.5, p);
       const glide = ease(0.55, 0.9, p);
@@ -141,14 +168,31 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
       // Size: the hand-off pose first (heroPose.ts), then the zoom, then the right column.
       const hero = heroStart(halfW, halfH);
       const fit = (share: number, heightShare: number) => fitPump(halfW, halfH, share, heightShare);
-      const pumpScale = lerp(lerp(hero.scale, fit(1.55, 1.45), zoom), fit(0.47, 0.64), glide);
-      pump.scale.setScalar(pumpScale * lerp(1, 0.46, shrink));
-      pump.position.set(lerp(0, halfW * 0.48, glide), lerp(hero.y, -halfH * 0.04, glide) + halfH * 0.66 * shrink, 0);
+      // Phones end centred near the top, above the site map. Wide screens end in the middle of the right column.
+      const endScale = small ? fit(0.86, 0.34) : fit(0.47, 0.64);
+      const endX = small ? 0 : halfW * 0.48;
+      const endY = small ? halfH * 0.56 : -halfH * 0.04;
+      const pumpScale = lerp(lerp(hero.scale, fit(1.55, 1.45), zoom), endScale, glide);
+      pump.scale.setScalar(pumpScale * lerp(1, small ? 0.8 : 0.46, shrink));
+      pump.position.set(lerp(0, endX, glide), lerp(hero.y, endY, glide) + (small ? 0 : halfH * 0.66 * shrink), 0);
       // Turn: the scroll turns the pump half way round.
       const turn = reduced ? 0 : Math.PI * ease(0, 0.6, p);
       pump.rotation.set(lerp(lerp(hero.rotation.x, 0.18, zoom), 0.32, glide), hero.rotation.y + turn, 0);
 
       lines.render(scene, camera);
+
+      // The highlighted area fades in with the card and pulses gently while it is open.
+      glowLevel += ((area && isSelected ? 1 : 0) - glowLevel) * (1 - Math.exp(-dt * 6));
+      if (glowMesh && area && glowLevel > 0.01) {
+        pump.updateMatrixWorld();
+        sliceStart.set(new THREE.Vector3(1, 0, 0), -area[0]).applyMatrix4(pump.matrixWorld);
+        sliceEnd.set(new THREE.Vector3(-1, 0, 0), area[1]).applyMatrix4(pump.matrixWorld);
+        const pulse = reduced ? 1 : 0.85 + 0.15 * Math.sin(now / 420);
+        glow.opacity = 0.42 * glowLevel * pulse;
+        camera.layers.set(1);
+        renderer.render(scene, camera);
+        camera.layers.set(0);
+      }
     };
     tick();
 
@@ -159,6 +203,7 @@ export function PumpStage({ phases, selected = false }: { phases: React.RefObjec
       io.disconnect();
       geometry?.dispose();
       material.dispose();
+      glow.dispose();
       lines.dispose();
       renderer.dispose();
       renderer.domElement.remove();
