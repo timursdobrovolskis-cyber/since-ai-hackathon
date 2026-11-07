@@ -18,12 +18,17 @@ type App = {
   hour: number;
   /** Cases known at `hour`. */
   cases: Case[];
+  /** Alerts raised at or before `hour`, for screens that step through the week up to the shift. */
+  alertsToShift: Alert[];
   decisions: Record<string, Decision>;
   decide: (decision: Omit<Decision, "decidedAt" | "atHour">) => void;
-  recordFinding: (caseId: string, finding: Finding) => void;
+  /** Saves what the worker found on an acknowledged alert. No finding clears it, so they can change their answer. */
+  recordFinding: (caseId: string, finding?: Finding, foundType?: string) => void;
   /** How often each named cause has been right. Totals only. */
   record: TrackRecord | undefined;
   clearDecisions: () => void;
+  /** Takes back one decision, for an undo straight after it was made. */
+  undoDecision: (caseId: string) => void;
 };
 
 const Ctx = createContext<App | null>(null);
@@ -76,16 +81,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     save({ ...decisions, [decision.caseId]: { ...decision, atHour: SHIFT_HOUR, decidedAt: new Date().toISOString() } });
   };
 
-  const recordFinding: App["recordFinding"] = (caseId, finding) => {
-    save({ ...decisions, [caseId]: { ...decisions[caseId], finding } });
+  const recordFinding: App["recordFinding"] = (caseId, finding, foundType) => {
+    if (!decisions[caseId]) return;
+    save({ ...decisions, [caseId]: { ...decisions[caseId], finding, foundType: finding === "other" ? foundType : undefined } });
   };
 
   const clearDecisions = () => save({});
 
+  const undoDecision = (caseId: string) => {
+    const rest = { ...decisions };
+    delete rest[caseId];
+    save(rest);
+  };
+
   const cases = useMemo(() => buildCases(alerts, SHIFT_HOUR), [alerts]);
+  const alertsToShift = useMemo(() => alerts.filter((a) => a.offset_hours <= SHIFT_HOUR), [alerts]);
 
   return (
-    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, decisions, decide, recordFinding, record, clearDecisions }}>
+    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, alertsToShift, decisions, decide, recordFinding, record, clearDecisions, undoDecision }}>
       {children}
     </Ctx.Provider>
   );

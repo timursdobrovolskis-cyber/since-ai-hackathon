@@ -75,8 +75,13 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Styling | Tailwind CSS | MIT |
 | Charts | uPlot | MIT |
 | Isometric case board | react-isokit | MIT |
+| 3D pump on the landing page | three.js | MIT |
+| Pump model on the landing page | `pump.obj`, downloaded by the team, stored as line work and a compact solid mesh in `public/models/` by `tools/build_pump_edges.mjs` | **Source and licence to confirm** |
+| Engine room on the landing page | Built in code with three.js: room, pipework, valves, gauges and panels, drawn as line work by our own edge shader | MIT |
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
+| Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
+| Landing page charts | bklit-ui (copied into `components/charts/` by the shadcn CLI), with d3-array, d3-scale, d3-shape, Motion, NumberFlow, clsx and tailwind-merge | MIT |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |

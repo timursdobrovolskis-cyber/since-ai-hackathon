@@ -1,4 +1,5 @@
-// Labelled faults and scores. Import this file from the Review view ONLY, so live replay screens cannot see the answers.
+// Labelled faults and scores. Import this file only from the results section (components/welcome/Results.tsx), which is a
+// review of past faults, so the alarm panel and pump card cannot see the answers.
 import type { EventClass } from "./types";
 
 export type ReviewEvent = {
@@ -39,6 +40,11 @@ export type PerEvent = {
   repeats: number;
   plantDetected: boolean;
   plantLeadHours: number | null;
+  plantTypeCorrect: boolean;
+  faultType: string;
+  eventClass: EventClass;
+  /** True when the fault reached a conventional alarm limit within the week. */
+  hasLimit: boolean;
 };
 
 export type Scorecard = {

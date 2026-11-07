@@ -1,28 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow, Barlow_Semi_Condensed } from "next/font/google";
-import "uplot/dist/uPlot.min.css";
-import "react-isokit/styles.css";
+import { Geist, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/components/AppProvider";
-import { Shell } from "@/components/Shell";
 
-const barlow = Barlow({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-barlow" });
-const barlowCond = Barlow_Semi_Condensed({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-barlow-cond" });
+// Geist for text, JetBrains Mono for measurements. Both under the SIL Open Font License.
+const geist = Geist({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--ff-geist" });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--ff-mono" });
 
 export const metadata: Metadata = {
-  title: "Retrofit Assist",
+  title: "Pump alerts",
   description: "Early, explainable warnings for existing cooling-water pumps. Advisory only, on simulated data.",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#d5d8da" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0b1014" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${barlow.variable} ${barlowCond.variable}`}>
+    <html lang="en" className={`${geist.variable} ${mono.variable}`}>
       <body>
-        <AppProvider>
-          <Shell>{children}</Shell>
-        </AppProvider>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

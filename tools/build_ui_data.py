@@ -366,6 +366,7 @@ def build_scorecard(assets, events, alarms, baseline, pred, alerts, source) -> d
                 raise SystemExit(f"{key} {split} does not reproduce the published score: investigate before showing it")
 
     pumps = {}
+    label = {e.event_id: e for e in events.itertuples()}
     for a in assets.itertuples():
         one = assets_csv[assets_csv.asset_id == a.asset_id]
         start = pd.Timestamp(a.window_start_utc)
@@ -381,6 +382,10 @@ def build_scorecard(assets, events, alarms, baseline, pred, alerts, source) -> d
                 "predictedType": e["predicted_fault_type"], "typeCorrect": e["type_correct"], "classCorrect": e["class_correct"],
                 "leadHours": clean(e["lead_time_to_deadline_h"], 1), "repeats": e["repeats"],
                 "plantDetected": pl["detected"], "plantLeadHours": clean(pl["lead_time_to_deadline_h"], 1),
+                "plantTypeCorrect": pl["type_correct"],
+                # The labelled fault and whether it reached a conventional limit, so the results rows can list them.
+                "faultType": label[e["event_id"]].fault_type, "eventClass": label[e["event_id"]].event_class,
+                "hasLimit": bool(pd.notna(label[e["event_id"]].action_deadline_utc)),
             })
         windows = scoring_windows(events[events.asset_id == a.asset_id], a)
         false_ids = [al["alert_id"] for al in alerts if al["asset_id"] == a.asset_id
@@ -469,9 +474,21 @@ def main():
     write(OUT / "review" / "scorecard.json", card)
     # Totals only, like the track record, so the main page can show them without loading anything labelled.
     now, plant = card["totals"]["current"]["all"], card["totals"]["plant"]["all"]
+    # Faults that reached a conventional limit within the window, and how many each side warned about before it.
+    rows = [r for p in card["pumps"].values() for r in p["perEvent"]]
+    deadline = {e.event_id: pd.notna(e.action_deadline_utc) for e in events.itertuples()}
+    limited = [r for r in rows if deadline.get(r["eventId"])]
+    # Lead times are rounded to 0.1 h, so an alarm a few seconds late shows as -0.0. copysign keeps it on the late side.
+    before = lambda h: h is not None and h >= 0 and math.copysign(1, h) > 0
     write(OUT / "key-numbers.json", {"source": source, "caught": now["true_positive_events"], "faults": now["events_scored"],
                                      "alarmsCaught": plant["true_positive_events"], "medianWarningH": now["median_lead_time_h"],
-                                     "recall": now["event_recall"], "falsePerPumpDay": now["false_alerts_per_asset_day"]})
+                                     "recall": now["event_recall"], "falsePerPumpDay": now["false_alerts_per_asset_day"],
+                                     "falsePerPumpDayAlarms": plant["false_alerts_per_asset_day"],
+                                     "rightCause": sum(r["typeCorrect"] for r in rows),
+                                     "rightCauseAlarms": round(plant["fault_type_recall"] * plant["events_scored"]),
+                                     "withLimit": len(limited),
+                                     "beforeLimit": sum(1 for r in limited if before(r["leadHours"])),
+                                     "beforeLimitAlarms": sum(1 for r in limited if before(r["plantLeadHours"]))})
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
     print(f"{len(sizes)} files, {sum(s for s, _ in sizes) / 1e6:.1f} MB total, largest {sizes[0][0] / 1e3:.0f} kB ({sizes[0][1]})")
