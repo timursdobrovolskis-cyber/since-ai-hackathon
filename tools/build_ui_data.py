@@ -465,7 +465,13 @@ def main():
                                "windowHours": 168, "stepMinutes": STEP_MIN})
     write(OUT / "alerts.json", {"source": source, "alerts": alerts})
     write(OUT / "track-record.json", {"source": source, "causes": track_record(alerts, events)})
-    write(OUT / "review" / "scorecard.json", build_scorecard(assets, events, alarms, pred, current, alerts, source))
+    card = build_scorecard(assets, events, alarms, pred, current, alerts, source)
+    write(OUT / "review" / "scorecard.json", card)
+    # Totals only, like the track record, so the main page can show them without loading anything labelled.
+    now, plant = card["totals"]["current"]["all"], card["totals"]["plant"]["all"]
+    write(OUT / "key-numbers.json", {"source": source, "caught": now["true_positive_events"], "faults": now["events_scored"],
+                                     "alarmsCaught": plant["true_positive_events"], "medianWarningH": now["median_lead_time_h"],
+                                     "recall": now["event_recall"], "falsePerPumpDay": now["false_alerts_per_asset_day"]})
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
     print(f"{len(sizes)} files, {sum(s for s, _ in sizes) / 1e6:.1f} MB total, largest {sizes[0][0] / 1e3:.0f} kB ({sizes[0][1]})")

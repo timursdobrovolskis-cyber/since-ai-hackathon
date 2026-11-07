@@ -5,7 +5,7 @@ const CASE_GAP_HOURS = 36;
 
 /**
  * Merge repeat alerts into cases. Takes only alerts at or before `hour`, so live screens cannot see the future.
- * A case keeps its id as replay moves on, because the id comes from its first alert.
+ * A case keeps its id because the id comes from its first alert.
  */
 export function buildCases(alerts: Alert[], hour: number): Case[] {
   const visible = alerts.filter((a) => a.offset_hours <= hour).sort((a, b) => a.offset_hours - b.offset_hours);

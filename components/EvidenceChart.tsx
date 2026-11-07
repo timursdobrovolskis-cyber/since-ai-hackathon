@@ -11,7 +11,7 @@ type Props = {
   unit: string;
   series: Series;
   stepMinutes: number;
-  /** Replay position. Nothing after this hour is drawn. */
+  /** This shift. Nothing after this hour is drawn. */
   hour: number;
   alertHours: number[];
   eventClass: EventClass;
@@ -22,7 +22,7 @@ type Props = {
 
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-/** Cut every array at the replay hour. The band also stays hidden while normal behaviour is still being learned. */
+/** Cut every array at this shift. The band also stays hidden while normal behaviour is still being learned. */
 function slice(series: Series, stepMinutes: number, hour: number) {
   const n = series.obs.length;
   const x = Array.from({ length: n }, (_, i) => (i * stepMinutes) / 60);
@@ -60,7 +60,7 @@ export function EvidenceChart({ label, unit, series, stepMinutes, hour, alertHou
       width: el.clientWidth,
       height,
       padding: [8, 12, 0, 0],
-      scales: { x: { time: false, range: [0, 168] } },
+      scales: { x: { time: false, range: [0, hour] } },
       legend: { show: false },
       cursor: { y: false, points: { size: 7 }, drag: { x: false, y: false } },
       axes: [
@@ -68,8 +68,8 @@ export function EvidenceChart({ label, unit, series, stepMinutes, hour, alertHou
           stroke: css("--ink-3"),
           grid,
           ticks: { show: false },
-          splits: () => [0, 24, 48, 72, 96, 120, 144],
-          values: (_u, splits) => splits.map((h) => `Day ${h / 24 + 1}`),
+          splits: () => [hour - 48, hour - 24, hour].filter((h) => h >= 0),
+          values: (_u, splits) => splits.map((h) => (h === hour ? "Now" : `${hour - h} h ago`)),
           font: "13px var(--font-barlow), sans-serif",
           size: 24,
         },
@@ -135,7 +135,7 @@ export function EvidenceChart({ label, unit, series, stepMinutes, hour, alertHou
       <figcaption className="text-[13px] font-medium text-ink-2">
         {label}{unit ? ` (${unit})` : ""}
       </figcaption>
-      <div ref={box} className="overflow-hidden bg-raised" role="img" aria-label={`${label} over the week up to the replay time, against its expected band`} />
+      <div ref={box} className="overflow-hidden bg-raised" role="img" aria-label={`${label} over the week up to this shift, against its expected band`} />
     </figure>
   );
 }

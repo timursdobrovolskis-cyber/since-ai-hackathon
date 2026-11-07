@@ -7,7 +7,7 @@ import { useApp } from "./AppProvider";
 type Item = { hour: number; label: string; text: string; file: string };
 type Stored = { detector: string; items: Item[] };
 
-/** Plays the newest recorded handover at or before the replay time. The words stay readable, so it works without sound. */
+/** Plays the recorded handover for this shift. The words stay readable, so it works without sound. */
 export function HandoverPlayer() {
   const { alertSource, hour } = useApp();
   const [stored, setStored] = useState<Stored | null>(null);
@@ -30,15 +30,7 @@ export function HandoverPlayer() {
   }, []);
 
   // Audio recorded for another detector would describe alerts that are no longer on screen.
-  const item = stored && stored.detector === alertSource ? [...stored.items].reverse().find((i) => i.hour <= hour) : undefined;
-  const file = item?.file;
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- a new shift starts from the beginning
-    setPlaying(false);
-    setFailed(false);
-  }, [file]);
-
+  const item = stored && stored.detector === alertSource ? stored.items.find((i) => i.hour === hour) : undefined;
   if (!item) return null;
 
   const toggle = async () => {

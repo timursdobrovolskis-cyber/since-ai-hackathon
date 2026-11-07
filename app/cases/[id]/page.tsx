@@ -10,7 +10,7 @@ import { DecisionPanel } from "@/components/DecisionPanel";
 import { ExplanationPanel } from "@/components/ExplanationPanel";
 import { CaseMark, classLabel } from "@/components/Marks";
 import { TrustLine } from "@/components/ui/trust-line";
-import { clock } from "@/lib/labels";
+import { ago } from "@/lib/labels";
 import { JOB_HOURS, plainAlert, pumpName } from "@/lib/plain";
 import { lastDone, nextStop, workSince } from "@/lib/worker";
 
@@ -24,7 +24,7 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
   if (!item) {
     return (
       <div className="mx-auto max-w-3xl p-6">
-        <p>This has not happened yet at {clock(hour)}. Move the replay forward, or go back to Today.</p>
+        <p>This case is not part of this shift.</p>
         <Link href="/" className="underline underline-offset-2">Back to Today</Link>
       </div>
     );
@@ -48,7 +48,7 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
         <div>
           <p className="text-ink-2">{pumpName(meta.id)}, {meta.system}, {meta.site.split(" (")[0]}</p>
           <h1 className="font-cond text-3xl leading-tight font-semibold">{words.what}</h1>
-          <p className="text-[13px] text-ink-3">{classLabel(item.eventClass)}. First noticed {clock(item.first.offset_hours)}{item.alerts.length > 1 ? `, ${item.alerts.length - 1} ${item.alerts.length === 2 ? "update" : "updates"} since` : ""}.</p>
+          <p className="text-[13px] text-ink-3">{classLabel(item.eventClass)}. First noticed {ago(hour - item.first.offset_hours)}{item.alerts.length > 1 ? `, ${item.alerts.length - 1} ${item.alerts.length === 2 ? "update" : "updates"} since` : ""}.</p>
         </div>
       </header>
 
