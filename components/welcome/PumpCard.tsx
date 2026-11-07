@@ -81,8 +81,8 @@ function latestWork(pump: PumpData, hour: number): MaintenanceNote | null {
 
 function Section({ title, children, inner = false }: { title: string; children: React.ReactNode; inner?: boolean }) {
   return (
-    <section className={inner ? "py-2.5 first:pt-0 last:pb-0 sm:py-3.5" : "border-t border-mz-line py-4"}>
-      <h3 className="mb-1.5 text-[13px] text-mz-muted">{title}</h3>
+    <section className={inner ? "border-t border-mz-line py-3 first:border-t-0 first:pt-0 last:pb-0 sm:py-4" : "border-t border-mz-line py-4"}>
+      <h3 className={inner ? "mb-2 font-mono text-[11.5px] uppercase tracking-[0.14em] text-mz-accent" : "mb-1.5 text-[13px] text-mz-muted"}>{title}</h3>
       {children}
     </section>
   );
@@ -168,15 +168,19 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
   const sensor = c?.lead.eventClass === "SENSOR";
   const out = now.filter((r) => r.state === "below" || r.state === "above").length;
   const past = c ? record?.[c.lead.faultType] : undefined;
+  const advice = c && !sensor ? adviceFor(c.trend, hoursToStop(pump, site.hour)) : null;
   const named = useMemo(() => (c && alert && pump ? namedChannels(alert, pump, c.channel) : []), [c, alert, pump]);
 
   // A reading pointed at or picked under "Readings now" is added to the evidence as one more chart.
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  // The three answers show first; the evidence and readings open on request.
+  const [details, setDetails] = useState(false);
   const [lastId, setLastId] = useState(id);
   if (lastId !== id) {
     setLastId(id);
+    setDetails(false);
     setHovered(null);
     setPinned(null);
     setExpanded(false);
@@ -204,6 +208,7 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
     (to: number, velocity = 0, expand?: boolean) => {
       anim.current?.stop();
       setExpanded(expand ?? to === 0);
+      if (expand ?? to === 0) setDetails(true);
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setY(to);
       // Critically damped, unless a flick carried momentum into it.
       moving.current = true;
@@ -334,8 +339,8 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
               </Section>
             ) : (
               // The answer first: what's wrong, what to do, and the review.
-              <div className="bg-mz-panel px-4 py-3.5 sm:py-4">
-                <Section title="What's wrong" inner>
+              <div className="border-l-[3px] border-mz-accent bg-mz-panel px-4 py-4 sm:px-5 sm:py-5">
+                <Section title="1 · What's wrong" inner>
                   {c && alert ? (
                     <>
                       <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[19px] leading-tight tracking-[-0.015em] sm:text-[21px]">
@@ -346,6 +351,18 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                         </span>
                       </p>
                       <p className="mt-1.5 max-w-[60ch] text-[15px] leading-snug">{faultMeans(c.lead.faultType)}</p>
+                      {/* How sure, in one line: the past record for this cause first, then the detector's own score. */}
+                      <p className="mt-2 text-[14px] leading-snug">
+                        <span className="font-medium">How sure: </span>
+                        {alert.fault_type === "UNKNOWN"
+                          ? "The detector could not name a cause."
+                          : past && past.total > 0
+                            ? `${TRUST_HEAD[c.trust?.level ?? "few"]}, ${past.right} of ${past.total} past alerts naming this cause were correct.`
+                            : "No past cases of this cause yet."}
+                        {alert.fault_type !== "UNKNOWN" && alert.confidence_calibrated && (
+                          <span className="text-mz-muted"> Detector {Math.round(alert.confidence * 100)}% sure.</span>
+                        )}
+                      </p>
                       <p className="mt-1.5 text-[13.5px] text-mz-muted">
                         First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
                         {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
@@ -359,58 +376,61 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                 </Section>
 
                 {c && alert && (
-                  <Section title="What to do" inner>
-                    <p className="text-[16px] leading-snug">{alert.recommended_action}</p>
-                    <p className="mt-1 text-[13px] text-mz-muted">{c.stop ? `${c.stop} ` : ""}Advice only. Nothing is sent to the pump.</p>
-                  </Section>
-                )}
-
-                {c && alert && (
-                  <Section title="Time to act" inner>
+                  <Section title="2 · What to do, and by when" inner>
+                    <p className="text-[17px] leading-snug font-medium">{alert.recommended_action}</p>
                     {sensor ? (
-                      <>
-                        <p className="text-[16px] leading-snug">Check the sensor first. No need to stop or open the pump.</p>
-                        <p className="mt-1 text-[13px] text-mz-muted">That saves at least {euros(SENSOR_CHECK_SAVES_EUR)}: one 3-hour stop for nothing, at the organizers&rsquo; figures.</p>
-                      </>
+                      <p className="mt-1.5 text-[15px] leading-snug">
+                        Check the sensor first. No need to stop or open the pump.
+                        <span className="text-mz-muted"> Saves at least {euros(SENSOR_CHECK_SAVES_EUR)}.</span>
+                      </p>
                     ) : (
-                      (() => {
-                        const advice = adviceFor(c.trend, hoursToStop(pump, site.hour));
-                        return (
-                          <>
-                            <p className="text-[16px] leading-snug">{advice.headline}</p>
-                            <p className="mt-1 text-[13px] text-mz-muted">{advice.why}</p>
-                            <dl className="mt-2.5 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-[13.5px]">
-                              <dt>Fixed at a planned stop</dt>
-                              <dd className="text-right tabular-nums">{euros(PLANNED_EUR)}</dd>
-                              <dt>If it runs to a breakdown</dt>
-                              <dd className="text-right tabular-nums">{euros(BREAKDOWN_EUR)}</dd>
-                              <dt className="border-t border-mz-line pt-1 font-medium">Waiting risks</dt>
-                              <dd className="border-t border-mz-line pt-1 text-right font-medium tabular-nums">{euros(BREAKDOWN_EUR - PLANNED_EUR)} more</dd>
-                            </dl>
-                            <p className="mt-1.5 text-[12px] text-mz-muted">Organizers&rsquo; figures: a 3 h planned stop against 10 h unplanned, at {euros(1500)} an hour, plus the repair.</p>
-                          </>
-                        );
-                      })()
+                      <p className="mt-1.5 text-[15px] leading-snug">
+                        {advice?.headline}
+                        <span className="text-mz-muted"> Waiting risks {euros(BREAKDOWN_EUR - PLANNED_EUR)} more.</span>
+                      </p>
                     )}
+                    <p className="mt-1 text-[12.5px] text-mz-muted">Advice only. Nothing is sent to the pump.</p>
                   </Section>
                 )}
 
                 {c && alert && (
-                  <Section title="Your review" inner>
+                  <Section title="3 · Your decision" inner>
                     <PumpReview c={c} />
                   </Section>
                 )}
               </div>
             )}
-            {sheet && !expanded && !TEST_PUMPS.has(id) && (
-              <button type="button" onClick={() => settle(0)} className="press mt-1 flex min-h-10 w-full items-center justify-center text-[14px] text-mz-accent">
-                Show the evidence and readings
+            {!TEST_PUMPS.has(id) && (
+              <button
+                type="button"
+                aria-expanded={details}
+                onClick={() => {
+                  if (details) return setDetails(false);
+                  setDetails(true);
+                  if (sheet) settle(0);
+                }}
+                className="press mt-2 flex min-h-10 w-full items-center justify-center gap-1.5 border border-mz-line text-[14px] text-mz-accent hover:bg-mz-panel"
+              >
+                {details ? "Hide the evidence" : "Show the evidence, readings and costs"}
               </button>
             )}
           </div>
 
-          {!TEST_PUMPS.has(id) && (
+          {!TEST_PUMPS.has(id) && details && (
             <>
+              {c && alert && !sensor && (
+                <Section title="Cost of waiting">
+                  <dl className="grid max-w-md grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-[14px]">
+                    <dt>Fixed at a planned stop</dt>
+                    <dd className="text-right tabular-nums">{euros(PLANNED_EUR)}</dd>
+                    <dt>If it runs to a breakdown</dt>
+                    <dd className="text-right tabular-nums">{euros(BREAKDOWN_EUR)}</dd>
+                    <dt className="border-t border-mz-line pt-1 font-medium">Waiting risks</dt>
+                    <dd className="border-t border-mz-line pt-1 text-right font-medium tabular-nums">{euros(BREAKDOWN_EUR - PLANNED_EUR)} more</dd>
+                  </dl>
+                  <p className="mt-1.5 text-[12.5px] text-mz-muted">{advice?.why} Organizers&rsquo; figures: a 3 h planned stop against 10 h unplanned, at {euros(1500)} an hour, plus the repair.</p>
+                </Section>
+              )}
               <Section title="State now">
                 <p className="text-[16px]">
                   {running ? (RUNNING[running] ?? words(running)) : "Unknown"}
