@@ -469,9 +469,21 @@ def main():
     write(OUT / "review" / "scorecard.json", card)
     # Totals only, like the track record, so the main page can show them without loading anything labelled.
     now, plant = card["totals"]["current"]["all"], card["totals"]["plant"]["all"]
+    # Faults that reached a conventional limit within the window, and how many each side warned about before it.
+    rows = [r for p in card["pumps"].values() for r in p["perEvent"]]
+    deadline = {e.event_id: pd.notna(e.action_deadline_utc) for e in events.itertuples()}
+    limited = [r for r in rows if deadline.get(r["eventId"])]
+    # Lead times are rounded to 0.1 h, so an alarm a few seconds late shows as -0.0. copysign keeps it on the late side.
+    before = lambda h: h is not None and h >= 0 and math.copysign(1, h) > 0
     write(OUT / "key-numbers.json", {"source": source, "caught": now["true_positive_events"], "faults": now["events_scored"],
                                      "alarmsCaught": plant["true_positive_events"], "medianWarningH": now["median_lead_time_h"],
-                                     "recall": now["event_recall"], "falsePerPumpDay": now["false_alerts_per_asset_day"]})
+                                     "recall": now["event_recall"], "falsePerPumpDay": now["false_alerts_per_asset_day"],
+                                     "falsePerPumpDayAlarms": plant["false_alerts_per_asset_day"],
+                                     "rightCause": sum(r["typeCorrect"] for r in rows),
+                                     "rightCauseAlarms": round(plant["fault_type_recall"] * plant["events_scored"]),
+                                     "withLimit": len(limited),
+                                     "beforeLimit": sum(1 for r in limited if before(r["leadHours"])),
+                                     "beforeLimitAlarms": sum(1 for r in limited if before(r["plantLeadHours"]))})
 
     sizes = sorted(((p.stat().st_size, p.relative_to(OUT)) for p in OUT.rglob("*.json")), reverse=True)
     print(f"{len(sizes)} files, {sum(s for s, _ in sizes) / 1e6:.1f} MB total, largest {sizes[0][0] / 1e3:.0f} kB ({sizes[0][1]})")

@@ -5,9 +5,8 @@
 //       turns and moves aside while the page fades from ink to white.
 //   02  The alarm panel: one window per pump, as the evening shift stands, following Today's rule. Clicking a pump
 //       flickers the 3D pump away and shows that pump's card in its place, built from real data only.
-//   03  The pump dashboard: every pump at the shift, and one pump's report: what's wrong, the evidence, how sure, what
-//       to do, and Acknowledge, Dismiss or Escalate.
-//   04  How well it works: faults caught against plant alarms, warning time and false alerts.
+//       The card ends with the review: Acknowledge, Dismiss or Escalate.
+//   03  How well it works: faults caught against plant alarms, warning time and false alerts.
 // The retrofit cards and the closing call to action are set aside for now (see the note in the page).
 // Live parts only use data up to the shift. Results use totals only.
 import Link from "next/link";
@@ -18,7 +17,6 @@ import { RoomStage } from "@/components/welcome/RoomStage";
 import { AlarmPanel } from "@/components/welcome/AlarmPanel";
 import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
-import { PumpDashboard } from "@/components/welcome/PumpDashboard";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
 
@@ -66,7 +64,7 @@ export default function Welcome() {
   }, [mapReady]);
 
   /** Header links: the top, the map at the evening shift, and the sections below. */
-  const jump = (to: "top" | "map" | "pumps" | "results") => {
+  const jump = (to: "top" | "map" | "results") => {
     const el = track.current;
     if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
     if (to === "map" && el) {
@@ -89,7 +87,6 @@ export default function Welcome() {
         </button>
         <nav aria-label="Sections" className="ml-10 hidden gap-7 text-[15px] md:flex">
           <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Alarm panel</button>
-          <button type="button" onClick={() => jump("pumps")} className="hover:underline underline-offset-4">Pumps</button>
           <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
         </nav>
         <Link href="/" className="ml-auto text-[15px] underline-offset-4 hover:underline">
@@ -133,12 +130,11 @@ export default function Welcome() {
           <AlarmPanel site={site} shiftHour={SHIFT_HOUR} ready selected={selected} onSelect={setSelected} columns={2} />
         </section>
       )}
-      <PumpDashboard shiftHour={SHIFT_HOUR} />
       <Results />
       {/* The retrofit cards and the closing call to action (MetricCards.tsx, Closing.tsx) are set aside for now. */}
       <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
         Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
-        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The site layout is fictional.
+        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The engine room is an illustration, and the vessel and plant names are fictional.
       </footer>
     </div>
   );

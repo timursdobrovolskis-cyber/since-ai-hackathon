@@ -19,6 +19,7 @@ import { TEST_PUMPS, type SiteState } from "@/lib/sitemap";
 import type { MaintenanceNote, PumpData } from "@/lib/types";
 import { lastDone } from "@/lib/worker";
 import { useConcern } from "./concerns";
+import { PumpReview } from "./PumpReview";
 import { LIGHT_WORDS } from "./mapParts";
 import { SignalChart } from "./SignalChart";
 
@@ -238,6 +239,12 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                       Open the job card
                     </Link>
                   </p>
+                </Section>
+              )}
+
+              {c && alert && (
+                <Section title="Your review">
+                  <PumpReview c={c} />
                 </Section>
               )}
 

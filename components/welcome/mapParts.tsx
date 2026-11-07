@@ -9,10 +9,13 @@ import { PLAIN, pumpName } from "@/lib/plain";
 import { siteAt, TEST_PUMPS, ZONES, type Light, type SiteState } from "@/lib/sitemap";
 import { useConcerns } from "./concerns";
 
-/** The site at `hour`, shared by the panel and the pump card so they always show the same moment. */
+/**
+ * The site at `hour`, shared by the panel and the pump card so they always show the same moment. It shows the alerts as
+ * raised, without decisions, so a pump keeps its window and its card while it is reviewed. Decisions show on top.
+ */
 export function useSite(hour: number, shiftHour: number) {
-  const { alertsToShift, decisions, record, pumps } = useApp();
-  return useMemo(() => siteAt(alertsToShift, hour, shiftHour, decisions, record, pumps), [alertsToShift, hour, shiftHour, decisions, record, pumps]);
+  const { alertsToShift, record, pumps } = useApp();
+  return useMemo(() => siteAt(alertsToShift, hour, shiftHour, {}, record, pumps), [alertsToShift, hour, shiftHour, record, pumps]);
 }
 
 export const LIGHT_WORDS: Record<Light, string> = {
@@ -53,8 +56,10 @@ export type PumpRow = {
   since: number | null;
   /** Every alert on the pump up to the map's hour. */
   alertHours: number[];
-  /** When the leading concern started, for the timeline. */
+  /** When the leading concern started. */
   from: number | null;
+  /** The leading concern's case, for its decision. */
+  caseId: string | null;
 };
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -83,6 +88,7 @@ export function usePumpRows(site: SiteState): PumpRow[] {
           since: c ? Math.max(0, Math.round(site.hour - c.lead.first.offset_hours)) : null,
           alertHours: alertsToShift.filter((a) => a.asset_id === id && a.offset_hours <= site.hour).map((a) => a.offset_hours),
           from: c ? c.lead.first.offset_hours : null,
+          caseId: c ? c.lead.id : null,
         };
       }),
     );
@@ -115,23 +121,22 @@ export function MapHead({ site, shiftHour, panelBelow = false }: { site: SiteSta
   const atShift = site.hour === shiftHour;
   return (
     <div className="mb-5">
-      <h2 className="text-[26px] leading-tight font-light tracking-[-0.025em]">
-        The site at <span className="font-normal tabular-nums">{clock(site.hour)}</span>
-      </h2>
+      <h2 className="text-[26px] leading-tight font-light tracking-[-0.025em]">The pumps at the evening shift</h2>
       <p className="mt-1.5 text-[15px] leading-snug text-mz-muted">
         {site.alerts === 0 ? (
           "No alerts yet. Every pump with data is normal."
         ) : (
           <>
             <span className="text-mz-ink">
-              <Count value={site.red} /> {site.red === 1 ? "pump needs" : "pumps need"} you
-            </span>
-            , <Count value={site.orange} /> {site.orange === 1 ? "reading" : "readings"} to check, from <Count value={site.alerts} /> alerts. Plant alarms so far:{" "}
-            <Count value={site.alarms} />.
+              <Count value={site.red} /> {site.red === 1 ? "pump needs" : "pumps need"} you, <Count value={site.orange} /> {site.orange === 1 ? "reading" : "readings"} to check.
+            </span>{" "}
+            So far this week the detector raised <Count value={site.alerts} /> alerts and the plant&rsquo;s own alarms {site.alarms === 0 ? "none" : <Count value={site.alarms} />}.
           </>
         )}
       </p>
-      <p className="mt-1 text-[13px] text-mz-muted">{atShift ? `This is the evening shift, as on Today. ${panelBelow ? "The alarm panel for it follows." : "Pick a pump for its details."}` : "Keep scrolling to run the week to the evening shift."}</p>
+      <p className="mt-1 text-[13px] text-mz-muted">
+        {clock(site.hour)} of each pump&rsquo;s simulated test week, as on Today. {atShift ? (panelBelow ? "The alarm panel for it follows." : "Pick a pump for its details.") : ""}
+      </p>
     </div>
   );
 }

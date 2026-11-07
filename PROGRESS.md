@@ -22,11 +22,14 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Results are back after the pump dashboard, restyled, with a link to Review.
 - The alarm panel shows the evening shift as it stands, with no clock running, and the scroll section is shorter.
 - Clicking a pump flickers the 3D pump away and shows its card in its place, built from data only: state now, what's wrong, evidence and chart, every reading now against its band, how sure, the detector's recommended action and next stop, latest work from the log, and what it cannot measure. The wrong "14 kinds of reading" count and the area glow are gone.
+- Every figure on the page traced to its source. Results now compare alerts with plant alarms on four checked figures (faults caught, warned before the limit, right cause, false alerts), in three layouts to compare. `lib/keynumbers.test.ts` ties each to the organizers' scorer.
+- The duplicate pump dashboard is gone. Its Acknowledge, Dismiss and Escalate moved into the pump card, and the panel shows the decision on the pump's window.
+- The panel heading no longer claims a real site or clock: it names hour 66 of each pump's simulated test week.
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona's look at the pump card.
+Nothing. Waiting for Jona to pick a results layout.
 
 ## Next
 

@@ -6,6 +6,8 @@
 // Solid red means it needs you today, amber means check the reading, and an icon marks both, so colour is never the
 // only signal.
 import { Gauge, TriangleAlert } from "lucide-react";
+import { useApp } from "@/components/AppProvider";
+import { DECIDED_SHORT } from "./PumpReview";
 import { MapHead, pickProps, STATUS_WORD, usePumpRows, type MapProps, type PumpRow } from "./mapParts";
 
 const byNumber = (a: PumpRow, b: PumpRow) => Number(a.id.slice(5)) - Number(b.id.slice(5));
@@ -21,6 +23,7 @@ const quiet: Partial<Record<PumpRow["status"], string>> = { normal: "Normal", no
 /** `columns` 2 suits a phone at full width; the default is 3 on small screens and 4 from tablet width. */
 export function AlarmPanel({ columns, ...props }: MapProps & { columns?: 2 }) {
   const rows = [...usePumpRows(props.site)].sort(byNumber);
+  const { decisions } = useApp();
   return (
     <div>
       <MapHead site={props.site} shiftHour={props.shiftHour} />
@@ -39,6 +42,7 @@ export function AlarmPanel({ columns, ...props }: MapProps & { columns?: 2 }) {
                 {p.since !== null && <span className="ann-since ml-auto font-mono text-[12px] font-normal tabular-nums">{p.since} h</span>}
               </p>
               <p className="ann-text line-clamp-3 text-[13px] leading-[1.2]">{p.fault ?? quiet[p.status]}</p>
+              {p.caseId && decisions[p.caseId] && <p className="ann-decided text-[12px] font-medium">{DECIDED_SHORT[decisions[p.caseId].kind]}</p>}
             </div>
           </div>
         ))}

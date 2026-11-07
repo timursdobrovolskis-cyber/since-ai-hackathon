@@ -339,3 +339,5 @@ input[type="range"] { accent-color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .pump-stage[data-gone="true"] { animation: none; }
 }
+.ann-decided { color: var(--mz-accent); }
+.ann-needs .ann-decided { color: white; text-decoration: underline; text-underline-offset: 3px; }
