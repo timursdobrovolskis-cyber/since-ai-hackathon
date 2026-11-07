@@ -10,11 +10,12 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Part 2: the site map. 12 pumps in four zones of one fictional site, with test pumps dimmed. Scrolling runs the clock from hour 0 to the evening shift, and the lights, alert count and plant alarm count change with it.
 - The lights come from `lib/sitemap.ts`, which reuses Today's grouping. Tests check the map agrees with Today at the shift and never sees a later alert.
 - Part 3: click or press Enter on a pump on the map. The 3D pump shrinks to the top of the right column, and a card slides in with the problem, how sure it is, the trend, the next stop, the 14 kinds of reading, and a link to the job card. Escape or the close button closes it and returns focus to the pump.
+- The page now opens in a ferry engine room, in two versions to compare with the Opening switch in the header: a line-work 3D room that flies in to the front pump, or a halftone photo whose dots fade as the pump appears (`?hero=halftone`).
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona's look at part 3.
+Nothing. Waiting for Jona to choose between the two openings.
 
 ## Next
 

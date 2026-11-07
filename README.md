@@ -80,6 +80,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
+| Engine room photo, halftone opening | "Engine room, ferry Bastø IV 08" by Ulflarsen, Wikimedia Commons, in `public/images`. Shown as dots, credited on the page | CC BY-SA 4.0. The dotted version is shared under the same licence |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |

@@ -121,7 +121,8 @@ input[type="range"] { accent-color: var(--ink); }
 .welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
 .welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
 .welcome-label { color: color-mix(in srgb, rgb(255 255 255 / 0.6), var(--mz-muted) calc(var(--g) * 100%)); }
-.welcome-cue { opacity: calc(1 - var(--p) * 12); }
+.welcome-cue { opacity: calc(1 - var(--r) * 8); }
+.welcome-credit { opacity: calc(1 - var(--r) * 1.6); }
 .welcome-map {
   opacity: calc((var(--p) - 0.74) * 6);
   transform: translateX(calc((1 - clamp(0, (var(--p) - 0.7) * 5, 1)) * -40px));

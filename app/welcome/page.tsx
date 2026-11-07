@@ -4,10 +4,12 @@
 // Geist and JetBrains Mono, one accent blue. The pump zooms and turns as you scroll, then glides right while the
 // page fades from ink to white. Then the site map appears, and further scrolling runs its clock to the shift.
 // Part 3: clicking a pump on the map shrinks the 3D pump and opens that pump's card below it.
+// The page opens in a ferry engine room, in one of two versions to compare: line work or a halftone photo.
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PumpCard } from "@/components/welcome/PumpCard";
-import { PumpStage } from "@/components/welcome/PumpStage";
+import { HalftoneRoom } from "@/components/welcome/HalftoneRoom";
+import { PumpStage, type HeroVariant } from "@/components/welcome/PumpStage";
 import { SiteMap, useSite } from "@/components/welcome/SiteMap";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
@@ -23,6 +25,19 @@ export default function Welcome() {
   const site = useSite(hour, SHIFT_HOUR);
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
+  // Two openings to compare: line work (default) or the halftone photo (?hero=halftone).
+  const [variant, setVariant] = useState<HeroVariant>("lines");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the address bar is only readable after mount
+    if (new URLSearchParams(window.location.search).get("hero") === "halftone") setVariant("halftone");
+  }, []);
+  const pickVariant = (v: HeroVariant) => {
+    setVariant(v);
+    const url = new URL(window.location.href);
+    if (v === "halftone") url.searchParams.set("hero", "halftone");
+    else url.searchParams.delete("hero");
+    window.history.replaceState(null, "", url);
+  };
   // Scrolling back up to the pump closes any open card.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
@@ -39,13 +54,28 @@ export default function Welcome() {
           <span>Site map</span>
           <span>Results</span>
         </nav>
-        <Link href="/" className="ml-auto font-mono text-[12px] uppercase tracking-[0.14em] underline-offset-4 hover:underline">
+        {/* Comparison switch for the two openings, until one is chosen. */}
+        <div role="group" aria-label="Opening to compare" className="ml-auto flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.14em]">
+          <span className="mr-1 opacity-60">Opening</span>
+          {(["lines", "halftone"] as HeroVariant[]).map((v) => (
+            <button
+              key={v}
+              type="button"
+              aria-pressed={variant === v}
+              onClick={() => pickVariant(v)}
+              className={`min-h-8 border px-2.5 ${variant === v ? "border-white bg-white text-black" : "border-white/40 hover:border-white"}`}
+            >
+              {v === "lines" ? "Line work" : "Halftone"}
+            </button>
+          ))}
+        </div>
+        <Link href="/" className="ml-8 font-mono text-[12px] uppercase tracking-[0.14em] underline-offset-4 hover:underline">
           Today&rsquo;s shift
         </Link>
       </header>
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} className="relative h-[540vh]" style={{ "--p": 0, "--t": 0 } as React.CSSProperties}>
+      <section ref={track} className="relative h-[680vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-6 inset-y-20 border sm:inset-x-10">
@@ -54,10 +84,19 @@ export default function Welcome() {
           </div>
 
           <p className="welcome-label absolute left-6 top-24 font-mono text-[11px] uppercase tracking-[0.18em] sm:left-14">
-            01 &middot; Centrifugal pump
+            01 &middot; Engine room &middot; seawater cooling pumps
           </p>
 
-          <PumpStage phases={phases} selected={selected !== null} />
+          {variant === "halftone" && <HalftoneRoom phases={phases} />}
+          <PumpStage phases={phases} selected={selected !== null} variant={variant} />
+
+          {variant === "halftone" && (
+            <p className="welcome-credit absolute right-6 bottom-10 max-w-[44ch] text-right font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-white/55 sm:right-14">
+              Photo: Ulflarsen, Engine room, ferry Bast&oslash; IV,{" "}
+              <a href="https://commons.wikimedia.org/wiki/File:Engine_room,_ferry_Bast%C3%B8_IV_08.JPG" className="underline underline-offset-2">Wikimedia Commons</a>,{" "}
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" className="underline underline-offset-2">CC BY-SA 4.0</a>, shown as dots
+            </p>
+          )}
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
             Scroll

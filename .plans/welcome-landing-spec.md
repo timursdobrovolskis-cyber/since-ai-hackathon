@@ -45,11 +45,20 @@ From `profile` in the organizer `assets.csv`. Site names stay fictional.
 
 | # | Section | Background | What it does |
 |---|---|---|---|
-| 1 | Pump hero | Ink, fading to white | The line-work pump zooms, turns and glides right |
+| 1 | Engine room, then pump | Ink, fading to white | Opens wide in a ferry engine room. Scrolling flies in to one pump, which zooms, turns and glides right. Two versions to compare: 3D line work, and a halftone photo |
 | 2 | Site map | White | Pinned. Scroll runs time to the evening shift, lights change. Then click a pump for its dashboard, with the pump shrinking above it |
 | 3 | Step list | White | Pinned. Today's red and orange pumps listed on the left, highlighting one by one as you scroll. On the right, that pump's real signal draws in, leaving its grey normal band, with the alert marked |
 | 4 | Results counter | Ink | Big counting numbers: faults caught against plant alarms, median warning. Baseline figures, labelled |
 | 5 | Payback and sensors | White | A row of four cards lighting up one by one, each with a mini chart |
+
+## Machine room opening (7 Nov, evening)
+
+Like Meuze, which opens inside a restaurant, the page opens inside a ship's engine room, because 6 of the 12 pumps are ferry pumps and Pump 8 is the main demo. Jona asked for two versions to compare before choosing:
+
+- **Line work:** a 3D engine room in three.js, in the same white line work: deck plates, hull ribs, overhead pipes, a header with drops, a switchboard, and a row of copies of the pump model. Scrolling flies in to the front pump, and the room fades away around it.
+- **Halftone:** a real ferry pump room photo drawn as dots in the browser, like Meuze. Scrolling zooms into the photo, and the dots fade as the line-work pump fades in. Photo: "Engine room, ferry Bastø IV 08" by Ulflarsen, Wikimedia Commons, CC BY-SA 4.0, credited on the page. The dotted version stays CC BY-SA.
+
+A small switch on the page flips between them, and `?hero=halftone` opens the second.
 
 ## Parts
 
