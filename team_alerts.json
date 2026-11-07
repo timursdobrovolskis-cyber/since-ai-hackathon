@@ -1,0 +1,1902 @@
+{
+ "source": "Team detector v4",
+ "calibration": {
+  "fitted_on": "train",
+  "by_type": {
+   "AIR_ENTRAINMENT": {
+    "alerts": 1,
+    "hits": 1,
+    "confidence": 0.67
+   },
+   "BEARING_WEAR": {
+    "alerts": 19,
+    "hits": 19,
+    "confidence": 0.95
+   },
+   "CAVITATION": {
+    "alerts": 3,
+    "hits": 3,
+    "confidence": 0.8
+   },
+   "COMMUNICATION_LOSS": {
+    "alerts": 1,
+    "hits": 1,
+    "confidence": 0.67
+   },
+   "DISCHARGE_RESTRICTION": {
+    "alerts": 5,
+    "hits": 5,
+    "confidence": 0.86
+   },
+   "MISALIGNMENT": {
+    "alerts": 5,
+    "hits": 2,
+    "confidence": 0.43
+   },
+   "SENSOR_CALIBRATION_SHIFT": {
+    "alerts": 2,
+    "hits": 2,
+    "confidence": 0.75
+   },
+   "SENSOR_DRIFT": {
+    "alerts": 13,
+    "hits": 7,
+    "confidence": 0.53
+   },
+   "SENSOR_NOISE_SPIKES": {
+    "alerts": 1,
+    "hits": 1,
+    "confidence": 0.67
+   },
+   "SENSOR_STUCK": {
+    "alerts": 5,
+    "hits": 5,
+    "confidence": 0.86
+   },
+   "SUCTION_STRAINER_CLOGGING": {
+    "alerts": 8,
+    "hits": 8,
+    "confidence": 0.9
+   }
+  },
+  "by_class": {
+   "MACHINE": {
+    "alerts": 41,
+    "hits": 38,
+    "confidence": 0.91
+   },
+   "SENSOR": {
+    "alerts": 22,
+    "hits": 16,
+    "confidence": 0.71
+   }
+  }
+ },
+ "alerts": [
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-12T19:06:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 6.1 kPa below normal for 259 m3/h (z=-5.6); head still on the pump curve; speed z=+0.8, power z=+0.6; NPSH margin 10.7."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-13T07:06:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 11.1 kPa below normal for 249 m3/h (z=-10.2); head still on the pump curve; speed z=+0.5, power z=-0.1; NPSH margin 10.7."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-14T13:44:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "COMMUNICATION_LOSS",
+   "confidence": 0.67,
+   "recommended_action": "Check the gateway, network switch and sensor power; data stopped arriving.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "COMMUNICATION_LOSS",
+     "probability": 0.67
+    }
+   ],
+   "evidence": {
+    "summary": "Data stopped arriving from this pump (rows missing in the last 30 min)."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-16T14:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 5.9 kPa below normal for 240 m3/h (z=-5.4); head still on the pump curve; speed z=-1.2, power z=-1.2; NPSH margin 12.4."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-16T20:12:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "bearing temperature reading frozen at 35.5 C for 85 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-17T08:12:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "bearing temperature reading frozen at 35.5 C for 805 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-17T20:12:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "bearing temperature reading frozen at 35.5 C for 1525 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-01",
+   "alert_time_utc": "2025-08-17T20:27:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 10.0 kPa below normal for 203 m3/h (z=-9.2); head still on the pump curve; speed z=-1.4, power z=-2.4; NPSH margin 15.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-02T08:19:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure +4.0 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 7.9 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-02T12:34:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.1 g (z=+3.1), crest factor 6.3 (z=+1.8), vibration velocity 0.8 mm/s (z=-1.1), bearing temperature 31.2 C (z=+0.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-02T20:19:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure +8.1 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 19.9 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-03T00:34:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor drift alert is still open: vibration acceleration 0.1 g (z=+5.7), crest factor 6.3 (z=+1.8), vibration velocity 0.8 mm/s (z=+0.3), bearing temperature 29.7 C (z=-3.7): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-03T08:19:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure +13.7 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 31.9 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-03T12:34:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor drift alert is still open: vibration acceleration 0.2 g (z=+9.4), crest factor 6.1 (z=+1.3), vibration velocity 0.8 mm/s (z=+0.1), bearing temperature 30.6 C (z=-1.5): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-03T22:06:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure +18.8 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 0.1 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-04T00:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor drift alert is still open: vibration acceleration 0.2 g (z=+14.2), crest factor 5.7 (z=+0.4), vibration velocity 0.8 mm/s (z=-0.5), bearing temperature 30.3 C (z=-2.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-04T10:06:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure +24.5 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 12.1 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-04T12:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor drift alert is still open: vibration acceleration 0.3 g (z=+20.9), crest factor 5.3 (z=-0.7), vibration velocity 0.8 mm/s (z=+0.2), bearing temperature 31.2 C (z=+0.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-04T22:06:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the bearing wear alert is still open: Suction pressure +27.7 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 24.1 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-05T00:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor drift alert is still open: vibration acceleration 0.4 g (z=+27.1), crest factor 4.8 (z=-2.1), vibration velocity 1.0 mm/s (z=+2.8), bearing temperature 32.1 C (z=+2.6): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-05T10:56:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.47
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the bearing wear alert is still open: Suction pressure +34.2 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 37.0 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-05T12:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.5 g (z=+36.7), crest factor 4.4 (z=-3.3), vibration velocity 1.3 mm/s (z=+9.7), bearing temperature 33.7 C (z=+6.8): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-06T00:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.6 g (z=+48.5), crest factor 4.0 (z=-4.4), vibration velocity 1.9 mm/s (z=+22.5), bearing temperature 35.4 C (z=+11.0): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-06T12:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.8 g (z=+66.9), crest factor 3.7 (z=-5.3), vibration velocity 2.9 mm/s (z=+41.1), bearing temperature 38.2 C (z=+18.3): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-07T05:53:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 1.1 mm/s (z=+5.5) stepped up 0.1 h ago, within 8 h of a maintenance restart, without acceleration rise (z=-0.7); bearing temp z=-2.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-02",
+   "alert_time_utc": "2025-12-07T17:57:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 1.1 mm/s (z=+5.5) stepped up 12.2 h ago, within 8 h of a maintenance restart, without acceleration rise (z=-1.0); bearing temp z=+3.0."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-03T23:59:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 474.1 kPa (z=+7.4) up while motor current 63.5 A (z=-7.4) is down: flow is being throttled."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-04T11:59:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 484.4 kPa (z=+12.6) up while motor current 61.2 A (z=-12.3) is down: flow is being throttled."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-04T23:59:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 481.2 kPa (z=+11.0) up while motor current 61.7 A (z=-11.3) is down: flow is being throttled."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-05T11:59:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 481.1 kPa (z=+10.9) up while motor current 62.0 A (z=-10.6) is down: flow is being throttled."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-05T23:59:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 479.6 kPa (z=+10.2) up while motor current 61.8 A (z=-11.0) is down: flow is being throttled."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-06T06:21:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_CALIBRATION_SHIFT",
+   "confidence": 0.75,
+   "recommended_action": "Compare the transmitter with a local gauge; it stepped after maintenance or a knock.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_CALIBRATION_SHIFT",
+     "probability": 0.75
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 473.1 kPa (z=+6.9) moved while motor current (z=-2.7) did not; it stepped in one move 89 min ago."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-06T18:21:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Discharge pressure +17.6 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 13.5 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-07T06:21:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure 474.8 kPa (z=+7.8) moved while motor current (z=-1.7) did not; it has drifted for 25.5 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-03",
+   "alert_time_utc": "2026-03-07T18:21:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Discharge pressure +15.0 kPa from normal for this flow while flow, power, speed and the other pressure are normal; it has drifted for 37.5 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-17T10:04:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.3 g (z=+3.6), crest factor 6.3 (z=+1.3), vibration velocity 1.3 mm/s (z=+4.7), bearing temperature 43.9 C (z=+0.4): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-17T22:07:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.3 g (z=+7.2), crest factor 6.1 (z=+0.8), vibration velocity 1.5 mm/s (z=+9.2), bearing temperature 43.1 C (z=+0.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-18T10:07:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.5 g (z=+12.3), crest factor 5.8 (z=-0.0), vibration velocity 1.8 mm/s (z=+14.1), bearing temperature 44.8 C (z=+0.8): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-18T22:06:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_NOISE_SPIKES",
+   "confidence": 0.67,
+   "recommended_action": "Check the cable screen, grounding and connector of the transmitter.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_NOISE_SPIKES",
+     "probability": 0.67
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.33
+    }
+   ],
+   "evidence": {
+    "summary": "flow jumps within each minute 4.8x more than normal while related signals are calm."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-18T23:11:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_NOISE_SPIKES",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the sensor noise spikes alert is still open: vibration acceleration 0.6 g (z=+18.0), crest factor 5.2 (z=-1.4), vibration velocity 1.9 mm/s (z=+17.2), bearing temperature 41.0 C (z=-0.8): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-19T11:11:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.8 g (z=+27.2), crest factor 4.7 (z=-2.6), vibration velocity 2.5 mm/s (z=+28.8), bearing temperature 46.7 C (z=+1.7): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-19T23:14:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 1.0 g (z=+35.9), crest factor 4.2 (z=-4.0), vibration velocity 3.0 mm/s (z=+38.2), bearing temperature 45.2 C (z=+1.0): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-20T15:19:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 1.3 g (z=+49.7), crest factor 3.7 (z=-5.2), vibration velocity 4.2 mm/s (z=+62.7), bearing temperature 37.9 C (z=-2.2): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-21T03:19:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 1.6 g (z=+62.2), crest factor 3.5 (z=-5.7), vibration velocity 5.4 mm/s (z=+87.0), bearing temperature 53.4 C (z=+4.6): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-21T16:34:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 3.4 mm/s (z=+46.5) stepped up 0.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=-0.4); bearing temp z=-4.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-22T04:34:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 3.5 mm/s (z=+48.1) stepped up 12.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=-0.7); bearing temp z=-1.9."
+   }
+  },
+  {
+   "asset_id": "PUMP-04",
+   "alert_time_utc": "2025-06-22T16:35:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 4.0 mm/s (z=+58.5) stepped up 4.5 h ago, within 0 h of a maintenance restart, without acceleration rise (z=-0.2); bearing temp z=-0.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-05",
+   "alert_time_utc": "2026-01-21T09:40:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure reading frozen at 350.8 kPa for 25 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-05",
+   "alert_time_utc": "2026-01-21T21:40:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure reading frozen at 350.8 kPa for 745 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-09T00:50:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 11.6 kPa below normal for 58 m3/h (z=-11.6); head still on the pump curve; NPSH margin 3.0."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-09T12:53:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 40.8 kPa below normal for 61 m3/h (z=-40.8); head still on the pump curve; NPSH margin 1.9."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-09T21:54:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "CAVITATION",
+   "confidence": 0.8,
+   "recommended_action": "Reduce flow or speed if allowed; check the suction strainer, suction valve and liquid level now.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "CAVITATION",
+     "probability": 0.8
+    }
+   ],
+   "evidence": {
+    "summary": "NPSH margin 0.99 (below 1.3): suction pressure -55 kPa at 54 m3/h; head 3.2 m below the curve; vibration acceleration 1.1 g (z=+34.6)."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-10T00:57:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 38.1 kPa below normal for 41 m3/h (z=-38.1); head still on the pump curve; NPSH margin 2.9."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-10T06:07:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "CAVITATION",
+   "confidence": 0.8,
+   "recommended_action": "Reduce flow or speed if allowed; check the suction strainer, suction valve and liquid level now.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "CAVITATION",
+     "probability": 0.8
+    }
+   ],
+   "evidence": {
+    "summary": "NPSH margin 0.86 (below 1.3): suction pressure -62 kPa at 32 m3/h; head 9.9 m below the curve; vibration acceleration 1.6 g (z=+46.9)."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-10T09:15:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "CAVITATION",
+   "confidence": 0.8,
+   "recommended_action": "Reduce flow or speed if allowed; check the suction strainer, suction valve and liquid level now.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "CAVITATION",
+     "probability": 0.8
+    }
+   ],
+   "evidence": {
+    "summary": "NPSH margin 0.78 (below 1.3): suction pressure -61 kPa at 19 m3/h; head 13.6 m below the curve; vibration acceleration 1.6 g (z=+45.9)."
+   }
+  },
+  {
+   "asset_id": "PUMP-06",
+   "alert_time_utc": "2025-10-10T13:18:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 50.6 kPa below normal for 37 m3/h (z=-50.6); head still on the pump curve; NPSH margin 2.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-15T02:52:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_CALIBRATION_SHIFT",
+   "confidence": 0.75,
+   "recommended_action": "Compare the transmitter with a local gauge; it stepped after maintenance or a knock.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_CALIBRATION_SHIFT",
+     "probability": 0.75
+    }
+   ],
+   "evidence": {
+    "summary": "Flow meter -44 m3/h off the flow implied by power and by head, which agree with each other; it stepped in one move 8 min ago."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-15T14:52:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Flow meter -45 m3/h off the flow implied by power and by head, which agree with each other; it has drifted for 12.1 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-16T02:52:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Flow meter -46 m3/h off the flow implied by power and by head, which agree with each other; it has drifted for 8.9 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-16T14:52:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_DRIFT",
+   "confidence": 0.53,
+   "recommended_action": "Compare the transmitter with a local gauge; recalibrate.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_DRIFT",
+     "probability": 0.53
+    }
+   ],
+   "evidence": {
+    "summary": "Flow meter -45 m3/h off the flow implied by power and by head, which agree with each other; it has drifted for 20.9 h."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-17T07:35:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "AIR_ENTRAINMENT",
+   "confidence": 0.67,
+   "recommended_action": "Check the suction level, sea chest or basin for air draw; vent the pump.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "AIR_ENTRAINMENT",
+     "probability": 0.67
+    }
+   ],
+   "evidence": {
+    "summary": "Head 0.5 m below the pump curve at 334 m3/h (z=-1.8); power says -69 m3/h less flow than the head does; NPSH margin 10.2 is fine; appeared 0.1 h ago."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-18T04:11:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.1 g (z=-0.1), crest factor 3.6 (z=+7.4), vibration velocity 0.7 mm/s (z=-0.6), bearing temperature 28.5 C (z=-11.3): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-07",
+   "alert_time_utc": "2025-05-18T16:11:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.1 g (z=+0.2), crest factor 4.0 (z=+17.0), vibration velocity 0.7 mm/s (z=-0.2), bearing temperature 34.9 C (z=+0.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-10T09:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 5.5 kPa below normal for 281 m3/h (z=-5.5); head still on the pump curve; speed z=+0.0, power z=-1.0; NPSH margin 11.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-10T18:16:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the suction strainer clogging alert is still open: vibration acceleration 0.1 g (z=-0.6), crest factor 4.6 (z=+5.1), vibration velocity 0.8 mm/s (z=+0.1), bearing temperature 36.6 C (z=-0.9): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-10T21:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.1
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 9.2 kPa below normal for 269 m3/h (z=-9.2); head still on the pump curve; speed z=+0.0, power z=-1.8; NPSH margin 11.2."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-11T06:16:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.05
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the suction strainer clogging alert is still open: vibration acceleration 0.1 g (z=-0.3), crest factor 4.6 (z=+5.3), vibration velocity 0.8 mm/s (z=+0.6), bearing temperature 36.9 C (z=-0.9): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-11T09:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "SUCTION_STRAINER_CLOGGING",
+   "confidence": 0.9,
+   "recommended_action": "Inspect and clean the suction strainer at the next opportunity.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "SUCTION_STRAINER_CLOGGING",
+     "probability": 0.9
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.1
+    }
+   ],
+   "evidence": {
+    "summary": "Suction pressure 13.7 kPa below normal for 256 m3/h (z=-13.7); head still on the pump curve; speed z=+0.0, power z=-2.6; NPSH margin 11.1."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-11T18:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.1 g (z=-0.4), crest factor 5.2 (z=+7.3), vibration velocity 0.7 mm/s (z=-0.3), bearing temperature 35.2 C (z=-3.1): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-13T00:07:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "COMMUNICATION_LOSS",
+   "confidence": 0.67,
+   "recommended_action": "Check the gateway, network switch and sensor power; data stopped arriving.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "COMMUNICATION_LOSS",
+     "probability": 0.67
+    }
+   ],
+   "evidence": {
+    "summary": "Data stopped arriving from this pump (rows missing in the last 30 min)."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-13T12:35:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.1 g (z=+4.1), crest factor 6.2 (z=+11.2), vibration velocity 0.8 mm/s (z=+0.6), bearing temperature 37.0 C (z=-0.4): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-13T20:25:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_NOISE_SPIKES",
+   "confidence": 0.67,
+   "recommended_action": "Check the cable screen, grounding and connector of the transmitter.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_NOISE_SPIKES",
+     "probability": 0.67
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.33
+    }
+   ],
+   "evidence": {
+    "summary": "discharge pressure jumps within each minute 4.2x more than normal while related signals are calm."
+   }
+  },
+  {
+   "asset_id": "PUMP-08",
+   "alert_time_utc": "2025-09-14T08:05:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "BEARING_WEAR",
+   "confidence": 0.95,
+   "recommended_action": "Check the bearing for noise and heat; plan a bearing replacement and check lubrication.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "BEARING_WEAR",
+     "probability": 0.95
+    }
+   ],
+   "evidence": {
+    "summary": "vibration acceleration 0.2 g (z=+9.3), crest factor 6.4 (z=+12.9), vibration velocity 0.7 mm/s (z=-0.1), bearing temperature 36.9 C (z=-0.7): high-frequency energy first, typical of a rolling-bearing defect."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-10T06:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 2.1 mm/s (z=+17.5) stepped up 0.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=+0.6); bearing temp z=-4.8."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-10T18:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 2.2 mm/s (z=+19.5) stepped up 12.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=+1.6); bearing temp z=+2.1."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-11T06:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 2.3 mm/s (z=+21.0) stepped up 24.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=+1.1); bearing temp z=+0.7."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-11T18:28:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 2.3 mm/s (z=+20.9) stepped up 36.1 h ago, within 0 h of a maintenance restart, without acceleration rise (z=+0.5); bearing temp z=+1.9."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-11T22:28:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "bearing temperature reading frozen at 44.5 C for 11 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-12T10:30:00Z",
+   "event_class": "SENSOR",
+   "fault_type": "SENSOR_STUCK",
+   "confidence": 0.86,
+   "recommended_action": "Check the sensor, its cable and the transmitter; the reading is frozen.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "SENSOR",
+     "fault_type": "SENSOR_STUCK",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "bearing temperature reading frozen at 44.5 C for 733 min while the pump runs and load varies."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-12T18:40:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "MISALIGNMENT",
+   "confidence": 0.43,
+   "recommended_action": "Check the coupling alignment with a laser tool; pump was reassembled recently.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "MISALIGNMENT",
+     "probability": 0.43
+    }
+   ],
+   "evidence": {
+    "summary": "vibration velocity 2.5 mm/s (z=+25.2) stepped up 18.5 h ago, within 0 h of a maintenance restart, without acceleration rise (z=+1.9); bearing temp z=+1.6."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-14T01:21:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "Flow 289 m3/h (z=-10.9) and power (z=-7.0) fell at fixed speed while discharge pressure rose (z=+4.7) and suction is normal: the system resistance has increased."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-14T13:21:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "Flow 264 m3/h (z=-23.2) and power (z=-14.2) fell at fixed speed while discharge pressure rose (z=+9.5) and suction is normal: the system resistance has increased."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-15T01:21:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    }
+   ],
+   "evidence": {
+    "summary": "Flow 264 m3/h (z=-23.3) and power (z=-14.2) fell at fixed speed while discharge pressure rose (z=+9.5) and suction is normal: the system resistance has increased."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-15T07:36:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "AIR_ENTRAINMENT",
+   "confidence": 0.67,
+   "recommended_action": "Check the suction level, sea chest or basin for air draw; vent the pump.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "AIR_ENTRAINMENT",
+     "probability": 0.67
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.33
+    }
+   ],
+   "evidence": {
+    "summary": "New finding while the discharge restriction alert is still open: Head 0.8 m below the pump curve at 262 m3/h (z=-2.8); power says -25 m3/h less flow than the head does; NPSH margin 4.0 is fine; appeared 0.1 h ago."
+   }
+  },
+  {
+   "asset_id": "PUMP-09",
+   "alert_time_utc": "2026-02-15T14:31:00Z",
+   "event_class": "MACHINE",
+   "fault_type": "DISCHARGE_RESTRICTION",
+   "confidence": 0.86,
+   "recommended_action": "Check the discharge valve position and the heat exchanger for fouling.",
+   "detector_version": "Team detector v4",
+   "confidence_calibrated": true,
+   "hypotheses": [
+    {
+     "event_class": "MACHINE",
+     "fault_type": "DISCHARGE_RESTRICTION",
+     "probability": 0.86
+    },
+    {
+     "event_class": "MACHINE",
+     "fault_type": "AIR_ENTRAINMENT",
+     "probability": 0.14
+    }
+   ],
+   "evidence": {
+    "summary": "Discharge pressure 14.1 kPa above normal for 262 m3/h (z=+7.1) while power z=-17.6, current z=-6.9, flow z=-24.3."
+   }
+  }
+ ]
+}
