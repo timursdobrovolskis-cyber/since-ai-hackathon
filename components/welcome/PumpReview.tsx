@@ -182,7 +182,7 @@ export function PumpReview({ c }: { c: Concern }) {
     faultType: c.lead.faultType,
   };
   const btn =
-    "press inline-flex min-h-11 items-center px-4 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
+    "press inline-flex min-h-11 items-center justify-center px-4 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
 
   if (done) {
     return (
@@ -212,7 +212,8 @@ export function PumpReview({ c }: { c: Concern }) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-2">
+      {/* One row of three on a phone, so the sheet's top part stays short. */}
+      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         <button
           type="button"
           onClick={() => decide({ ...base, kind: "approved" })}
@@ -236,7 +237,7 @@ export function PumpReview({ c }: { c: Concern }) {
           Escalate
         </button>
       </div>
-      <p className="mt-2 text-[13px] text-mz-muted">
+      <p className="mt-2 hidden text-[13px] text-mz-muted sm:block">
         Acknowledge means you will check it. Escalate passes it to the duty
         engineer.
       </p>

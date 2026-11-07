@@ -23,14 +23,18 @@ type Props = {
   axes?: boolean;
   /** Labels along the time axis. */
   ticks?: number;
+  /** Show the time axis. Stacked charts show it on the last one only. */
+  xAxis?: boolean;
 };
 
 /** The plot's margins with axes, so an overlay such as the replay cursor can line up with the plot area. */
 export const AXES_MARGIN = { top: 28, right: 44, bottom: 32, left: 56 };
+/** The margins for a chart with or without its time axis. */
+export const chartMargin = (xAxis: boolean) => (xAxis ? AXES_MARGIN : { ...AXES_MARGIN, bottom: 10 });
 
 const fmt = (v: number) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2));
 
-export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "2 / 1", axes = true, ticks = 4 }: Props) {
+export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "2 / 1", axes = true, ticks = 4, xAxis = true }: Props) {
   // The chart's scale starts at zero for positive data, which flattens a reading into a thin line. Centring each
   // reading on its midpoint makes the scale fit the data. Axis labels and the tooltip add the midpoint back, so every
   // number shown is the real reading.
@@ -63,11 +67,11 @@ export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "
   if (rows.length < 2) return <p className="p-6 text-center text-sm text-mz-muted">No reading recorded for this concern.</p>;
 
   return (
-    <LineChart data={data} aspectRatio={aspectRatio} revealSignature={replayKey} margin={axes ? AXES_MARGIN : { top: 20, right: 8, bottom: 8, left: 8 }}>
+    <LineChart data={data} aspectRatio={aspectRatio} revealSignature={replayKey} margin={axes ? chartMargin(xAxis) : { top: 20, right: 8, bottom: 8, left: 8 }}>
       <Grid horizontal numTicksRows={4} />
-      <Band upperKey="hi" lowerKey="lo" label="Expected" fill="var(--welcome-band)" fillOpacity={1} stroke="var(--welcome-band-edge)" strokeWidth={1} />
+      <Band upperKey="hi" lowerKey="lo" label="Normal" fill="var(--welcome-band)" fillOpacity={1} stroke="var(--welcome-band-edge)" strokeWidth={1} />
       <Line dataKey="value" stroke="var(--mz-accent)" strokeWidth={1.75} />
-      {axes && <XAxis labels={labels} numTicks={ticks} />}
+      {axes && xAxis && <XAxis labels={labels} numTicks={ticks} />}
       {axes && <YAxis numTicks={4} formatValue={(v) => fmt(v + mid)} />}
       <ChartMarkers items={markers} size={20} />
       {/* A square ring, not a dot: the site uses no round shapes. */}
@@ -79,7 +83,7 @@ export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "
         dateLabels={labels}
         rows={(p) => [
           { color: "var(--mz-accent)", label: "Reading", value: `${fmt(Number(p.raw))} ${unit}` },
-          { color: "var(--welcome-band-edge)", label: "Expected", value: `${fmt(Number(p.rawLo))} to ${fmt(Number(p.rawHi))} ${unit}` },
+          { color: "var(--welcome-band-edge)", label: "Normal", value: `${fmt(Number(p.rawLo))} to ${fmt(Number(p.rawHi))} ${unit}` },
         ]}
       />
     </LineChart>

@@ -34,6 +34,7 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The room's labels sit on their own ink plates, so the drawing never runs through the words. A label near the screen edge flips side, and phones show only the name.
 - The top bar is a solid bar: ink over the engine room, white from the fade on. It marks the section you are in, and on wider screens says how many pumps need you, with a jump to the panel.
 - The pump turn is a third shorter: 90 viewport heights of scrolling instead of 135, and the scroll section is 440vh.
+- The pump card is laid out answer first (`.plans/pump-card-readability-spec.md`): what's wrong with a plain line on what the fault means, what to do and the review on top, then state now, evidence, readings, how sure and latest work. Evidence has plain sentences worked out from the readings (`lib/drift.ts`, tested) and one labelled chart per named reading on a shared time axis. Readings show as range bars, how sure as one square per past case. On phones the sheet opens to the top part, and drags up, down or away.
 - Scroll progress: a rail on the right edge with a point per section, and the stage frame traced round in the accent. The bar and nav versions are gone.
 - Every shape is square: buttons, filter, cards, panel windows, tags, legend keys, the chart's tooltip ring and alert markers. Buttons give press feedback on pointer-down.
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.

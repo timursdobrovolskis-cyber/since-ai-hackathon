@@ -369,3 +369,11 @@ input[type="range"] { accent-color: var(--ink); }
 .press:active:not(:disabled) { scale: 0.97; }
 .ann:active { scale: 0.985; }
 @media (prefers-reduced-motion: reduce) { .press:active:not(:disabled), .ann:active { scale: none; } }
+
+/* Pump card on a phone: a sheet moved by script (PumpCard.tsx), so its transform has no CSS transition. Collapsed,
+   it shows the top part only and does not scroll. */
+.pump-card[data-sheet] { transition: opacity 220ms ease-out; touch-action: pan-y; }
+.pump-card[data-sheet]:not([data-expanded]) { overflow-y: hidden; }
+.pump-card[data-sheet] .sheet-grip { touch-action: none; cursor: grab; }
+/* A reading the evidence already charts. */
+.reading-named { box-shadow: inset 2px 0 0 var(--mz-accent); padding-inline: 6px; margin-inline: -6px; width: calc(100% + 12px); }
