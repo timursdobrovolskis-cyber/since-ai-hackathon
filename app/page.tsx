@@ -102,9 +102,6 @@ export default function Welcome() {
           <ProgressFrame />
           <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
-          <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
-            Scroll
-          </p>
 
           {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
           <div className="welcome-map absolute inset-x-0 top-[34svh] bottom-0 flex flex-col px-5 pt-2 md:inset-y-0 md:top-0 md:right-auto md:w-1/2 md:justify-center md:px-10 md:pt-16 lg:px-16">

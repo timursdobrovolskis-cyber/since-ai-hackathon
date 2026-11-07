@@ -180,7 +180,6 @@ input[type="range"] { accent-color: var(--ink); }
 }
 .welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
 .welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
-.welcome-cue { opacity: calc(1 - var(--r) * 8); }
 /* The realistic engine room hands over to the line work between room 0.86 and 0.97. */
 .welcome-room { opacity: calc(1 - (var(--r) - 0.86) * 9); }
 .welcome-map {
