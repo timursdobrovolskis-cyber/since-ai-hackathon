@@ -1,21 +1,22 @@
-# Progress: overview-rework
+# Progress: today-screen
 
 ## Done
 
-- New shell: icon sidebar, sticky header and a phone menu.
-- Fleet overview: live stat cards, week strips beside the case list, a pumps-flagged chart, an isometric cases-per-day board and recent activity.
-- `lib/overview.ts` holds the numbers, and `lib/overview.test.ts` checks they hold nothing after the replay time.
+- Today screen is the new home page, with three plain groups.
+- Case page leads with what's happening and what to do, with evidence behind "Why does it think this?".
+- Plain wording for all 14 alert types, with a test that bans engineering terms.
+- The old overview moved to Week overview, under "For planners" in the sidebar.
+- Remind me later brings a case back to the top when due.
 
 ## In progress
 
-Nothing.
+Spoken shift handover, on the next branch.
 
 ## Next
 
-- Run `npm run explain` once `ANTHROPIC_API_KEY` is in `.env`, which spends a small amount of paid credit.
-- Run the swap steps in the README when the detector's alert file exists.
-- Deploy, then test the live link with `playwright-cli`.
+- Ask at the pump, behind an access code.
+- Update the technical note and video script.
 
 ## Blockers
 
-- `.env` has no Anthropic or ElevenLabs key yet.
+- No detector file yet.

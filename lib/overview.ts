@@ -1,7 +1,7 @@
 // Numbers for the overview screen. Everything here is worked out from cases, alarms and decisions at or before `hour`,
 // so the overview cannot show the future. `lib/overview.test.ts` checks that rule.
 import { pumpState } from "./cases.ts";
-import { faultLabel } from "./labels.ts";
+import { PLAIN } from "./plain.ts";
 import type { Case, Decision, EventClass, PumpData, PumpState } from "./types.ts";
 
 export type Filter = "all" | "MACHINE" | "SENSOR";
@@ -42,7 +42,8 @@ export function flaggedOverTime(cases: Case[], pumps: PumpData[], hour: number) 
 
 export type Activity = { key: string; hour: number; assetId: string; kind: "case" | "update" | "alarm" | "work" | "decision"; text: string; eventClass?: EventClass; faultType?: string };
 
-const DECIDED: Record<Decision["kind"], string> = { approved: "Inspection approved", rejected: "Alert rejected", watching: "Keeping watch" };
+const DECIDED: Record<Decision["kind"], string> = { approved: "You will check", rejected: "Marked not a problem", watching: "Reminder set" };
+const shortName = (type: string) => PLAIN[type]?.short ?? "needs a look";
 
 export function recentActivity(cases: Case[], pumps: PumpData[], decisions: Record<string, Decision>, hour: number, limit = 8): Activity[] {
   const items: Activity[] = [];
@@ -50,7 +51,7 @@ export function recentActivity(cases: Case[], pumps: PumpData[], decisions: Reco
     c.alerts.forEach((a, i) => {
       items.push({
         key: a.alert_id, hour: a.offset_hours, assetId: c.assetId, kind: i === 0 ? "case" : "update",
-        text: `${i === 0 ? "New case" : "Update"}: ${faultLabel(c.faultType).toLowerCase()}`, eventClass: c.eventClass, faultType: c.faultType,
+        text: `${i === 0 ? "New" : "Update"}: ${shortName(c.faultType)}`, eventClass: c.eventClass, faultType: c.faultType,
       });
     });
   }
@@ -63,7 +64,7 @@ export function recentActivity(cases: Case[], pumps: PumpData[], decisions: Reco
     }
   }
   for (const d of Object.values(decisions)) {
-    if (d.atHour <= hour) items.push({ key: `decision-${d.caseId}`, hour: d.atHour, assetId: d.assetId, kind: "decision", text: `${DECIDED[d.kind]}: ${faultLabel(d.faultType).toLowerCase()}` });
+    if (d.atHour <= hour) items.push({ key: `decision-${d.caseId}`, hour: d.atHour, assetId: d.assetId, kind: "decision", text: `${DECIDED[d.kind]}: ${shortName(d.faultType)}` });
   }
   return items.sort((a, b) => b.hour - a.hour).slice(0, limit);
 }

@@ -29,6 +29,20 @@ Our teammates build the detector. This app shows its output. Until their alerts 
 | Hosting | Public link for judges, plus a documented offline mode |
 | API keys | The team has ElevenLabs and Anthropic keys. Ask before spending paid credits |
 
+## 2a. Worker-first decisions (7 Nov)
+
+These replace the fleet-first layout in section 6 where they differ.
+
+| Topic | Decision |
+|---|---|
+| Who it is for | A mechanic with no data background, at a laptop at shift start and with a phone at the pump |
+| Main screen | Today: what needs me, what do I do, can it wait. Stats, chart, board and strips move to Week overview |
+| Grouping | Needs you today, Check the reading, Can wait. Newest first, not a claim about true urgency |
+| Wording | Hand-written per fault type in `lib/plain.ts`. Engineering terms stay behind "Why does it think this?" |
+| Buttons | I'll check it, Remind me later, Not a problem |
+| Voice | Spoken shift handover first, stored and offline. Ask at the pump second, using an ElevenLabs Agent, behind an access code |
+| Voice rules | That pump's data only, "points to" not "it is", checks not commands, and plant procedure for emergencies |
+
 ## 3. How the judging maps to the app
 
 | Criterion | Weight | What the app does |

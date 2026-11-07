@@ -2,19 +2,20 @@
 
 import Link from "next/link";
 import { certainty } from "@/lib/cases";
-import { age, faultLabel } from "@/lib/labels";
+import { age } from "@/lib/labels";
+import { plainAlert, pumpName } from "@/lib/plain";
 import type { Case, Decision } from "@/lib/types";
 import { useApp } from "./AppProvider";
 import { CaseMark, classLabel } from "./Marks";
 
 const DECISION_LABEL: Record<Decision["kind"], string> = {
-  approved: "Inspection approved",
-  rejected: "Rejected",
-  watching: "Keeping watch",
+  approved: "You will check it",
+  rejected: "Marked not a problem",
+  watching: "Reminder set",
 };
 
 export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
-  const { hour, decisions } = useApp();
+  const { fleet, hour, decisions } = useApp();
   const decided = decisions[item.id];
   const level = certainty(item.latest.confidence, item.latest.confidence_calibrated);
   const edge = item.eventClass === "SENSOR" ? "var(--sensor)" : "var(--machine)";
@@ -29,12 +30,12 @@ export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
         <span className="mt-1"><CaseMark eventClass={item.eventClass} faultType={item.faultType} /></span>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-cond font-semibold">{item.assetId}</span>
+            <span className="font-cond font-semibold">{pumpName(item.assetId)}</span>
             <span className="text-[13px] text-ink-2">{age(hour - item.first.offset_hours)}</span>
           </div>
-          <p className="font-medium">{faultLabel(item.faultType)}</p>
+          <p className="font-medium">{plainAlert(item.latest, fleet?.channelMeta ?? {}).what}</p>
           <p className="text-[13px] text-ink-2">
-            {classLabel(item.eventClass)}, {level ? `${level.toLowerCase()} certainty` : "certainty not calibrated"}
+            {classLabel(item.eventClass)}{level ? `, ${level.toLowerCase()} certainty` : ""}
             {item.alerts.length > 1 ? `, ${item.alerts.length} updates` : ""}
           </p>
           {decided && <p className="text-[13px] font-medium">{DECISION_LABEL[decided.kind]}</p>}

@@ -23,4 +23,4 @@ export function CaseMark({ eventClass, faultType, size = 14 }: { eventClass: Eve
   );
 }
 
-export const classLabel = (eventClass: EventClass) => (eventClass === "SENSOR" ? "Sensor problem" : "Machine problem");
+export const classLabel = (eventClass: EventClass) => (eventClass === "SENSOR" ? "Sensor problem" : "Pump problem");
