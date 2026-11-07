@@ -220,7 +220,6 @@ export function Evidence({ c, alert, pump, meta, shiftHour, extra, onRemoveExtra
         {done && firstAlert !== undefined ? `The first alert came at ${clock(firstAlert)}, ${hoursWords(shiftHour - firstAlert)} before this shift.` : ""}
       </p>
 
-      {alert.evidence?.summary && <p className="mt-3 text-[12.5px] leading-relaxed text-mz-muted">Detector&rsquo;s words: {alert.evidence.summary}</p>}
     </>
   );
 }

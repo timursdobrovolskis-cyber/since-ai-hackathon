@@ -1,0 +1,72 @@
+{
+  "fitted_on": "train",
+  "by_type": {
+    "AIR_ENTRAINMENT": {
+      "alerts": 1,
+      "hits": 1,
+      "confidence": 0.67
+    },
+    "BEARING_WEAR": {
+      "alerts": 19,
+      "hits": 19,
+      "confidence": 0.95
+    },
+    "CAVITATION": {
+      "alerts": 3,
+      "hits": 3,
+      "confidence": 0.8
+    },
+    "COMMUNICATION_LOSS": {
+      "alerts": 1,
+      "hits": 1,
+      "confidence": 0.67
+    },
+    "DISCHARGE_RESTRICTION": {
+      "alerts": 5,
+      "hits": 5,
+      "confidence": 0.86
+    },
+    "MISALIGNMENT": {
+      "alerts": 5,
+      "hits": 2,
+      "confidence": 0.43
+    },
+    "SENSOR_CALIBRATION_SHIFT": {
+      "alerts": 2,
+      "hits": 2,
+      "confidence": 0.75
+    },
+    "SENSOR_DRIFT": {
+      "alerts": 13,
+      "hits": 7,
+      "confidence": 0.53
+    },
+    "SENSOR_NOISE_SPIKES": {
+      "alerts": 1,
+      "hits": 1,
+      "confidence": 0.67
+    },
+    "SENSOR_STUCK": {
+      "alerts": 5,
+      "hits": 5,
+      "confidence": 0.86
+    },
+    "SUCTION_STRAINER_CLOGGING": {
+      "alerts": 8,
+      "hits": 8,
+      "confidence": 0.9
+    }
+  },
+  "by_class": {
+    "MACHINE": {
+      "alerts": 41,
+      "hits": 38,
+      "confidence": 0.91
+    },
+    "SENSOR": {
+      "alerts": 22,
+      "hits": 16,
+      "confidence": 0.71
+    }
+  }
+}
