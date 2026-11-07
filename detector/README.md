@@ -6,6 +6,8 @@ a named cause, a calibrated confidence, readable evidence and a recommended chec
 
 ## Run
 
+Step-by-step verification with expected outputs: `detector/VERIFY.md`.
+
 ```bash
 .venv/bin/python detector/run.py                       # all 12 pumps -> team_alerts.csv/.json, predictions_test.csv
 .venv/bin/python detector/score_all.py team_alerts.csv --confusion   # official scorer, train + validation, one table
