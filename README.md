@@ -76,11 +76,11 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Charts | uPlot | MIT |
 | Isometric case board | react-isokit | MIT |
 | 3D pump on the landing page | three.js | MIT |
-| Pump model on the landing page | `pump.obj`, downloaded by the team, stored only as line work in `public/models/pump-edges.bin` | **Source and licence to confirm** |
+| Pump model on the landing page | `pump.obj`, downloaded by the team, stored as line work and a compact solid mesh in `public/models/` by `tools/build_pump_edges.mjs` | **Source and licence to confirm** |
+| Engine room on the landing page | Built in code with three.js: room, pipework, valves, gauges, panels and procedural textures. Post-processing (ambient occlusion, bloom) from the three.js examples | MIT |
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
-| Engine room photo, halftone opening | "Engine room, ferry Bastø IV 08" by Ulflarsen, Wikimedia Commons, in `public/images`. Shown as dots, credited on the page | CC BY-SA 4.0. The dotted version is shared under the same licence |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |

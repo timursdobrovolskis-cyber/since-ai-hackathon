@@ -1,9 +1,9 @@
 "use client";
 
 // Turns the scroll position inside one tall section into three phases, each 0 to 1:
-//   room  0 % to 18 %:  the engine room, flying in to one pump
-//   pump  18 % to 60 %: the pump zooms, turns and glides right, and the page fades to white
-//   time  64 % to 92 %: the site map's clock runs from hour 0 to the shift, then it rests there
+//   room  0 % to 28 %:  the engine room, walking in to Pump 8
+//   pump  28 % to 64 %: the pump zooms, turns and glides right, and the page fades to white
+//   time  68 % to 93 %: the site map's clock runs from hour 0 to the shift, then it rests there
 // They are written to CSS variables on the section (--r, --p, --t) on every scroll, so CSS can use them without
 // React re-rendering. The hour and whether the map can be used are React state, but they change rarely.
 import { useEffect, useRef, useState } from "react";
@@ -11,9 +11,9 @@ import { useEffect, useRef, useState } from "react";
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const span = (r: number, a: number, b: number) => clamp01((r - a) / (b - a));
 
-const ROOM = [0, 0.18] as const;
-const PUMP = [0.18, 0.6] as const;
-const TIME = [0.64, 0.92] as const;
+const ROOM = [0, 0.28] as const;
+const PUMP = [0.28, 0.64] as const;
+const TIME = [0.68, 0.93] as const;
 
 export type Phases = { room: number; pump: number; time: number };
 
