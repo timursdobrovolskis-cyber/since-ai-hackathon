@@ -2,23 +2,15 @@
 
 import { pumpState } from "@/lib/cases";
 import { TIER_LABEL } from "@/lib/labels";
-import type { Case, PumpData, PumpMeta, PumpState } from "@/lib/types";
+import { STATE_RANK } from "@/lib/overview";
+import type { Case, PumpData, PumpMeta } from "@/lib/types";
 import { useApp } from "./AppProvider";
 import { CaseMark } from "./Marks";
+import { StateBadge } from "./ui/state-badge";
 
 const WINDOW = 168;
 const pct = (hour: number) => `${(hour / WINDOW) * 100}%`;
 const DAYS = [0, 1, 2, 3, 4, 5, 6];
-
-const STATE_RANK: Record<PumpState, number> = { "Needs review": 0, "Data problem": 1, Watching: 2, Stopped: 3, Normal: 4 };
-
-const STATE_STYLE: Record<PumpState, string> = {
-  "Needs review": "font-semibold text-machine",
-  "Data problem": "font-semibold text-sensor",
-  Watching: "font-medium text-ink",
-  Stopped: "text-ink-3",
-  Normal: "text-ink-3",
-};
 
 function Strip({ pump, cases, hour }: { pump: PumpData; cases: Case[]; hour: number }) {
   return (
@@ -89,9 +81,9 @@ export function FleetStrips() {
           {rows.map(({ meta, data, own, state }) => (
             <li key={meta.id} className="grid grid-cols-[13rem_1fr] items-center gap-0 border-b border-line-soft py-1" style={{ borderColor: "var(--line-soft)" }}>
               <div className="pr-3">
-                <div className="flex items-baseline justify-between gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <span className="font-cond font-semibold">{meta.id}</span>
-                  <span className={`text-[13px] ${STATE_STYLE[state]}`}>{state}</span>
+                  <StateBadge state={state} />
                 </div>
                 <div className="truncate text-[13px] text-ink-3" title={`${meta.site}, ${meta.system}`}>
                   {TIER_LABEL[meta.tier]}, {meta.site.split(" (")[0]}
