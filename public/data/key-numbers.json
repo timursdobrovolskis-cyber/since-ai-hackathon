@@ -1,1 +1,1 @@
-{"source":"B1 baseline","caught":26,"faults":35,"alarmsCaught":7,"medianWarningH":15.0615,"recall":0.7429,"falsePerPumpDay":0.1111,"falsePerPumpDayAlarms":0.1111,"rightCause":11,"rightCauseAlarms":2,"withLimit":11,"beforeLimit":5,"beforeLimitAlarms":1}
+{"source":"Team detector v4","caught":29,"faults":35,"alarmsCaught":7,"medianWarningH":-0.1779,"recall":0.8286,"falsePerPumpDay":0.0,"falsePerPumpDayAlarms":0.1111,"rightCause":27,"rightCauseAlarms":2,"withLimit":11,"beforeLimit":4,"beforeLimitAlarms":1,"sensorFaults":12,"sensorAsSensor":10,"sensorAsMachine":0}

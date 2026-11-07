@@ -16,6 +16,7 @@ import { RoomStage } from "@/components/welcome/RoomStage";
 import { AlarmPanel } from "@/components/welcome/AlarmPanel";
 import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
+import { CrewValue } from "@/components/welcome/CrewValue";
 import { ProgressFrame, ProgressRail, useProgress } from "@/components/welcome/ScrollProgress";
 import { TopBar, type Place } from "@/components/welcome/TopBar";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
@@ -121,10 +122,11 @@ export default function Welcome() {
         </section>
       )}
       <Results />
+      <CrewValue />
       {/* The retrofit cards and the closing call to action (MetricCards.tsx, Closing.tsx) are set aside for now. */}
       <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
         Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
-        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The engine room is an illustration, and the vessel and plant names are fictional.
+        RETROFIT AI 2026 benchmark, with alerts from the team&rsquo;s detector. The engine room is an illustration, and the vessel and plant names are fictional.
       </footer>
     </div>
   );
