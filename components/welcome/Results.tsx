@@ -281,7 +281,7 @@ export function Results() {
       </div>
 
       <p className="mt-12 max-w-[70ch] text-[13px] leading-relaxed text-white/55">
-        Alerts from the {key.source} until the team&rsquo;s detector is in. Scored by the organizers&rsquo; scorer on simulated data, not results from a real ship or
+        Alerts from the {key.source}. Scored by the organizers&rsquo; scorer on simulated data, not results from a real ship or
         plant.
       </p>
     </section>

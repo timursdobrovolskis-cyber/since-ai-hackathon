@@ -20,6 +20,8 @@ import { faultMeans, PLAIN, pumpName } from "@/lib/plain";
 import { TEST_PUMPS, type SiteState } from "@/lib/sitemap";
 import type { MaintenanceNote, PumpData } from "@/lib/types";
 import { lastDone } from "@/lib/worker";
+import { adviceFor, BREAKDOWN_EUR, hoursToStop, PLANNED_EUR, SENSOR_CHECK_SAVES_EUR } from "@/lib/timetoact";
+import { euros } from "@/lib/value";
 import { useConcern } from "./concerns";
 import { Evidence, namedChannels } from "./Evidence";
 import { LIGHT_WORDS } from "./mapParts";
@@ -360,6 +362,36 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                   <Section title="What to do" inner>
                     <p className="text-[16px] leading-snug">{alert.recommended_action}</p>
                     <p className="mt-1 text-[13px] text-mz-muted">{c.stop ? `${c.stop} ` : ""}Advice only. Nothing is sent to the pump.</p>
+                  </Section>
+                )}
+
+                {c && alert && (
+                  <Section title="Time to act" inner>
+                    {sensor ? (
+                      <>
+                        <p className="text-[16px] leading-snug">Check the sensor first. No need to stop or open the pump.</p>
+                        <p className="mt-1 text-[13px] text-mz-muted">That saves at least {euros(SENSOR_CHECK_SAVES_EUR)}: one 3-hour stop for nothing, at the organizers&rsquo; figures.</p>
+                      </>
+                    ) : (
+                      (() => {
+                        const advice = adviceFor(c.trend, hoursToStop(pump, site.hour));
+                        return (
+                          <>
+                            <p className="text-[16px] leading-snug">{advice.headline}</p>
+                            <p className="mt-1 text-[13px] text-mz-muted">{advice.why}</p>
+                            <dl className="mt-2.5 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-[13.5px]">
+                              <dt>Fixed at a planned stop</dt>
+                              <dd className="text-right tabular-nums">{euros(PLANNED_EUR)}</dd>
+                              <dt>If it runs to a breakdown</dt>
+                              <dd className="text-right tabular-nums">{euros(BREAKDOWN_EUR)}</dd>
+                              <dt className="border-t border-mz-line pt-1 font-medium">Waiting risks</dt>
+                              <dd className="border-t border-mz-line pt-1 text-right font-medium tabular-nums">{euros(BREAKDOWN_EUR - PLANNED_EUR)} more</dd>
+                            </dl>
+                            <p className="mt-1.5 text-[12px] text-mz-muted">Organizers&rsquo; figures: a 3 h planned stop against 10 h unplanned, at {euros(1500)} an hour, plus the repair.</p>
+                          </>
+                        );
+                      })()
+                    )}
                   </Section>
                 )}
 

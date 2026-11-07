@@ -54,7 +54,7 @@ function concernFor(site: SiteState, id: string, { fleet, pumps, record }: Sourc
     what: words.what,
     check: words.check,
     trust: words.trust,
-    trend: trendOf(lead.latest, pump, site.hour),
+    trend: trendOf(lead.latest, pump, site.hour, channel),
     stop: nextStop(pump, site.hour),
     firstNoticed: ago(site.hour - lead.first.offset_hours),
     channel,

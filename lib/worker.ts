@@ -42,8 +42,9 @@ function meanDistance(pump: PumpData, channel: string, end: number) {
 }
 
 /** Compares how far the named signal sits from normal now and six hours ago. Null when there is nothing fair to compare. */
-export function trendOf(alert: Alert, pump: PumpData | undefined, hour: number): Trend | null {
-  const channel = alert.evidence.channels[0]?.channel;
+export function trendOf(alert: Alert, pump: PumpData | undefined, hour: number, fallback?: string | null): Trend | null {
+  // The team detector names its evidence in the summary, not in channels, so the concern passes the reading it found.
+  const channel = alert.evidence.channels[0]?.channel ?? fallback ?? undefined;
   if (!channel || !pump) return null;
   const now = Math.floor((hour * 60) / pump.stepMinutes);
   const recent = meanDistance(pump, channel, now);

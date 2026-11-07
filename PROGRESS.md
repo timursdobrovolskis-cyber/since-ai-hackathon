@@ -174,3 +174,24 @@ One command: `.venv/bin/python detector/run.py` (mode `own`) writes `detector/re
 - Causality: `detector/causality_check.py --cuts 3` passes on all 9 labelled pumps (27 cuts).
 
 ## Done = beats B1 on train + validation combined (84.4 vs 63.4), is causal, and the app runs with our alerts.
+
+---
+
+# Crew decisions (branch `crew-decisions`, criterion A)
+
+Built on `dashboard` with `detector` merged in; app data rebuilt from the team detector (v4).
+
+- **Pump or sensor?** `key-numbers.json` gains `sensorFaults`, `sensorAsSensor`, `sensorAsMachine` (totals only). New
+  section "What it saves the crew" (`components/welcome/CrewValue.tsx`): 10 of 12 sensor faults sent to the sensor,
+  0 sent to the pump, at least €45,000 of needless pump stops avoided (3 h planned stop at €1,500/h, organizers').
+- **Energy watch.** `tools/build_energy.py` → `public/data/energy.json`: each live pump against its datasheet best
+  efficiency point up to the shift. Honest result: all run near their best point (under €680/yr lost per pump at an
+  assumed €0.15/kWh). Fixed-speed and valve-throttled pumps listed as speed-control candidates; legacy pumps 3 and 5
+  can't be placed on their curve without a suction pressure sensor.
+- **Time to act.** Pump card section between "What to do" and the review (`lib/timetoact.ts`): one decision from the
+  trend and the next stop, plus the cost of waiting (planned €8,500 vs breakdown €24,000, organizers' figures). Sensor
+  faults say "check the sensor first, no need to open the pump". No "hours to limit" figure: the data has no alarm
+  limit per reading.
+- Fix: `trendOf` now takes the concern's reading, so the trend works with the team detector's alerts.
+
+Checks: typecheck clean, 60 tests pass, checked in the browser at 1440x900 (Pump 4 machine fault, Pump 5 sensor fault).
