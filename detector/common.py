@@ -46,9 +46,14 @@ def load_benign() -> pd.DataFrame:
 
 
 def load_features() -> pd.DataFrame:
+    """1-min features plus the plant's suction level (operating_context.csv), where a level transmitter exists."""
     f = pd.read_parquet(DATA / "features_1min.parquet")
     f["asset_id"] = f["asset_id"].astype(str)
     f["window_start_utc"] = _ts(f["window_start_utc"])
+    ctx = pd.read_csv(DATA / "operating_context.csv", usecols=["asset_id", "timestamp_utc", "suction_static_head_m"])
+    ctx["timestamp_utc"] = _ts(ctx["timestamp_utc"])
+    f = f.merge(ctx.rename(columns={"timestamp_utc": "window_start_utc", "suction_static_head_m": "level_m"}),
+                on=["asset_id", "window_start_utc"], how="left")
     return f.sort_values(["asset_id", "window_start_utc"]).reset_index(drop=True)
 
 

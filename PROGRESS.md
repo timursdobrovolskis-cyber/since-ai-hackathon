@@ -4,7 +4,8 @@ Branch `detector`, cut from `dashboard`. The team's own fault detector, built in
 scorer (`python detector/score_all.py <predictions.csv>`), always on train and validation together, because validation
 has only 9 events. Data pack stays outside git (`RETROFIT_DATA_ROOT`, or next to the repo).
 
-Run with the repo venv: `.venv/bin/python detector/baseline_b1.py` and `.venv/bin/python detector/score_all.py ... --confusion`.
+Run with the repo venv: `.venv/bin/python detector/run.py` writes everything (see Phase 3); `detector/score_all.py <csv> --confusion`
+scores any file; `detector/causality_check.py` reruns the detector on truncated data.
 
 ## Results (composite 0-100)
 
@@ -16,6 +17,9 @@ Run with the repo venv: `.venv/bin/python detector/baseline_b1.py` and `.venv/bi
 | Team v2: B1 times, our diagnosis | train | 70.4 | 0.73 | 0.73 | 0.73 | 0.62 | 0.73 | 0.64 | 0.14 | 26 | 19 |
 | Team v2: B1 times, our diagnosis | validation | 93.0 | 0.95 | 1.00 | 0.90 | 0.89 | 0.89 | 0.95 | 0.07 | 9 | 9 |
 | Team v2: B1 times, our diagnosis | both | 76.3 | 0.79 | 0.80 | 0.78 | 0.69 | 0.77 | 0.72 | 0.13 | 35 | 28 |
+| Team v3: own alert times | train | 81.8 | 0.89 | 0.81 | 1.00 | 0.73 | 0.81 | 0.71 | 0.00 | 26 | 21 |
+| Team v3: own alert times | validation | 91.8 | 0.94 | 0.89 | 1.00 | 0.89 | 0.89 | 0.89 | 0.00 | 9 | 8 |
+| Team v3: own alert times | both | 84.4 | 0.91 | 0.83 | 1.00 | 0.77 | 0.83 | 0.75 | 0.00 | 35 | 29 |
 
 ## Phase 1: reproduce B1 (done)
 
@@ -59,9 +63,37 @@ One command: `.venv/bin/python detector/run.py --mode b1times` writes `detector/
   persistence); PUMP-09's current drift is first "caught" by a winding-temperature false alert after a restart.
 - Confidence is a placeholder from rule strength, not calibrated yet (Phase 4).
 
+## Phase 3: our own alert times (done)
+
+One command: `.venv/bin/python detector/run.py` (mode `own`) writes `detector/results/predictions_team_own.csv`,
+`team_alerts.csv` and `predictions_test.csv`. `--mode b1times` still gives the Phase 2 file.
+
+- `detector/detect.py`: a per-minute trigger (physics residual beyond 5 robust sd, NPSH margin below 1.3, vibration
+  z above 4 on held wireless readings, temperatures beyond 5 sd once the pump has run 2 h, B1's regime z beyond 8 as
+  a fallback, and the watchdog) that must hold 15 minutes of steady running. Nothing alerts in the 24 h learning
+  window, so every alert uses only earlier data. Evaluated every 5 minutes while the trigger holds.
+- Alert policy: one alert per case (a machine fault type, or one instrument whatever it does), a reminder after 12 h
+  while it persists, at most three open cases per pump, alerts at least 15 min apart (no bursts), UNKNOWN only after
+  3 h of unexplained deviation and never on top of an open case. Cavitation, air and communication loss re-arm when
+  their evidence has been gone for 30 min, so the repeated cavitation episodes on PUMP-06 get their own alerts.
+  Hydraulic diagnoses are suppressed for 12 h after a pressure transmitter is found bad, and for an hour after
+  cavitation (residuals and the wireless acceleration need time to settle).
+- The plant's suction level (operating_context.csv, cooling-tower and process pumps) enters the suction system curve
+  at rho g per metre, so a basin-level drop is no longer read as a clogged strainer (PUMP-04, PUMP-09).
+- Thresholds: k = 4/5/6 and persistence 10/15/20 min were swept on train; k = 5 and 15 min chosen (k = 4 adds false
+  alerts on train, validation is flat). Validation was only looked at, not tuned on.
+- Against Phase 2 (B1's times): train +11.4, validation -1.2, both +8.1. Precision is 1.00 on both splits (no false
+  alerts, no excess repeats). The validation point lost is PUMP-09's tiny current drift, which B1 only "caught"
+  with a winding-temperature alert 12.8 h into the window, inside its own learning period. Timeliness train 0.58 ->
+  0.71: PUMP-02 bearing wear is now found at 36 h instead of 118 h, PUMP-04 bearing wear 86 h before its limit.
+- Still missed: PUMP-03 and PUMP-05 impeller wear (legacy pumps, pre-existing wear is in the baseline), PUMP-06
+  misalignment (vibration +1.6 sd only), PUMP-06 bearing-temperature drift and the 17-minute cavitation episode
+  before the strainer cleaning, PUMP-09 current drift. Wrong type: PUMP-04 imbalance and restriction, both under
+  extreme bearing vibration.
+- `detector/causality_check.py`: reruns features and alerts on telemetry truncated at random cut points and compares
+  the alerts before the cut with the full run (3 cuts per labelled pump).
+- Test pumps: 28 alerts (PUMP-10: 8, PUMP-11: 6, PUMP-12: 14). Only counts were looked at.
+
 ## Next
 
-- Phase 3: our own alert times from the residuals (persistence counted in readings for wireless sensors, silence in
-  the 24 h learning window, merge bursts, one reminder per 12 h), fewer false alerts (temperature transients after
-  restarts, benign load changes).
-- Phase 4: calibrated confidence, final files, notes.
+- Phase 4: calibrated confidence from train-only hit rates per fault type, final files, notes.

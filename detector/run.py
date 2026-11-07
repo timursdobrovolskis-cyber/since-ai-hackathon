@@ -2,7 +2,7 @@
 """Run the team detector and write predictions for train, validation and test.
 
   python detector/run.py --mode b1times      Phase 2: keep B1's alert times, replace the diagnosis
-  python detector/run.py --mode own          Phase 3+: our own detection (not yet available)
+  python detector/run.py --mode own          Phase 3+: our own detection from the residuals (default)
 
 Writes detector/results/predictions_team_<mode>.csv (all pumps), team_alerts.csv (train + validation, for the app) and
 predictions_test.csv (PUMP-10..12, for the submission).
@@ -22,11 +22,12 @@ import pandas as pd  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from detector.baseline_b1 import B1_PARAMS, b1_frame  # noqa: E402
 from detector.common import COLS, REPO, RESULTS, load_assets, load_features, write_predictions  # noqa: E402
+from detector.detect import detect  # noqa: E402
 from detector.diagnose import diagnose, state_at  # noqa: E402
 from detector.features import physics_frame  # noqa: E402
 from retrofit_sim import baselines as B  # noqa: E402
 
-VERSION = "Team detector v2"
+VERSION = "Team detector v3"
 
 
 def build_frames(assets: pd.DataFrame, feat: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -53,7 +54,7 @@ def rediagnose(times: pd.DataFrame, frames: dict, assets: pd.DataFrame) -> pd.Da
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--mode", choices=["b1times"], default="b1times")
+    p.add_argument("--mode", choices=["b1times", "own"], default="own")
     a = p.parse_args(argv)
     assets = load_assets()
     feat = load_features()
@@ -62,6 +63,8 @@ def main(argv=None) -> int:
         zf = b1_frame(feat, assets)
         times = B.b1_threshold(zf, **B1_PARAMS)[["asset_id", "alert_time_utc"]]
         pred = rediagnose(times, frames, assets)
+    else:
+        pred = detect(frames, assets)
     out_all = RESULTS / f"predictions_team_{a.mode}.csv"
     write_predictions(pred, out_all)
     labelled = set(assets[assets["split"].isin(("train", "validation"))]["asset_id"])

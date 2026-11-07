@@ -130,10 +130,14 @@ def physics_frame(g: pd.DataFrame, a: pd.Series) -> pd.DataFrame:
     # ---- system curves: each pressure against a + b Q^2 fitted on the baseline, at the load-side flow --------------------
     # A clogged strainer pulls the suction pressure below its system curve while the pump stays on its own curve;
     # a discharge restriction pushes the discharge pressure above its system curve at the same flow.
+    # where the plant measures the suction level, 1 m of level is rho g kPa of suction pressure (static head)
+    level = g["level_m"].ffill() if "level_m" in g and g["level_m"].notna().any() else None
     for k, key in (("ps", "sys_ps"), ("pd", "sys_pd")):
         if not have[k]:
             continue
         y = m(k)
+        if level is not None:
+            y = y - rho * G * (level - level[base].median()) / 1000.0
         ok = base & y.notna() & q_sys.notna()
         if ok.sum() < 30:
             continue

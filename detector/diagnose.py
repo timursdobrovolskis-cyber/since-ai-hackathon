@@ -38,7 +38,7 @@ ACTION = {
 SENSOR_TYPES = {"SENSOR_DRIFT", "SENSOR_CALIBRATION_SHIFT", "SENSOR_STUCK", "SENSOR_NOISE_SPIKES", "COMMUNICATION_LOSS"}
 # thresholds (robust standard deviations unless noted); chosen on the training split
 T = dict(clog=3.0, restr=3.0, head=3.0, sudden_head_min=480, cav_sigma=1.3, accel=3.0, crest=3.0, vib=3.0,
-         alone=4.0, quiet=2.0, step_share=0.6, spike=3.0, lockout_h=36, flow_disagree=4.0, misalign_temp=1.5)
+         alone=4.0, promote=5.0, quiet=2.0, step_share=0.6, spike=3.0, lockout_h=36, flow_disagree=4.0, misalign_temp=1.5)
 
 
 @dataclass
@@ -103,13 +103,13 @@ def hypotheses(s: pd.Series, a: pd.Series) -> list[Hyp]:
     for k in ("pd", "ps", "q", "i", "pw", "bt", "tf", "wt"):
         if has[k] and _v(s, f"same_{k}") > _v(s, f"samelim_{k}", 1e9) and s["steady"]:
             hyps.append(Hyp("SENSOR_STUCK", "SENSOR", 90 + _v(s, f"same_{k}") / 1000,
-                            f"{LABEL[k]} reading frozen at {_val(s, k):.1f} {UNIT[k]} for {_v(s, f'same_{k}'):.0f} min while the pump runs and load varies."))
+                            f"{LABEL[k]} reading frozen at {_val(s, k):.1f} {UNIT[k]} for {_v(s, f'same_{k}'):.0f} min while the pump runs and load varies.", {"channel": k}))
     cavitating = pd.notna(sigma) and sigma < T["cav_sigma"] and (z["a"] > T["accel"] or pz["head"] < -T["head"])
     for k in ("pd", "ps", "q", "i", "pw", "bt", "tf", "wt"):
         r = _v(s, f"rng_{k}", np.nan)
         if has[k] and pd.notna(r) and r > T["spike"] and not cavitating:
             hyps.append(Hyp("SENSOR_NOISE_SPIKES", "SENSOR", 40 + r,
-                            f"{LABEL[k]} jumps within each minute {r:.1f}x more than normal while related signals are calm."))
+                            f"{LABEL[k]} jumps within each minute {r:.1f}x more than normal while related signals are calm.", {"channel": k}))
 
     # ---- single-instrument deviations (sensor faults) first: a bad pressure transmitter corrupts every head residual -----
     sensor_hyps = _sensor_alone(s, a, has, z, pz)
@@ -213,30 +213,42 @@ def _sensor_alone(s, a, has, z, pz) -> list[Hyp]:
     # current against power, power against flow/head
     if has["i"] and has["pw"] and abs(pz["i"]) > T["alone"] and abs(pz["pw"]) < T["quiet"] and abs(z["pw"]) < T["quiet"] and not machine_vib:
         ft, how = _step_or_drift(s, "i", abs(pz["i"]))
-        out.append(Hyp(ft, "SENSOR", abs(pz["i"]), f"Motor current {_v(s, 'res_i'):+.1f} A off the value implied by motor power, which is normal; it {how}."))
+        out.append(Hyp(ft, "SENSOR", abs(pz["i"]), f"Motor current {_v(s, 'res_i'):+.1f} A off the value implied by motor power, which is normal; it {how}.", {"channel": "i"}))
     if has["i"] and not has["pw"] and abs(z["i"]) > T["alone"] and abs(z["pd"]) < T["quiet"] and abs(pz["sys_pd"]) < T["quiet"] and not machine_vib:
         ft, how = _step_or_drift(s, "i", abs(z["i"]))
-        out.append(Hyp(ft, "SENSOR", abs(z["i"]), f"{_fmt(s, 'i', z['i'])} moved while the pressures did not; it {how}."))
+        out.append(Hyp(ft, "SENSOR", abs(z["i"]), f"{_fmt(s, 'i', z['i'])} moved while the pressures did not; it {how}.", {"channel": "i"}))
     if has["pw"] and abs(pz["qx"]) > T["flow_disagree"] and abs(pz["i"]) > T["alone"] and abs(pz["qm"]) < T["quiet"] and abs(pz["head"]) < 1.5 and not machine_vib:
         ft, how = _step_or_drift(s, "pw", abs(pz["pw"]))
-        out.append(Hyp(ft, "SENSOR", abs(pz["pw"]), f"Motor power {_v(s, 'res_pw'):+.1f} kW off the value implied by flow and head while current disagrees with it too; it {how}."))
+        out.append(Hyp(ft, "SENSOR", abs(pz["pw"]), f"Motor power {_v(s, 'res_pw'):+.1f} kW off the value implied by flow and head while current disagrees with it too; it {how}.", {"channel": "pw"}))
     # temperatures: a lone temperature move with calm vibration and load is an instrument problem
     for k, coupled in (("bt", ("v", "a", "wt", "tf")), ("tf", ("bt", "pw", "i")), ("wt", ("i", "pw", "bt"))):
-        if has[k] and abs(z[k]) > T["alone"] and not machine_vib and warm and all(abs(z[c]) < T["quiet"] for c in coupled if has[c]):
+        thr = 8.0 if k == "tf" else T["alone"]      # liquid temperature follows the sea or basin, so demand more of it
+        if has[k] and abs(z[k]) > thr and not machine_vib and warm and all(abs(z[c]) < T["quiet"] for c in coupled if has[c]):
             ft, how = _step_or_drift(s, k, abs(z[k]))
-            out.append(Hyp(ft, "SENSOR", abs(z[k]) * 0.8, f"{_fmt(s, k, z[k])} moved while vibration and load stayed normal; it {how}."))
+            out.append(Hyp(ft, "SENSOR", abs(z[k]) * 0.8, f"{_fmt(s, k, z[k])} moved while vibration and load stayed normal; it {how}.", {"channel": k}))
     return out
 
 
-def diagnose(s: pd.Series, a: pd.Series, recent: dict | None = None, reminder_h: float = 24.0) -> dict:
-    """Pick the alert to raise. `recent` maps fault_type -> last time it was named on this asset."""
-    hyps = hypotheses(s, a)
+HYDRAULIC = {"SUCTION_STRAINER_CLOGGING", "DISCHARGE_RESTRICTION", "AIR_ENTRAINMENT", "IMPELLER_WEAR"}
+
+
+def case_key(h: Hyp) -> str:
+    """Alerts are tracked per case: a machine fault type, or one instrument (whatever it does: step, drift, noise)."""
+    if h.cls == "SENSOR" and h.extra.get("channel"):
+        return "SENSOR:" + h.extra["channel"]
+    return h.fault
+
+
+def diagnose(s: pd.Series, a: pd.Series, recent: dict | None = None, reminder_h: float = 24.0, suppress: set | None = None) -> dict:
+    """Pick the alert to raise. `recent` maps fault_type -> last time it was named on this asset.
+    `suppress` drops hypotheses of those types (e.g. hydraulic ones while a pressure transmitter is known to be bad)."""
+    hyps = [h for h in hypotheses(s, a) if not suppress or h.fault not in suppress]
     pick = None
     if hyps:
         pick = hyps[0]
-        if recent and pick.fault in recent and (s["t"] - recent[pick.fault]) < pd.Timedelta(hours=reminder_h):
-            fresh = [h for h in hyps[1:] if h.fault not in recent or (s["t"] - recent[h.fault]) >= pd.Timedelta(hours=reminder_h)]
-            if fresh and fresh[0].strength >= 3.0 and fresh[0].strength >= 0.25 * hyps[0].strength:
+        if recent and case_key(pick) in recent and (s["t"] - recent[case_key(pick)]) < pd.Timedelta(hours=reminder_h):
+            fresh = [h for h in hyps[1:] if case_key(h) not in recent or (s["t"] - recent[case_key(h)]) >= pd.Timedelta(hours=reminder_h)]
+            if fresh and fresh[0].strength >= T["promote"] and fresh[0].strength >= 0.4 * hyps[0].strength:
                 pick = fresh[0]
                 pick.evidence = f"New finding while the {hyps[0].fault.replace('_', ' ').lower()} alert is still open: " + pick.evidence
     if pick is None:
@@ -247,5 +259,5 @@ def diagnose(s: pd.Series, a: pd.Series, recent: dict | None = None, reminder_h:
     if pick.fault == "UNKNOWN":
         conf = 0.3
     return {"event_class": pick.cls, "fault_type": pick.fault, "confidence": round(conf, 2), "evidence": pick.evidence,
-            "recommended_action": ACTION[pick.fault],
+            "recommended_action": ACTION[pick.fault], "case": case_key(pick),
             "hypotheses": [{"event_class": h.cls, "fault_type": h.fault, "strength": round(h.strength, 1)} for h in hyps[:3]]}
