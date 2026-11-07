@@ -14,7 +14,7 @@ import { plainAlert, pumpName } from "@/lib/plain";
 import { AMBIENT, TEST_PUMPS, type SiteState } from "@/lib/sitemap";
 import { nextStop, trendOf } from "@/lib/worker";
 import { useConcern } from "./concerns";
-import { LIGHT_WORDS } from "./SiteMap";
+import { LIGHT_WORDS } from "./mapParts";
 
 type Reading = { id: string; label: string; state: "flagged" | "has" | "missing" };
 

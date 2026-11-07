@@ -61,6 +61,18 @@ Like Meuze, which opens inside a restaurant, the page opens inside a ship's engi
 - **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then everything but Pump 8 dims away, in exactly the pose where the moving pump takes over (`heroPose.ts`).
 - **One style throughout:** the moving pump is drawn by the same hidden-line renderer (`lineRender.ts`), not as see-through line work, so it looks the same from the room to the site map. Jona rejected the see-through look on 7 Nov.
 
+## Alarm panel (7 Nov, evening)
+
+Jona compared a piping schematic, an alarm panel and a week timeline, and chose the alarm panel, simpler and sleeker, with usefulness first. It replaces the site map.
+
+- One window per pump in pump number order, so a pump is always in the same place.
+- Solid red: needs you today. Amber tint: check the reading. Quiet white: normal or can wait. Dashed: test pump, no data. An icon marks the two lit states.
+- Each window says which pump and for how long, and what is wrong. A window flashes three times when it first lights, as annunciators do.
+- A heading says what the hour means in one sentence, counting up as the week runs.
+- Phones: the heading ticks in the scroll section, and the full panel follows it in two columns.
+
+The results came back after the dashboard, without the numbered eyebrow or tracked labels, and with a link to Review.
+
 ## Pump dashboard (7 Nov, evening)
 
 Jona asked to step back and work on a dashboard where you can see the different pumps. It replaces the step list. The results, retrofit cards and closing call to action are set aside, not deleted, and come back one step at a time.

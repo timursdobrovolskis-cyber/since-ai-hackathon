@@ -3,11 +3,12 @@
 // The landing page from .plans/welcome-landing-spec.md, a dashboard you scroll through, styled after meuze.ai:
 //   01  A ferry engine room in hidden-line work. The camera walks in to Pump 8, the room dims away, and Pump 8 zooms,
 //       turns and moves aside while the page fades from ink to white.
-//   02  The site map. Scrolling runs the week's clock to the evening shift, and each light follows Today's rule.
-//       Clicking a pump opens its card and lights up the area of the 3D pump it concerns.
+//   02  The alarm panel: one window per pump. Scrolling runs the week's clock to the evening shift, and each window
+//       follows Today's rule. Clicking a pump opens its card and lights up the area of the 3D pump it concerns.
 //   03  The pump dashboard: every pump at the shift, and one pump's report: what's wrong, the evidence, how sure, what
 //       to do, and Acknowledge, Dismiss or Escalate.
-// Results, the retrofit cards and the closing call to action are set aside for now (see the note in the page).
+//   04  How well it works: faults caught against plant alarms, warning time and false alerts.
+// The retrofit cards and the closing call to action are set aside for now (see the note in the page).
 // Live parts only use data up to the shift. Results use totals only.
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,10 +16,9 @@ import { useConcern } from "@/components/welcome/concerns";
 import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
 import { RoomStage } from "@/components/welcome/RoomStage";
-import { MapAnnunciator } from "@/components/welcome/MapAnnunciator";
-import { MapSchematic } from "@/components/welcome/MapSchematic";
-import { MapTimeline } from "@/components/welcome/MapTimeline";
-import { SiteMap, useSite } from "@/components/welcome/SiteMap";
+import { AlarmPanel } from "@/components/welcome/AlarmPanel";
+import { MapHead, useSite } from "@/components/welcome/mapParts";
+import { Results } from "@/components/welcome/Results";
 import { PumpDashboard } from "@/components/welcome/PumpDashboard";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
@@ -27,15 +27,6 @@ import { SHIFT_HOUR } from "@/lib/labels";
 function Corner({ className }: { className: string }) {
   return <span aria-hidden className={`welcome-corner absolute size-1.5 ${className}`} />;
 }
-
-/** Site map alternatives to compare. `?map=` picks one; the switch at the bottom of the map changes it. */
-const MAPS = [
-  { key: "schematic", label: "Schematic", View: MapSchematic },
-  { key: "panel", label: "Alarm panel", View: MapAnnunciator },
-  { key: "timeline", label: "Timeline", View: MapTimeline },
-  { key: "current", label: "Current", View: SiteMap },
-] as const;
-type MapKey = (typeof MAPS)[number]["key"];
 
 /** True on phone-sized screens, where the pump ends above the map instead of beside it. */
 function useCompact() {
@@ -58,19 +49,6 @@ export default function Welcome() {
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
   const concern = useConcern(site, selected);
-  const [mapKey, setMapKey] = useState<MapKey>("schematic");
-  useEffect(() => {
-    const wanted = new URLSearchParams(window.location.search).get("map");
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- the address bar is only readable after mount
-    if (MAPS.some((m) => m.key === wanted)) setMapKey(wanted as MapKey);
-  }, []);
-  const pickMap = (key: MapKey) => {
-    setMapKey(key);
-    const url = new URL(window.location.href);
-    url.searchParams.set("map", key);
-    window.history.replaceState(null, "", url);
-  };
-  const MapView = MAPS.find((m) => m.key === mapKey)!.View;
   // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
   const [solid, setSolid] = useState(false);
   useEffect(() => {
@@ -89,7 +67,7 @@ export default function Welcome() {
   }, [mapReady]);
 
   /** Header links: the top, the map at the evening shift, and the sections below. */
-  const jump = (to: "top" | "map" | "pumps") => {
+  const jump = (to: "top" | "map" | "pumps" | "results") => {
     const el = track.current;
     if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
     if (to === "map" && el) {
@@ -111,8 +89,9 @@ export default function Welcome() {
           Retrofit Assist
         </button>
         <nav aria-label="Sections" className="ml-10 hidden gap-7 text-[15px] md:flex">
-          <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Site map</button>
+          <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Alarm panel</button>
           <button type="button" onClick={() => jump("pumps")} className="hover:underline underline-offset-4">Pumps</button>
+          <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
         </nav>
         <Link href="/" className="ml-auto text-[15px] underline-offset-4 hover:underline">
           Today&rsquo;s shift
@@ -142,37 +121,22 @@ export default function Welcome() {
 
           {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
           <div className="welcome-map absolute inset-x-0 top-[34svh] bottom-0 flex flex-col px-5 pt-2 md:inset-y-0 md:top-0 md:right-auto md:w-1/2 md:justify-center md:px-10 md:pt-16 lg:px-16">
-            <MapView site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />
+            {/* Phones show the ticking heading here, and the full panel right after the scroll section. */}
+            {compact ? <MapHead site={site} shiftHour={SHIFT_HOUR} panelBelow /> : <AlarmPanel site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />}
           </div>
 
           <PumpCard id={selected} site={site} onClose={close} />
-
-          {/* Temporary: compare the site map alternatives, then keep one. */}
-          <div
-            role="group"
-            aria-label="Site map style"
-            className={`welcome-mapswitch absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-mz-line bg-white/95 p-1 text-[13px] shadow-[0_8px_24px_-12px_rgb(11_16_20/0.35)] backdrop-blur ${mapReady ? "" : "pointer-events-none"}`}
-          >
-            <span className="hidden px-2.5 text-mz-muted sm:inline">Map</span>
-            {MAPS.map((m) => (
-              <button
-                key={m.key}
-                type="button"
-                aria-pressed={mapKey === m.key}
-                tabIndex={mapReady ? 0 : -1}
-                onClick={() => pickMap(m.key)}
-                className={`min-h-9 rounded-full px-2.5 whitespace-nowrap transition-colors sm:px-3.5 ${mapKey === m.key ? "bg-mz-ink text-white" : "hover:bg-mz-panel"}`}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
+      {compact && (
+        <section id="panel" aria-label="Alarm panel" className="bg-white px-5 pt-4 pb-14">
+          <AlarmPanel site={site} shiftHour={SHIFT_HOUR} ready selected={selected} onSelect={setSelected} columns={2} />
+        </section>
+      )}
       <PumpDashboard shiftHour={SHIFT_HOUR} />
-      {/* Results, the retrofit cards and the closing call to action (Results.tsx, MetricCards.tsx, Closing.tsx) are
-          set aside while the dashboard is reworked, and come back one step at a time. */}
+      <Results />
+      {/* The retrofit cards and the closing call to action (MetricCards.tsx, Closing.tsx) are set aside for now. */}
       <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
         Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
         RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The site layout is fictional.

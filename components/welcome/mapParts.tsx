@@ -1,13 +1,26 @@
 "use client";
 
-// Shared by the site map alternatives: one row of facts per pump at the map's hour, a heading whose sentence counts up
-// as the week runs, and the props every alternative takes.
+// Shared by the alarm panel and the pump card: the site at an hour, one row of facts per pump, a heading whose
+// sentence counts up as the week runs, and the panel's props.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "@/components/AppProvider";
 import { clock } from "@/lib/labels";
 import { PLAIN, pumpName } from "@/lib/plain";
-import { TEST_PUMPS, ZONES, type Light, type SiteState } from "@/lib/sitemap";
+import { siteAt, TEST_PUMPS, ZONES, type Light, type SiteState } from "@/lib/sitemap";
 import { useConcerns } from "./concerns";
+
+/** The site at `hour`, shared by the panel and the pump card so they always show the same moment. */
+export function useSite(hour: number, shiftHour: number) {
+  const { alertsToShift, decisions, record, pumps } = useApp();
+  return useMemo(() => siteAt(alertsToShift, hour, shiftHour, decisions, record, pumps), [alertsToShift, hour, shiftHour, decisions, record, pumps]);
+}
+
+export const LIGHT_WORDS: Record<Light, string> = {
+  red: "needs you today",
+  orange: "check the reading",
+  green: "normal or can wait",
+  none: "test pump, no data yet",
+};
 
 export type MapProps = {
   site: SiteState;
@@ -97,7 +110,8 @@ export function Count({ value }: { value: number }) {
 }
 
 /** The heading over every alternative: the hour, and what it means in one sentence. */
-export function MapHead({ site, shiftHour }: { site: SiteState; shiftHour: number }) {
+/** `panelBelow` is for phones, where the panel follows the scroll section instead of sitting beside the heading. */
+export function MapHead({ site, shiftHour, panelBelow = false }: { site: SiteState; shiftHour: number; panelBelow?: boolean }) {
   const atShift = site.hour === shiftHour;
   return (
     <div className="mb-5">
@@ -117,7 +131,7 @@ export function MapHead({ site, shiftHour }: { site: SiteState; shiftHour: numbe
           </>
         )}
       </p>
-      <p className="mt-1 text-[13px] text-mz-muted">{atShift ? "This is the evening shift, as on Today. Pick a pump for details." : "Keep scrolling to run the week to the evening shift."} The layout is fictional.</p>
+      <p className="mt-1 text-[13px] text-mz-muted">{atShift ? `This is the evening shift, as on Today. ${panelBelow ? "The alarm panel for it follows." : "Pick a pump for its details."}` : "Keep scrolling to run the week to the evening shift."}</p>
     </div>
   );
 }

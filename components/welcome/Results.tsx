@@ -3,6 +3,7 @@
 // Part 5 of .plans/welcome-landing-spec.md: how well it works, as big counting figures on ink. Totals only, from
 // key-numbers.json, so this section loads no labelled fault. The figures belong to whichever detector built the data.
 import NumberFlow from "@number-flow/react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadKeyNumbers, type KeyNumbers } from "@/lib/data";
 import { BASE, breakEvenFalseAlerts } from "@/lib/payback";
@@ -55,31 +56,39 @@ export function Results() {
   const share = (n: number) => `${(n / key.faults) * 100}%`;
 
   return (
-    <section id="results" aria-label="How well it works" className="welcome-dark relative overflow-hidden bg-mz-ink px-5 py-20 text-white sm:px-10 lg:px-16 lg:py-28">
-      <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0 opacity-60" />
-      <div className="relative">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/55">04 &middot; How well it works</p>
-        <h2 className="mt-4 max-w-[20ch] text-[34px] leading-[1.08] font-light tracking-[-0.03em] lg:text-[44px]">Earlier than the alarms, on the same pumps.</h2>
-        <div ref={ref} className="mt-12 grid gap-10 md:grid-cols-3 md:gap-12">
-          <Figure value={key.caught * on} digits={0} suffix={`of ${key.faults}`} label="Faults caught before they became a problem" note={`The plant's own alarms caught ${key.alarmsCaught}.`}>
-            <div className="mt-5 space-y-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/60">
-              <div className="flex items-center gap-3">
-                <span className="w-24 shrink-0">Alerts</span>
-                <span className="h-1.5 flex-1 bg-white/10"><span className="block h-full bg-mz-accent transition-[width] duration-[1400ms] ease-out" style={{ width: seen ? share(key.caught) : "0%" }} /></span>
+    <section id="results" aria-labelledby="results-title" className="bg-mz-ink px-5 py-20 text-white sm:px-10 lg:px-16 lg:py-24">
+      <h2 id="results-title" className="max-w-[22ch] text-[36px] leading-[1.1] font-light tracking-[-0.03em] lg:text-[44px]">
+        Earlier than the alarms, on the same pumps.
+      </h2>
+      <p className="mt-3 max-w-[60ch] text-[16px] leading-relaxed text-white/65">
+        How the alerts did on {key.faults} real faults across the 9 pumps with known answers, scored by the organizers against what actually happened.
+      </p>
+      <div ref={ref} className="mt-12 grid gap-10 md:grid-cols-3 md:gap-12">
+        <Figure value={key.caught * on} digits={0} suffix={`of ${key.faults}`} label="Faults caught" note={`The plant's own alarms caught ${key.alarmsCaught} of the same ${key.faults}.`}>
+          <div className="mt-5 space-y-2.5 text-[13px] text-white/70">
+            {[
+              { label: "Alerts", value: key.caught, bar: "bg-mz-accent" },
+              { label: "Plant alarms", value: key.alarmsCaught, bar: "bg-white/55" },
+            ].map((b) => (
+              <div key={b.label} className="grid grid-cols-[6.5rem_minmax(0,1fr)_2rem] items-center gap-3">
+                <span>{b.label}</span>
+                <span className="h-1.5 rounded-full bg-white/10">
+                  <span className={`block h-full rounded-full ${b.bar} transition-[width] duration-[1400ms] ease-out`} style={{ width: seen ? share(b.value) : "0%" }} />
+                </span>
+                <span className="text-right font-mono tabular-nums">{b.value}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-24 shrink-0">Plant alarms</span>
-                <span className="h-1.5 flex-1 bg-white/10"><span className="block h-full bg-white/60 transition-[width] duration-[1400ms] ease-out" style={{ width: seen ? share(key.alarmsCaught) : "0%" }} /></span>
-              </div>
-            </div>
-          </Figure>
-          <Figure value={key.medianWarningH * on} digits={1} suffix="h" label="Median warning before a conventional limit" note="Time to plan a stop, instead of reacting to a trip." />
-          <Figure value={key.falsePerPumpDay * on} digits={2} label="False or extra alerts per pump per day" note={`The business case stops paying above ${breakEven.toFixed(2)}, so this number decides it.`} />
-        </div>
-        <p className="mt-12 font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-white/45">
-          {key.source} &middot; {key.faults} scored faults on the 9 labelled pumps &middot; organizers&rsquo; scorer &middot; synthetic data, not field results
-        </p>
+            ))}
+          </div>
+        </Figure>
+        <Figure value={key.medianWarningH * on} digits={1} suffix="h" label="Warning before the limit, median" note="Enough time to plan a stop instead of reacting to a trip." />
+        <Figure value={key.falsePerPumpDay * on} digits={2} label="False or extra alerts per pump per day" note={`Payback is lost above ${breakEven.toFixed(2)}, so this number decides whether it pays.`} />
       </div>
+      <p className="mt-12 max-w-[70ch] text-[13px] leading-relaxed text-white/55">
+        From the {key.source}, on the 9 pumps with known answers, with the organizers&rsquo; scorer. Simulated data, not results from a real ship or plant.{" "}
+        <Link href="/review" className="text-white underline underline-offset-4 hover:text-white/80">
+          See every fault in Review
+        </Link>
+      </p>
     </section>
   );
 }
