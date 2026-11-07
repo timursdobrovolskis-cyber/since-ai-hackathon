@@ -16,6 +16,8 @@ const TITLES: Record<string, string> = {
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { error, fleet } = useApp();
+  // The landing page brings its own header and footer.
+  if (path === "/welcome") return <>{children}</>;
   const title = TITLES[path];
   // Other pages carry their own main heading, so this bar is only the heading on Week overview.
   const Title = path === "/week" ? "h1" : "p";

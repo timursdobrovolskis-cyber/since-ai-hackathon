@@ -75,6 +75,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Styling | Tailwind CSS | MIT |
 | Charts | uPlot | MIT |
 | Isometric case board | react-isokit | MIT |
+| 3D pump on the landing page | three.js | MIT |
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |

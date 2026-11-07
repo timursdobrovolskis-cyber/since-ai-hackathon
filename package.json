@@ -20,6 +20,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-isokit": "^0.5.0",
+    "three": "^0.187.0",
     "uplot": "^1.6.32"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.187.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
