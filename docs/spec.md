@@ -31,7 +31,7 @@ Our teammates build the detector. This app shows its output. Until their alerts 
 
 ## 2a. Worker-first decisions (7 Nov)
 
-These replace the fleet-first layout in section 6 where they differ.
+These replace the fleet-first layout and the replay controls in section 6 where they differ.
 
 | Topic | Decision |
 |---|---|
@@ -42,8 +42,9 @@ These replace the fleet-first layout in section 6 where they differ.
 | Buttons | I'll check it, Remind me later, Not a problem |
 | Voice | A small optional extra, tucked away and at most 10 seconds of the video. Spoken shift handover first, stored and offline. Ask at the pump second, using an ElevenLabs Agent, behind an access code |
 | Voice rules | That pump's data only, "points to" not "it is", checks not commands, and plant procedure for emergencies |
+| One main page | No replay bar and no sidebar. The app opens on one fixed shift, Day 3 evening, with no Day wording on the main page or job card. Pumps, three key results and links to the rest sit on one page |
 | Goal of every screen | Someone on shift decides in 10 seconds and knows how far to trust it |
-| Trust | Each line shows the cause's past results in plain words, from all 9 labelled pumps. The totals include the replayed alerts and stand in for a real site history. Weak causes lose "the pump may be fine" and add "Check the pump as well" |
+| Trust | Each line shows the cause's past results in plain words, from all 9 labelled pumps. The totals include the alerts shown and stand in for a real site history. Weak causes lose "the pump may be fine" and add "Check the pump as well" |
 | One line per pump | The most reliable concern leads, and the others show as "Plus N more on this pump" |
 | Job card | Steps, what you'd expect to find, what to do if not, estimated time stopped, and last done on this pump. Steps and hours need a check from Joonas at Elomatic |
 | Next stop | Read from the operating context, which reads ahead on purpose and stands in for a published timetable |
@@ -287,9 +288,9 @@ tools/build_what_if.py   pre-computed sandbox results
 - The organizer package is tested on **Python 3.10-3.13**. This Mac defaults to 3.14 without pandas, but Python 3.12, `uv` and Node are installed, so use a Python 3.12 environment.
 - Keep the 1-second data and vibration waveforms out of the browser. A static PUMP-04 spectrum image is a stretch goal.
 
-### Replay rule
+### Fixed shift rule
 
-Live screens render only data at or before the replay time, including alerts, alarms, notes, AI context and briefings. Labels load only in the Review view.
+Live screens render only data at or before the fixed shift (`SHIFT_HOUR`), including alerts, alarms, notes, AI context and briefings. Labels load only in the Review view.
 
 ### Which pumps appear
 

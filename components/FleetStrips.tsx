@@ -93,7 +93,7 @@ export function FleetStrips() {
             </li>
           ))}
         </ul>
-        {/* One replay line through every pump. It sits over the strip column only. */}
+        {/* One "now" line through every pump. It sits over the strip column only. */}
         <div className="pointer-events-none absolute inset-y-0 right-0 left-[13rem]">
           <span className="absolute inset-y-0 w-px bg-[var(--cursor)]" style={{ left: pct(hour) }} />
         </div>

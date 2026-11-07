@@ -8,16 +8,14 @@ import type { Case, Fleet, PumpData } from "./types.ts";
 const SPOKEN_LIMIT = 3;
 
 export function shiftLabel(hour: number) {
-  const day = Math.floor(hour / 24) + 1;
-  const time = hour % 24;
-  return `Day ${day}, ${time < 12 ? "morning" : "evening"} shift`;
+  return `${hour % 24 < 12 ? "morning" : "evening"} shift`;
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 export function handoverScript(cases: Case[], meta: Fleet["channelMeta"], hour: number, record?: TrackRecord, pumps?: Record<string, PumpData>) {
   const { today, readings, wait } = groupByPump(cases, {}, hour, record, pumps);
-  const parts = [`Handover for ${shiftLabel(hour)}.`];
+  const parts = [`Handover for the ${shiftLabel(hour)}.`];
   if (today.length === 0) {
     parts.push("No pumps need you right now.");
   } else {

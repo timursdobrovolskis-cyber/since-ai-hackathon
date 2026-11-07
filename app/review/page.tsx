@@ -26,7 +26,7 @@ function lead(hours: number | null) {
 }
 
 export default function ReviewPage() {
-  const { fleet, pumps, setPlaying } = useApp();
+  const { fleet, pumps } = useApp();
   const [card, setCard] = useState<Scorecard | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [selected, setSelected] = useState("PUMP-08");
@@ -34,7 +34,6 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setPlaying(false);
     const wanted = new URLSearchParams(window.location.search).get("pump");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL is only available after mount
     if (wanted) setSelected(wanted);
@@ -44,7 +43,7 @@ export default function ReviewPage() {
         setAlerts(a.alerts);
       })
       .catch((e: Error) => setError(e.message));
-  }, [setPlaying]);
+  }, []);
 
   useEffect(() => {
     loadReviewPump(selected)

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { buildCases } from "./cases.ts";
-import { FAULT_LABEL } from "./labels.ts";
+import { ago, FAULT_LABEL } from "./labels.ts";
 import { PLAIN, plainAlert, pumpName } from "./plain.ts";
 import { groupByPump } from "./today.ts";
 import { trustFor } from "./trust.ts";
@@ -135,4 +135,11 @@ test("last done uses the newest record at or before the replay time", () => {
   assert.equal(lastDone(pump([]), "LUBRICATION", 60), "Last greased 5 days ago: Old.");
   assert.equal(lastDone(pump([]), "LUBRICATION", 100), "Last greased 10 h ago: Greased.");
   assert.equal(lastDone(pump([]), undefined, 60), null);
+});
+
+test("times read as plain words", () => {
+  assert.equal(ago(0.5), "less than an hour ago");
+  assert.equal(ago(1), "1 hour ago");
+  assert.equal(ago(5.2), "5 hours ago");
+  assert.equal(ago(72), "3 days ago");
 });

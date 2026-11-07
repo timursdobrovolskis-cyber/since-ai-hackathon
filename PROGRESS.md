@@ -1,4 +1,4 @@
-# Progress: useful-for-workers
+# Progress: one-home-screen
 
 ## Done
 
@@ -7,7 +7,10 @@
 - The case screen is a job card: steps, what you'd expect to find, what to do if not, estimated time stopped and last done.
 - After "I'll check it", the worker records what they found. It appears in My decisions and the CSV.
 - Corrective work done since the alert moves a pump to Can wait, and says what was done.
-- Voice is tucked away. Handovers are re-recorded with the new rules.
+- Voice is tucked away.
+- The replay bar and sidebar are gone. The app opens on one fixed evening shift.
+- The main page holds the pumps, three key results and links to everything else.
+- One handover, recorded for that shift.
 
 ## In progress
 
@@ -17,8 +20,8 @@ Nothing.
 
 - Joonas at Elomatic checks the job cards and time estimates.
 - A person tests hold-to-talk and the app on a real phone.
-- Merge the PRs in order, then set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel before deploying.
-- After swapping in detector alerts, rerun `tools/build_ui_data.py --alerts` and `npm run handover`, because the track record and handovers change with the detector.
+- Set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel if Ask about this pump should work live.
+- After swapping in detector alerts, rerun `tools/build_ui_data.py --alerts`, check `SHIFT_HOUR` still tells the story, and rerun `npm run handover`, because the track record, key numbers and handover change with the detector.
 
 ## Blockers
 

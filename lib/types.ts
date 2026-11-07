@@ -120,7 +120,7 @@ export type Decision = {
   followUpHour?: number;
   /** What the worker found when they checked. */
   finding?: Finding;
-  /** Replay hour when the decision was made. */
+  /** The shift hour when the decision was made. */
   atHour: number;
   decidedAt: string;
 };
