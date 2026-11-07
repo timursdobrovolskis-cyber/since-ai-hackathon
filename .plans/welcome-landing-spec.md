@@ -55,7 +55,7 @@ From `profile` in the organizer `assets.csv`. Site names stay fictional.
 
 1. **Hero and scroll.** Built on 7 Nov. Restyled the same day: Meuze colours and fonts, bigger pump, ink-to-white fade.
 2. **Map with time.** Built on 7 Nov: lights come from `lib/sitemap.ts`, tested to agree with Today at the shift and to see nothing later. Zones, labels, pipe lines and lights, with scroll running the clock to `SHIFT_HOUR`. Test pumps dimmed.
-3. **Click and dashboard.** Pump shrinks, card slides in with the problem, what to do and the sensor list.
+3. **Click and dashboard.** Built on 7 Nov. Pumps on the map are buttons, keyboard included. The card shows the same hour as the map, the plain wording from Today, first noticed, how sure, trend, next stop, the 14 kinds of reading, and a link to the job card. Pump shrinks, card slides in with the problem, what to do and the sensor list.
 4. **Step list** with drawing signal charts.
 5. **Results counter and cards.**
 6. **Later, not agreed yet.** The "estimate" in the dashboard and the phone layout.

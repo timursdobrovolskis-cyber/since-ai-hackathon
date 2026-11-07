@@ -2,22 +2,23 @@
 
 // Turns the scroll position inside one tall section into two phases:
 //   pump  0 to 1 over the first 55 % of the scroll: the pump zooms, turns, glides right, the page fades to white
-//   time  0 to 1 from 60 % to 96 %: the site map's clock runs from hour 0 to the shift
+//   time  0 to 1 from 60 % to 90 %: the site map's clock runs from hour 0 to the shift, then it rests there
 // Both are written to CSS variables on the section (--p and --t) on every scroll, so CSS can use them without
-// React re-rendering. The hour is React state, but it only changes on whole hours, 66 times in all.
+// React re-rendering. The hour and whether the map can be used are React state, but they change rarely.
 import { useEffect, useRef, useState } from "react";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 export const PUMP_SHARE = 0.55;
 const TIME_START = 0.6;
-const TIME_END = 0.96;
+const TIME_END = 0.9;
 
 export type Phases = { pump: number; time: number };
 
 export function useScrollPhases(track: React.RefObject<HTMLElement | null>, shiftHour: number) {
   const phases = useRef<Phases>({ pump: 0, time: 0 });
   const [hour, setHour] = useState(0);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     let frame = 0;
@@ -34,6 +35,8 @@ export function useScrollPhases(track: React.RefObject<HTMLElement | null>, shif
       section.style.setProperty("--p", pump.toFixed(4));
       section.style.setProperty("--t", time.toFixed(4));
       setHour(Math.round(time * shiftHour));
+      // The map fades in from pump 0.74. Below this it is too faint to click.
+      setMapReady(pump >= 0.85);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -48,5 +51,5 @@ export function useScrollPhases(track: React.RefObject<HTMLElement | null>, shif
     };
   }, [track, shiftHour]);
 
-  return { phases, hour };
+  return { phases, hour, mapReady };
 }

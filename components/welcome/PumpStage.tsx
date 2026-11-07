@@ -40,8 +40,16 @@ function parseEdges(buf: ArrayBuffer) {
   return geometry;
 }
 
-export function PumpStage({ phases }: { phases: React.RefObject<Phases> }) {
+/**
+ * `selected` is true while a pump card is open: the pump then eases to about half size at the top of the right column,
+ * making room for the card below it.
+ */
+export function PumpStage({ phases, selected = false }: { phases: React.RefObject<Phases>; selected?: boolean }) {
   const holder = useRef<HTMLDivElement>(null);
+  const selectedRef = useRef(selected);
+  useEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
   const [problem, setProblem] = useState<string | null>(null);
 
   useEffect(() => {
@@ -101,13 +109,21 @@ export function PumpStage({ phases }: { phases: React.RefObject<Phases> }) {
     io.observe(el);
 
     const start = performance.now();
+    let last = start;
+    let shrink = 0;
     let frame = 0;
     const tick = () => {
       frame = requestAnimationFrame(tick);
       if (!onScreen || document.hidden) return;
       const p = phases.current.pump;
 
-      const t = (performance.now() - start) / 1000;
+      const now = performance.now();
+      const t = (now - start) / 1000;
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      // Ease towards the selected size, about 0.3 s to settle. Reduced motion jumps straight there.
+      const target = selectedRef.current ? 1 : 0;
+      shrink = reduced ? target : shrink + (target - shrink) * (1 - Math.exp(-dt * 9));
       const zoom = ease(0, 0.5, p);
       const glide = ease(0.55, 0.9, p);
       // --g in globals.css fades the background over p 0.6 to 0.72. The lines flip at its middle, so they never
@@ -119,10 +135,10 @@ export function PumpStage({ phases }: { phases: React.RefObject<Phases> }) {
       const fit = (share: number, heightShare: number) =>
         Math.min((share * 2 * halfW) / MODEL_LENGTH, (heightShare * 2 * halfH) / MODEL_LENGTH);
       const scale = lerp(lerp(fit(1.25, 1.1), fit(1.55, 1.45), zoom), fit(0.47, 0.64), glide);
-      pump.scale.setScalar(scale);
+      pump.scale.setScalar(scale * lerp(1, 0.46, shrink));
 
       // Place: centred in the hero, then into the middle of the right column.
-      pump.position.set(lerp(0, halfW * 0.48, glide), lerp(-halfH * 0.02, -halfH * 0.04, glide), 0);
+      pump.position.set(lerp(0, halfW * 0.48, glide), lerp(-halfH * 0.02, -halfH * 0.04, glide) + halfH * 0.66 * shrink, 0);
 
       // Turn: the scroll turns the pump half way round. A slow sway keeps the hero alive.
       const sway = reduced ? 0 : Math.sin(t * 0.35) * 0.22 * (1 - ease(0, 0.12, p));

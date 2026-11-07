@@ -3,10 +3,12 @@
 // Landing page, parts 1 and 2 of .plans/welcome-landing-spec.md, styled after meuze.ai: ink and white sections,
 // Geist and JetBrains Mono, one accent blue. The pump zooms and turns as you scroll, then glides right while the
 // page fades from ink to white. Then the site map appears, and further scrolling runs its clock to the shift.
+// Part 3: clicking a pump on the map shrinks the 3D pump and opens that pump's card below it.
 import Link from "next/link";
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
-import { SiteMap } from "@/components/welcome/SiteMap";
+import { SiteMap, useSite } from "@/components/welcome/SiteMap";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
 
@@ -17,7 +19,15 @@ function Corner({ className }: { className: string }) {
 
 export default function Welcome() {
   const track = useRef<HTMLElement>(null);
-  const { phases, hour } = useScrollPhases(track, SHIFT_HOUR);
+  const { phases, hour, mapReady } = useScrollPhases(track, SHIFT_HOUR);
+  const site = useSite(hour, SHIFT_HOUR);
+  const [selected, setSelected] = useState<string | null>(null);
+  const close = useCallback(() => setSelected(null), []);
+  // Scrolling back up to the pump closes any open card.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
+    if (!mapReady) setSelected(null);
+  }, [mapReady]);
 
   return (
     <div className="welcome min-h-full bg-white font-geist text-mz-ink">
@@ -47,7 +57,7 @@ export default function Welcome() {
             01 &middot; Centrifugal pump
           </p>
 
-          <PumpStage phases={phases} />
+          <PumpStage phases={phases} selected={selected !== null} />
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
             Scroll
@@ -56,8 +66,10 @@ export default function Welcome() {
           {/* Left column: the site map. Scrolling on runs its clock to the shift. */}
           <div className="welcome-map absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center px-10 pt-16 sm:px-16">
             <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted">02 &middot; Site map</p>
-            <SiteMap hour={hour} shiftHour={SHIFT_HOUR} />
+            <SiteMap site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />
           </div>
+
+          <PumpCard id={selected} site={site} onClose={close} />
         </div>
       </section>
 

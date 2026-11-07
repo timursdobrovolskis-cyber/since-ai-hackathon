@@ -9,16 +9,17 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The pump is the team's downloaded model, turned into line work by `tools/build_pump_edges.mjs`. Scrolling zooms in, turns it half way round, then moves it into the right column.
 - Part 2: the site map. 12 pumps in four zones of one fictional site, with test pumps dimmed. Scrolling runs the clock from hour 0 to the evening shift, and the lights, alert count and plant alarm count change with it.
 - The lights come from `lib/sitemap.ts`, which reuses Today's grouping. Tests check the map agrees with Today at the shift and never sees a later alert.
+- Part 3: click or press Enter on a pump on the map. The 3D pump shrinks to the top of the right column, and a card slides in with the problem, how sure it is, the trend, the next stop, the 14 kinds of reading, and a link to the job card. Escape or the close button closes it and returns focus to the pump.
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona's look at part 2.
+Nothing. Waiting for Jona's look at part 3.
 
 ## Next
 
-- Part 3: click a pump on the map to shrink the 3D pump and slide in its small dashboard.
-- Later parts: step list with drawing signal charts, results counter, payback and sensor cards. See the spec.
+- Part 4: the step list, with each problem pump's signal chart drawing in.
+- Later parts: results counter, payback and sensor cards. See the spec.
 
 ## Blockers
 

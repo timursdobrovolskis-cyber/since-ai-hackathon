@@ -1,7 +1,7 @@
 // The site map on the landing page: 12 pumps on one fictional site, each with a light.
 // Lights use the same rule as Today (groupByPump), so the map and Today never disagree at the shift.
 import { buildCases } from "./cases.ts";
-import { groupByPump } from "./today.ts";
+import { groupByPump, type PumpLine } from "./today.ts";
 import type { TrackRecord } from "./trust.ts";
 import type { Alert, Case, Decision, PumpData } from "./types.ts";
 
@@ -22,9 +22,17 @@ export const ZONES: Zone[] = [
 
 export const TEST_PUMPS = new Set(["PUMP-10", "PUMP-11", "PUMP-12"]);
 
+/**
+ * The 14 kinds of reading across the fleet. The app's data holds 13 of them. Ambient temperature is the 14th: the
+ * organizer assets file lists it for every pump, but the data build does not load it, so it is never behind an alert.
+ */
+export const AMBIENT = { id: "ambient_temp_c", label: "Ambient temperature" };
+
 export type SiteState = {
   hour: number;
   lights: Record<string, Light>;
+  /** The pump's line on Today at this hour, when it has one: the leading concern and any others. */
+  lines: Record<string, PumpLine>;
   /** Alerts raised so far, and pumps in each group. */
   alerts: number;
   red: number;
@@ -51,14 +59,16 @@ export function siteAt(
 
   const lights: Record<string, Light> = {};
   for (const zone of ZONES) for (const id of zone.pumps) lights[id] = TEST_PUMPS.has(id) ? "none" : "green";
-  for (const l of wait) lights[l.assetId] = "green";
-  for (const l of readings) lights[l.assetId] = "orange";
-  for (const l of today) lights[l.assetId] = "red";
+  const lines: Record<string, PumpLine> = {};
+  for (const l of wait) [lights[l.assetId], lines[l.assetId]] = ["green", l];
+  for (const l of readings) [lights[l.assetId], lines[l.assetId]] = ["orange", l];
+  for (const l of today) [lights[l.assetId], lines[l.assetId]] = ["red", l];
 
   const alarms = Object.values(pumps ?? {}).reduce((n, p) => n + p.alarms.filter((a) => a.raisedHour <= h).length, 0);
   return {
     hour: h,
     lights,
+    lines,
     alerts: alerts.filter((a) => a.offset_hours <= h).length,
     red: today.length,
     orange: readings.length,

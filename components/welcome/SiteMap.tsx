@@ -1,12 +1,12 @@
 "use client";
 
 // Part 2 of .plans/welcome-landing-spec.md: one fictional site with 12 pumps in four zones. Scrolling runs `hour` from
-// 0 to the shift, and each pump's light follows the same rule as Today. Clicking a pump comes in part 3.
+// 0 to the shift, and each pump's light follows the same rule as Today. Clicking a pump selects it for the pump card.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "@/components/AppProvider";
 import { clock } from "@/lib/labels";
 import { pumpName } from "@/lib/plain";
-import { siteAt, TEST_PUMPS, ZONES, type Light } from "@/lib/sitemap";
+import { siteAt, TEST_PUMPS, ZONES, type Light, type SiteState } from "@/lib/sitemap";
 
 const W = 800;
 const H = 520;
@@ -20,7 +20,7 @@ const BOXES: Record<string, { x: number; y: number; w: number; h: number }> = {
   pw: { x: 520 + GAP, y: (H + GAP) / 2, w: W - 520 - GAP, h: (H - GAP) / 2 },
 };
 
-const LIGHT_WORDS: Record<Light, string> = {
+export const LIGHT_WORDS: Record<Light, string> = {
   red: "needs you today",
   orange: "check the reading",
   green: "normal or can wait",
@@ -61,13 +61,26 @@ function Stat({ value, label, swatch }: { value: number; label: string; swatch?:
   );
 }
 
-export function SiteMap({ hour, shiftHour }: { hour: number; shiftHour: number }) {
-  const { fleet, alertsToShift, alertSource, decisions, record, pumps } = useApp();
-  const site = useMemo(
+/** The site at `hour`, shared by the map and the pump card so they always show the same moment. */
+export function useSite(hour: number, shiftHour: number) {
+  const { alertsToShift, decisions, record, pumps } = useApp();
+  return useMemo(
     () => siteAt(alertsToShift, hour, shiftHour, decisions, record, pumps),
     [alertsToShift, hour, shiftHour, decisions, record, pumps],
   );
+}
 
+type Props = {
+  site: SiteState;
+  shiftHour: number;
+  /** False while the map is still too faint to use: pumps then take no clicks and no keyboard focus. */
+  ready: boolean;
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+};
+
+export function SiteMap({ site, shiftHour, ready, selected, onSelect }: Props) {
+  const { fleet, alertSource } = useApp();
   if (!fleet) return <p className="text-mz-muted">Loading pump data</p>;
 
   const atShift = site.hour === shiftHour;
@@ -111,8 +124,27 @@ export function SiteMap({ hour, shiftHour }: { hour: number; shiftHour: number }
                 const y = b.y + 112;
                 const light = site.lights[id];
                 const test = TEST_PUMPS.has(id);
+                const pick = () => onSelect(selected === id ? null : id);
                 return (
-                  <g key={id} className={test ? "site-test" : undefined}>
+                  <g
+                    key={id}
+                    data-pump={id}
+                    className={`site-pump${test ? " site-test" : ""}`}
+                    role="button"
+                    tabIndex={ready ? 0 : -1}
+                    aria-pressed={selected === id}
+                    aria-label={`${pumpName(id)}, ${LIGHT_WORDS[light]}. Show details.`}
+                    onClick={ready ? pick : undefined}
+                    onKeyDown={(e) => {
+                      if (ready && (e.key === "Enter" || e.key === " ")) {
+                        e.preventDefault();
+                        pick();
+                      }
+                    }}
+                  >
+                    {/* Larger invisible target, so the small light is easy to hit. */}
+                    <rect x={x - 44} y={y - 50} width={88} height={92} className="site-hit" />
+                    {selected === id && <circle cx={x} cy={y} r={24} className="site-selected" />}
                     <line x1={x} x2={x} y1={test ? y + 46 : y + 14} y2={header} className="site-pipe" />
                     <text x={x} y={y - 28} textAnchor="middle" className="site-name">
                       {pumpName(id)}

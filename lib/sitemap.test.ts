@@ -54,3 +54,10 @@ test("a decision made at the shift does not change the picture earlier in the we
   const decisions = { a: { caseId: "a", kind: "rejected", atHour: SHIFT } } as unknown as Record<string, Decision>;
   assert.equal(siteAt(ALERTS, 50, SHIFT, decisions).lights["PUMP-08"], "red");
 });
+
+test("each lit pump carries the case that leads its line", () => {
+  const s = siteAt(ALERTS, SHIFT, SHIFT, {});
+  assert.equal(s.lines["PUMP-08"].lead.id, "a");
+  assert.equal(s.lines["PUMP-07"].lead.id, "b");
+  assert.equal(s.lines["PUMP-04"], undefined);
+});

@@ -46,6 +46,7 @@
   --color-mz-line: var(--mz-line);
   --color-mz-muted: var(--mz-muted);
   --color-mz-accent: var(--mz-accent);
+  --color-site-red: var(--site-red);
   --font-sans: var(--font-barlow);
   --font-geist: var(--ff-geist);
   --font-mono: var(--ff-mono);
@@ -149,4 +150,28 @@ input[type="range"] { accent-color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .site-burst { display: none; }
   .site-halo.site-red { animation: none; }
+}
+
+/* Site map pumps are buttons (part 3). */
+.site-pump { cursor: pointer; outline: none; }
+.site-pump .site-hit { fill: transparent; }
+.site-pump:hover .site-name { text-decoration: underline; text-underline-offset: 3px; }
+.site-pump:focus-visible .site-hit { stroke: var(--mz-accent); stroke-width: 2; }
+.site-selected { fill: none; stroke: var(--mz-accent); stroke-width: 2; }
+
+/* Pump card: slides in from the right when a pump is picked. */
+.pump-card {
+  opacity: 0;
+  transform: translateX(32px);
+  pointer-events: none;
+  transition: opacity 220ms ease-out, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pump-card[data-open="true"] { opacity: 1; transform: none; pointer-events: auto; }
+/* Keyboard users see where focus went when the card opens. A mouse click shows no ring. */
+.pump-card:focus-visible { outline: 1.5px solid var(--mz-accent); outline-offset: -1px; }
+.card-sensor-flagged { background: var(--mz-accent); }
+.card-sensor-has { background: var(--mz-ink); }
+.card-sensor-missing { border: 1px dashed var(--mz-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .pump-card { transition: opacity 150ms linear; transform: none; }
 }
