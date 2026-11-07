@@ -80,6 +80,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
+| Jury brief PDF | reportlab (`tools/build_jury_brief.py`, output `docs/detector-jury-brief.pdf`) | BSD-3 |
 | Simulator and baselines | `retrofit_sim` from the organizer pack | MIT |
 | Data | RETROFIT AI 2026 synthetic pump benchmark, Since AI Hackathon 2026 | CC BY 4.0 |
 
