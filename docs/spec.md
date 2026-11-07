@@ -43,7 +43,7 @@ These replace the fleet-first layout in section 6 where they differ.
 | Voice | A small optional extra, tucked away and at most 10 seconds of the video. Spoken shift handover first, stored and offline. Ask at the pump second, using an ElevenLabs Agent, behind an access code |
 | Voice rules | That pump's data only, "points to" not "it is", checks not commands, and plant procedure for emergencies |
 | Goal of every screen | Someone on shift decides in 10 seconds and knows how far to trust it |
-| Trust | Each line shows the cause's past results in plain words, from the validation pumps. Weak causes lose "the pump may be fine" and add "Check the pump as well" |
+| Trust | Each line shows the cause's past results in plain words, from all 9 labelled pumps. The totals include the replayed alerts and stand in for a real site history. Weak causes lose "the pump may be fine" and add "Check the pump as well" |
 | One line per pump | The most reliable concern leads, and the others show as "Plus N more on this pump" |
 | Job card | Steps, what you'd expect to find, what to do if not, estimated time stopped, and last done on this pump. Steps and hours need a check from Joonas at Elomatic |
 | Next stop | Read from the operating context, which reads ahead on purpose and stands in for a published timetable |
