@@ -11,6 +11,7 @@
 // Pipe colours follow ISO 14726: seawater green, fresh water blue, fuel brown. In the data, Pump 7 and Pump 8 are
 // seawater cooling pumps No. 1 and No. 2 on Vessel B, so this room holds both, plus a fire and general service pump.
 import * as THREE from "three";
+import { weighted as lineWeight } from "./lineRender";
 
 const FLOOR = -0.62;
 const CEIL = 3.4;
@@ -37,16 +38,15 @@ export type Anchor = { key: string; label: string; detail: string; at: THREE.Vec
 const Y = new THREE.Vector3(0, 1, 0);
 const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 
-export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THREE.BufferGeometry) {
+export function buildRealRoom(pumpGeometry: THREE.BufferGeometry) {
   const group = new THREE.Group();
   const disposables: { dispose: () => void }[] = [];
   const keep = <T extends { dispose: () => void }>(x: T) => (disposables.push(x), x);
 
   /** A surface that draws its outline at `weight`, from 0 (none) to 1 (full white). Stored as the normal pass's alpha. */
-  const weighted = (weight: number) =>
-    keep(new THREE.MeshNormalMaterial({ opacity: weight, blending: THREE.NoBlending, side: THREE.DoubleSide }));
+  const weighted = (weight: number) => keep(lineWeight(weight));
 
-  // Line weights: equipment bright, structure faint.
+  // Line weights: equipment bright, structure faint. Pump 8 alone gets exactly 1, so it stays when the room dims.
   const floorMat = weighted(0.26);
   const wallMat = weighted(0.2);
   const frameMat = weighted(0.34);
@@ -317,12 +317,6 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
   }
 
 
-  // Line work over Pump 8, for the hand-off to the drawing. Drawn on top, like the line-work pump that follows.
-  const edgeMat = keep(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthTest: false }));
-  const edges = new THREE.LineSegments(pumpEdges, edgeMat);
-  edges.renderOrder = 10;
-  edges.layers.set(1);
-  group.add(edges);
 
   const anchors: Anchor[] = [
     { key: "p8", label: "Pump 8", detail: "SW cooling pump No. 2", at: v(-0.45, 0.85, 0) },
@@ -338,7 +332,6 @@ export function buildRealRoom(pumpGeometry: THREE.BufferGeometry, pumpEdges: THR
     group,
     target: target as THREE.Mesh,
     targetMaterial,
-    edgeMaterial: edgeMat,
     anchors,
     update,
     dispose: () => disposables.forEach((d) => d.dispose()),

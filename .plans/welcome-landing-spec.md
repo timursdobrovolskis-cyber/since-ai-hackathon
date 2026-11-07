@@ -58,7 +58,8 @@ Like Meuze, which opens inside a restaurant, the page opens inside a ship's engi
 - **Room:** a seawater cooling pump room on Vessel B. Chequer-plate deck, cream bulkheads with hull frames, deckhead beams, lagged pipes, fresh-water and fuel lines in ISO 14726 colours, cable trays, light fittings, starter panels with lamps and ammeters, a sign, a ladder, a handrail and a fire extinguisher.
 - **Pumps:** Pump 8 and Pump 7 (Vessel B's seawater cooling pumps No. 2 and No. 1), plus a fire and general service pump, all from the team's pump model as painted solid meshes. Each has a discharge drop with check valve, valve, handwheel and gauge to the seawater header, and a suction branch through a basket strainer from the suction main.
 - **Rendering:** each part has a line weight instead of paint. The room is drawn once as surface directions, weights and depth, and an edge shader turns outlines and folds into white lines on ink. Hidden lines disappear on their own, equipment draws bright, structure faint, and far lines fade. Runs at 60 frames per second on the development laptop.
-- **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then the room dims and Pump 8 switches to its see-through line work, in exactly the pose where the line-work story starts (`heroPose.ts`).
+- **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then everything but Pump 8 dims away, in exactly the pose where the moving pump takes over (`heroPose.ts`).
+- **One style throughout:** the moving pump is drawn by the same hidden-line renderer (`lineRender.ts`), not as see-through line work, so it looks the same from the room to the site map. Jona rejected the see-through look on 7 Nov.
 
 ## Parts
 
