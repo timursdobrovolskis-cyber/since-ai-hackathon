@@ -14,7 +14,7 @@ const span = (r: number, a: number, b: number) => clamp01((r - a) / (b - a));
 
 // In scroll heights of the section's travel (340 viewport heights): room 190, pump 90, hold 60.
 // The pump used 135 until 7 Nov; Jona found the turn too long twice, so it is now two thirds of that.
-const ROOM = [0, 0.559] as const;
+export const ROOM = [0, 0.559] as const;
 const PUMP = [0.559, 0.824] as const;
 /** The stage reads as white from here on (the ink-to-white fade in globals.css passes its middle at pump 0.66). */
 const LIGHT_FROM = 0.66;

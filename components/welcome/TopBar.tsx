@@ -15,13 +15,13 @@ const LINKS: { to: Place; label: string }[] = [
   { to: "results", label: "Results" },
 ];
 
-export function TopBar({ tone, place, site, onJump }: { tone: "ink" | "white"; place: Place; site: SiteState; onJump: (to: Place) => void }) {
+export function TopBar({ tone, place, site, onJump, fill = false }: { tone: "ink" | "white"; place: Place; site: SiteState; onJump: (to: Place) => void; fill?: boolean }) {
   const ink = tone === "ink";
   return (
     <header data-tone={tone} className="top-bar fixed inset-x-0 top-0 z-30 h-14 sm:h-16">
       <div className="flex h-full items-stretch justify-between gap-4 px-5 sm:px-10">
         <nav aria-label="Sections" className="flex items-stretch gap-6 text-[15px] sm:gap-8">
-          {LINKS.map((l) => {
+          {LINKS.map((l, i) => {
             const on = place === l.to;
             return (
               <button
@@ -29,7 +29,8 @@ export function TopBar({ tone, place, site, onJump }: { tone: "ink" | "white"; p
                 type="button"
                 aria-current={on ? "location" : undefined}
                 onClick={() => onJump(l.to)}
-                className={`top-bar-link relative flex items-center transition-colors ${on ? "top-bar-on" : ""}`}
+                style={fill ? ({ "--fill": `var(--s${i})` } as React.CSSProperties) : undefined}
+                className={`top-bar-link relative flex items-center transition-colors ${on ? "top-bar-on" : ""} ${fill ? "top-bar-fill" : ""}`}
               >
                 {l.label}
               </button>

@@ -34,6 +34,7 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The room's labels sit on their own ink plates, so the drawing never runs through the words. A label near the screen edge flips side, and phones show only the name.
 - The top bar is a solid bar: ink over the engine room, white from the fade on. It marks the section you are in, and on wider screens says how many pumps need you, with a jump to the panel.
 - The pump turn is a third shorter: 90 viewport heights of scrolling instead of 135, and the scroll section is 440vh.
+- Scroll progress in four versions to compare with `?progress=` on the URL, which also shows a switch: bar (a hairline under the top bar), nav (each section link fills its own underline, the default), rail (a rail on the right with a point per section) and frame (the stage frame is traced round). Pick one, then remove the others and the switch.
 - The alarm panel has a filter: all, needs you, check the reading, not reviewed, reviewed. Pumps that do not match are dimmed, so every pump keeps its place.
 
 ## In progress

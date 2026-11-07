@@ -16,6 +16,7 @@ import { RoomStage } from "@/components/welcome/RoomStage";
 import { AlarmPanel } from "@/components/welcome/AlarmPanel";
 import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
+import { ProgressBar, ProgressFrame, ProgressRail, ProgressSwitch, useProgress, useProgressKind } from "@/components/welcome/ScrollProgress";
 import { TopBar, type Place } from "@/components/welcome/TopBar";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
@@ -61,6 +62,10 @@ export default function Welcome() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   const place: Place = inResults ? "results" : mapReady || past ? "map" : "top";
+  const tone = light || past ? "white" : "ink";
+  // Scroll progress: four versions to compare with ?progress=bar|nav|rail|frame (see ScrollProgress.tsx).
+  const marks = useProgress(track);
+  const progress = useProgressKind("nav");
   // Scrolling back up to the pump closes any open card.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
@@ -80,7 +85,10 @@ export default function Welcome() {
 
   return (
     <div className="welcome min-h-full bg-white font-geist text-mz-ink">
-      <TopBar tone={light || past ? "white" : "ink"} place={place} site={site} onJump={jump} />
+      <TopBar tone={tone} place={place} site={site} onJump={jump} fill={progress.kind === "nav"} />
+      {progress.kind === "bar" && <ProgressBar />}
+      {progress.kind === "rail" && <ProgressRail marks={marks} place={place} tone={tone} onJump={jump} />}
+      {progress.compare && <ProgressSwitch kind={progress.kind} choose={progress.choose} />}
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
       <section ref={track} aria-label="Engine room and site map" className="relative h-[440vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
@@ -94,6 +102,7 @@ export default function Welcome() {
           </div>
 
 
+          {progress.kind === "frame" && <ProgressFrame />}
           <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">

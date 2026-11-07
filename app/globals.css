@@ -346,3 +346,21 @@ input[type="range"] { accent-color: var(--ink); }
 .top-bar-link:hover, .top-bar-on { opacity: 1; }
 .top-bar-on::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: var(--mz-accent); }
 @media (prefers-reduced-motion: reduce) { .top-bar { transition: none; } }
+
+/* Scroll progress versions (components/welcome/ScrollProgress.tsx). Fills come from --page, --s0..2 and --t on <html>. */
+.progress-bar { background: var(--mz-accent); transform-origin: left; transform: scaleX(var(--page, 0)); }
+.top-bar-fill::before, .top-bar-fill::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; }
+.top-bar[data-tone="ink"] .top-bar-fill::before { background: rgb(255 255 255 / 0.14); }
+.top-bar[data-tone="white"] .top-bar-fill::before { background: var(--mz-line); }
+.top-bar-fill::after { background: var(--mz-accent); transform-origin: left; transform: scaleX(var(--fill, 0)); }
+.top-bar-fill.top-bar-on::after { content: ""; }
+.progress-rail-track { background: rgb(127 127 127 / 0.35); }
+.progress-rail-fill { background: var(--mz-accent); height: calc(var(--page, 0) * 100%); }
+.progress-rail-dot { background: var(--mz-accent); box-shadow: 0 0 0 3px var(--rail-bg); transition: transform 160ms ease; }
+.progress-rail-point[aria-current] .progress-rail-dot { transform: scale(1.5); }
+.progress-rail[data-tone="ink"] { --rail-bg: var(--mz-ink); }
+.progress-rail[data-tone="white"] { --rail-bg: white; }
+.progress-rail-label { transition: opacity 160ms ease; }
+.progress-rail[data-tone="ink"] .progress-rail-label { background: var(--mz-ink); color: white; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28); }
+.progress-rail[data-tone="white"] .progress-rail-label { background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line); }
+.progress-frame { stroke: var(--mz-accent); stroke-width: 1.5; stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--t, 0)); vector-effect: non-scaling-stroke; }
