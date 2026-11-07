@@ -1,0 +1,14 @@
+# Paradev workspace config: every new workspace comes up ready to run the app.
+
+[install]
+run = ["npm install"]
+
+[setup]
+# Copy .env (API keys) from the main checkout; fall back to the example.
+run = ['[ -f .env ] || cp "$SUPERSET_ROOT_PATH/.env" .env 2>/dev/null || cp .env.example .env']
+
+[terminals.dev]
+# Next.js moves to the next free port (3001, 3002, ...) when 3000 is taken,
+# so several workspaces can run their dev servers side by side.
+run = "npm run dev"
+default = true

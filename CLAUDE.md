@@ -15,3 +15,5 @@ Event rules that apply to all work in this repo:
 - Test the live link after every deploy, because a local run cannot catch deployment problems such as missing data files.
 
 Submission closes Sunday 8 November at 10:00 EET on sinceai.app.
+
+Agent workflow rules (worktrees, commits, checks, PROGRESS.md) are in @AGENTS.md.
