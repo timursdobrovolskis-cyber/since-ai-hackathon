@@ -41,6 +41,7 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 
 - The project is named Vahti: in the top bar, the tab title, the README and package.json.
 - `crew-decisions` is merged in: the team detector's v4 alerts, the pump card's time to act and cost of waiting, and the "What it saves the crew" section. Its labels were restyled to the site's headings (no numbered mono caps, no "·").
+- Phone card: the top part is about 120 px shorter, so Acknowledge, Dismiss and Escalate and the evidence button fit with the alarm panel showing above. On phones only: one header line (the panel gives the shift), a shorter How sure line without the detector score, the first-alert line moved to Evidence, no "Waiting risks" (it is in the cost table), and tighter spacing.
 - Readings now no longer adds a chart when you point at a reading. That moved the list under the pointer and made it jump back and forth. Clicking a reading opens its chart right under that row, and the clicked row stays where it is.
 - On phones the pump card sheet now paints above the alarm panel behind it. Before, the filter counts showed through the top of the sheet.
 
@@ -52,7 +53,6 @@ Nothing. Next: Jona's answers on more interactivity.
 
 - The team's detector alerts, then rebuild the data and check the evening shift still tells the story.
 
-- Phone: the card's top part is now taller than the screen, so the review buttons sit below the fold. Decide what to shorten.
 
 ## Blockers
 

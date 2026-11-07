@@ -81,7 +81,7 @@ function latestWork(pump: PumpData, hour: number): MaintenanceNote | null {
 
 function Section({ title, children, inner = false }: { title: string; children: React.ReactNode; inner?: boolean }) {
   return (
-    <section className={inner ? "border-t border-mz-line py-3 first:border-t-0 first:pt-0 last:pb-0 sm:py-4" : "border-t border-mz-line py-4"}>
+    <section className={inner ? "border-t border-mz-line py-2.5 first:border-t-0 first:pt-0 last:pb-0 md:py-4" : "border-t border-mz-line py-4"}>
       <h3 className="mb-1.5 text-[13px] text-mz-muted">{title}</h3>
       {children}
     </section>
@@ -314,8 +314,8 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
           <div ref={topRef}>
             {/* On a phone the header is also the grip: drag it to pull the sheet up, down, or away. */}
             <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} className="sheet-grip">
-              <span aria-hidden className="mx-auto mt-2 mb-3 block h-1 w-10 bg-mz-line md:hidden" />
-              <header className="flex items-start gap-3 pb-3 sm:pb-4">
+              <span aria-hidden className="mx-auto mt-2 mb-2 block h-1 w-10 bg-mz-line md:hidden" />
+              <header className="flex items-start gap-3 pb-2.5 md:pb-4">
                 <div className="min-w-0 flex-1">
                   <h2 className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[24px] sm:text-[26px] leading-tight font-normal tracking-[-0.025em]">
                     {pumpName(id)}
@@ -326,8 +326,9 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                   </h2>
                   {meta && (
                     <div className="mt-1 text-[14px] leading-snug text-mz-muted">
-                      <p>{meta.system}</p>
-                      <p>
+                      <p className="max-md:truncate">{meta.system}</p>
+                      {/* On a phone the alarm panel above already gives the shift, so the sheet keeps one line. */}
+                      <p className="max-md:hidden">
                         {siteWords(meta.site)}. {clock(site.hour)}
                       </p>
                     </div>
@@ -349,8 +350,9 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                 <p className="text-[15px] leading-snug">This is a test pump. The organizers hold its answers, so the app shows no data for it until the submission is frozen.</p>
               </Section>
             ) : (
-              // The answer first: what's wrong, what to do, and the review.
-              <div className="border-l-[3px] border-mz-accent bg-mz-panel px-4 py-4 sm:px-5 sm:py-5">
+              // The answer first: what's wrong, what to do, and the review. Phones get tighter spacing and shorter lines
+              // here, so the review buttons fit with the alarm panel still showing above the sheet.
+              <div className="border-l-[3px] border-mz-accent bg-mz-panel px-4 py-3 md:px-5 md:py-5">
                 <Section title="What's wrong" inner>
                   {c && alert ? (
                     <>
@@ -361,20 +363,25 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                           {sensor ? "Sensor" : "Machine"}
                         </span>
                       </p>
-                      <p className="mt-1.5 max-w-[60ch] text-[15px] leading-snug">{faultMeans(c.lead.faultType)}</p>
+                      <p className="mt-1 max-w-[60ch] text-[14px] leading-snug md:mt-1.5 md:text-[15px]">{faultMeans(c.lead.faultType)}</p>
                       {/* How sure, in one line: the past record for this cause first, then the detector's own score. */}
                       <p className="mt-2 text-[14px] leading-snug">
                         <span className="font-medium">How sure: </span>
                         {alert.fault_type === "UNKNOWN"
                           ? "The detector could not name a cause."
                           : past && past.total > 0
-                            ? `${TRUST_HEAD[c.trust?.level ?? "few"]}, ${past.right} of ${past.total} past alerts naming this cause were correct.`
+                            ? (
+                                <>
+                                  <span className="max-md:hidden">{`${TRUST_HEAD[c.trust?.level ?? "few"]}, ${past.right} of ${past.total} past alerts naming this cause were correct.`}</span>
+                                  <span className="md:hidden">{`${past.right} of ${past.total} past alerts naming this cause were right.`}</span>
+                                </>
+                              )
                             : "No past cases of this cause yet."}
                         {alert.fault_type !== "UNKNOWN" && alert.confidence_calibrated && (
-                          <span className="text-mz-muted"> Detector {Math.round(alert.confidence * 100)}% sure.</span>
+                          <span className="text-mz-muted max-md:hidden"> Detector {Math.round(alert.confidence * 100)}% sure.</span>
                         )}
                       </p>
-                      <p className="mt-1.5 text-[13.5px] text-mz-muted">
+                      <p className="mt-1.5 text-[13.5px] text-mz-muted max-md:hidden">
                         First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
                         {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
                       </p>
@@ -388,16 +395,16 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
 
                 {c && alert && (
                   <Section title="What to do, and by when" inner>
-                    <p className="text-[17px] leading-snug font-medium">{alert.recommended_action}</p>
+                    <p className="text-[15.5px] leading-snug font-medium md:text-[17px]">{alert.recommended_action}</p>
                     {sensor ? (
-                      <p className="mt-1.5 text-[15px] leading-snug">
+                      <p className="mt-1 text-[14px] leading-snug md:mt-1.5 md:text-[15px]">
                         Check the sensor first. No need to stop or open the pump.
                         <span className="text-mz-muted"> Saves at least {euros(SENSOR_CHECK_SAVES_EUR)}.</span>
                       </p>
                     ) : (
-                      <p className="mt-1.5 text-[15px] leading-snug">
+                      <p className="mt-1 text-[14px] leading-snug md:mt-1.5 md:text-[15px]">
                         {advice?.headline}
-                        <span className="text-mz-muted"> Waiting risks {euros(BREAKDOWN_EUR - PLANNED_EUR)} more.</span>
+                        <span className="text-mz-muted max-md:hidden"> Waiting risks {euros(BREAKDOWN_EUR - PLANNED_EUR)} more.</span>
                       </p>
                     )}
                     <p className="mt-1 text-[12.5px] text-mz-muted">Advice only. Nothing is sent to the pump.</p>
@@ -420,7 +427,7 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                   setDetails(true);
                   if (sheet) settle(0);
                 }}
-                className="press mt-2 flex min-h-10 w-full items-center justify-center gap-1.5 border border-mz-line text-[14px] text-mz-accent hover:bg-mz-panel"
+                className="press mt-1.5 flex min-h-9 w-full items-center justify-center gap-1.5 border border-mz-line md:mt-2 md:min-h-10 text-[14px] text-mz-accent hover:bg-mz-panel"
               >
                 {details ? "Hide the evidence" : "Show the evidence, readings and costs"}
               </button>
@@ -454,6 +461,11 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
 
               {c && alert && pump && (
                 <Section title="Evidence">
+                  {/* On a phone this line moves here from What's wrong, to keep the top part short. */}
+                  <p className="mb-2 text-[13.5px] text-mz-muted md:hidden">
+                    First alert {c.firstNoticed}. {c.lead.alerts.length === 1 ? "One alert" : `${c.lead.alerts.length} alerts`} so far
+                    {c.others > 0 ? `, and ${c.others} other ${c.others === 1 ? "concern" : "concerns"} on this pump` : ""}.
+                  </p>
                   <Evidence c={c} alert={alert} pump={pump} meta={channelMeta} shiftHour={site.hour} />
                 </Section>
               )}
