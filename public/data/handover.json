@@ -1,0 +1,79 @@
+{
+ "detector": "B1 baseline",
+ "voice": "onwK4e9ZLuTAKqWW03F9",
+ "model": "eleven_v4",
+ "items": [
+  {
+   "hour": 30,
+   "label": "Day 2, morning shift",
+   "text": "Handover for Day 2, morning shift. 1 pump problem needs you today. Pump 4. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Also, 1 sensor reading needs checking. The pumps may be fine.",
+   "file": "h030.mp3"
+  },
+  {
+   "hour": 42,
+   "label": "Day 2, evening shift",
+   "text": "Handover for Day 2, evening shift. 3 pump problems need you today. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 9. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 4. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Also, 1 sensor reading needs checking. The pumps may be fine. 1 other thing can wait.",
+   "file": "h042.mp3"
+  },
+  {
+   "hour": 54,
+   "label": "Day 3, morning shift",
+   "text": "Handover for Day 3, morning shift. 3 pump problems need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 9. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, 2 sensor readings need checking. The pumps may be fine. 2 other things can wait.",
+   "file": "h054.mp3"
+  },
+  {
+   "hour": 66,
+   "label": "Day 3, evening shift",
+   "text": "Handover for Day 3, evening shift. 4 pump problems need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 1. Strainer is probably clogging. Check and clean it at the next stop. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. 1 more is on your list. Also, 5 sensor readings need checking. The pumps may be fine. 3 other things can wait.",
+   "file": "h066.mp3"
+  },
+  {
+   "hour": 78,
+   "label": "Day 4, morning shift",
+   "text": "Handover for Day 4, morning shift. 5 pump problems need you today. Pump 7. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. 2 more are on your list. Also, 7 sensor readings need checking. The pumps may be fine. 4 other things can wait.",
+   "file": "h078.mp3"
+  },
+  {
+   "hour": 90,
+   "label": "Day 4, evening shift",
+   "text": "Handover for Day 4, evening shift. 5 pump problems need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 6. Strainer is probably clogging. Check and clean it at the next stop. 2 more are on your list. Also, 6 sensor readings need checking. The pumps may be fine. 8 other things can wait.",
+   "file": "h090.mp3"
+  },
+  {
+   "hour": 102,
+   "label": "Day 5, morning shift",
+   "text": "Handover for Day 5, morning shift. 4 pump problems need you today. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 6. Strainer is probably clogging. Check and clean it at the next stop. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. 1 more is on your list. Also, 6 sensor readings need checking. The pumps may be fine. 11 other things can wait.",
+   "file": "h102.mp3"
+  },
+  {
+   "hour": 114,
+   "label": "Day 5, evening shift",
+   "text": "Handover for Day 5, evening shift. 4 pump problems need you today. Pump 6. Strainer is probably clogging. Check and clean it at the next stop. Pump 3. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. 1 more is on your list. Also, 5 sensor readings need checking. The pumps may be fine. 14 other things can wait.",
+   "file": "h114.mp3"
+  },
+  {
+   "hour": 126,
+   "label": "Day 6, morning shift",
+   "text": "Handover for Day 6, morning shift. 6 pump problems need you today. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 9. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 2. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. 3 more are on your list. Also, 4 sensor readings need checking. The pumps may be fine. 18 other things can wait.",
+   "file": "h126.mp3"
+  },
+  {
+   "hour": 138,
+   "label": "Day 6, evening shift",
+   "text": "Handover for Day 6, evening shift. 7 pump problems need you today. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 1. Strainer is probably clogging. Check and clean it at the next stop. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. 4 more are on your list. Also, 3 sensor readings need checking. The pumps may be fine. 21 other things can wait.",
+   "file": "h138.mp3"
+  },
+  {
+   "hour": 150,
+   "label": "Day 7, morning shift",
+   "text": "Handover for Day 7, morning shift. 6 pump problems need you today. Pump 7. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Pump 9. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. 3 more are on your list. Also, 3 sensor readings need checking. The pumps may be fine. 24 other things can wait.",
+   "file": "h150.mp3"
+  },
+  {
+   "hour": 162,
+   "label": "Day 7, evening shift",
+   "text": "Handover for Day 7, evening shift. 7 pump problems need you today. Pump 9. Strainer is probably clogging. Check and clean it at the next stop. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 2. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. 4 more are on your list. Also, 3 sensor readings need checking. The pumps may be fine. 25 other things can wait.",
+   "file": "h162.mp3"
+  }
+ ]
+}

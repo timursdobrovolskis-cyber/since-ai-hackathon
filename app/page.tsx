@@ -3,6 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useApp } from "@/components/AppProvider";
+import { HandoverPlayer } from "@/components/HandoverPlayer";
 import { CaseMark } from "@/components/Marks";
 import { age } from "@/lib/labels";
 import { plainAlert, pumpName } from "@/lib/plain";
@@ -53,6 +54,7 @@ export default function TodayPage() {
         <h1 className="font-cond text-3xl leading-tight font-semibold">{headline}</h1>
         {!nothing && <p className="text-ink-2">Newest first. Open a line to see what to do.</p>}
       </header>
+      <HandoverPlayer />
       <Group title="Needs you today" items={today} />
       <Group title="Check the reading" items={readings} />
       {wait.length > 0 && (
