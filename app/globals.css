@@ -323,3 +323,62 @@ input[type="range"] { accent-color: var(--ink); }
   .pump-card { transform: translateY(40px); }
   .pump-card[data-open="true"] { transform: none; }
 }
+
+/* Site map alternative 1: piping schematic. */
+.schem-pipe { stroke: var(--mz-ink); stroke-opacity: 0.5; stroke-width: 1.5; fill: none; }
+.schem-main { stroke-opacity: 0.7; stroke-width: 2.25; }
+.schem-arrowhead { fill: var(--mz-ink); fill-opacity: 0.7; }
+.schem-rule { stroke: var(--mz-line); }
+.schem-system { font: 500 14px var(--ff-geist); fill: var(--mz-ink); }
+.schem-name { font: 500 13.5px var(--ff-geist); fill: var(--mz-ink); }
+.schem-fault { font: 400 12px var(--ff-geist); fill: var(--mz-ink); }
+.schem-quiet { font: 400 12px var(--ff-geist); fill: var(--mz-muted); }
+.schem-mark { font: 700 13px var(--ff-geist); fill: white; pointer-events: none; }
+.schem-body { fill: white; stroke: var(--mz-ink); stroke-width: 1.75; transition: fill 250ms ease, stroke 250ms ease; }
+.schem-needs .schem-body { fill: var(--site-red); stroke: var(--site-red); }
+.schem-check .schem-body { fill: var(--site-orange); stroke: var(--site-orange); }
+.schem-needs .schem-fault { fill: #b4232a; }
+.schem-check .schem-fault { fill: #9a5300; }
+.schem-nodata .schem-body { stroke-dasharray: 3 3; stroke: var(--mz-muted); }
+.schem-nodata .schem-name { fill: var(--mz-muted); }
+.schem-selected { fill: none; stroke: var(--mz-accent); stroke-width: 2; }
+.schem-pump { cursor: pointer; outline: none; }
+.schem-pump .site-hit { fill: transparent; }
+.schem-pump:hover .site-hit { fill: var(--mz-panel); }
+.schem-pump:focus-visible .site-hit { stroke: var(--mz-accent); stroke-width: 2; }
+.schem-pump:hover .schem-name { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Site map alternative 2: alarm panel. A lit window flashes three times when it lights, as annunciators do. */
+.ann-window { cursor: pointer; min-height: 6.25rem; border: 1px solid var(--mz-line); border-radius: 8px; background: var(--mz-panel); color: var(--mz-muted); padding: 10px 11px; transition: background-color 250ms ease, border-color 250ms ease; }
+.ann-window:hover { border-color: rgb(11 16 20 / 0.35); }
+.ann-window:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
+.ann-selected { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
+.ann-wait, .ann-normal { background: white; color: var(--mz-ink); }
+.ann-wait .ann-status, .ann-normal .ann-status { color: var(--mz-muted); }
+.ann-nodata { border-style: dashed; background: transparent; }
+.ann-needs { background: #fdecec; border-color: var(--site-red); color: #5c1014; }
+.ann-check { background: #fff3e0; border-color: var(--site-orange); color: #4d2a00; }
+.ann-needs .ann-status::before, .ann-check .ann-status::before { content: none; }
+.ann-needs .ann-face, .ann-check .ann-face { animation: ann-flash 1.2s steps(1, end) 1; }
+@keyframes ann-flash { 0%, 33%, 66% { opacity: 0.35; } 16%, 50%, 83%, 100% { opacity: 1; } }
+
+/* Site map alternative 3: week timeline. */
+.tl-row { cursor: pointer; }
+.tl-row:hover, .tl-selected { background: var(--mz-panel); }
+.tl-row:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: -2px; }
+.tl-selected { box-shadow: inset 0 0 0 1px var(--mz-accent); }
+.tl-tick { background: var(--mz-ink); }
+.tl-now { background: var(--mz-accent); }
+.tl-nodata { background: transparent; border-top: 1px dashed var(--mz-muted); height: 0; }
+.tl-needs { background: var(--site-red); }
+.tl-check { background: var(--site-orange); }
+.tl-wait { background: #c7cad3; }
+.tl-normal { background: var(--site-green); }
+.tl-dot.tl-nodata { border: 1px dashed var(--mz-muted); }
+.tl-bar { opacity: 0.85; }
+@media (prefers-reduced-motion: reduce) {
+  .ann-needs .ann-face, .ann-check .ann-face { animation: none; }
+}
+
+/* The map switch shows with the map. */
+.welcome-mapswitch { opacity: calc((var(--p) - 0.8) * 6); }

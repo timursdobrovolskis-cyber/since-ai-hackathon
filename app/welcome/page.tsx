@@ -15,6 +15,9 @@ import { useConcern } from "@/components/welcome/concerns";
 import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
 import { RoomStage } from "@/components/welcome/RoomStage";
+import { MapAnnunciator } from "@/components/welcome/MapAnnunciator";
+import { MapSchematic } from "@/components/welcome/MapSchematic";
+import { MapTimeline } from "@/components/welcome/MapTimeline";
 import { SiteMap, useSite } from "@/components/welcome/SiteMap";
 import { PumpDashboard } from "@/components/welcome/PumpDashboard";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
@@ -24,6 +27,15 @@ import { SHIFT_HOUR } from "@/lib/labels";
 function Corner({ className }: { className: string }) {
   return <span aria-hidden className={`welcome-corner absolute size-1.5 ${className}`} />;
 }
+
+/** Site map alternatives to compare. `?map=` picks one; the switch at the bottom of the map changes it. */
+const MAPS = [
+  { key: "schematic", label: "Schematic", View: MapSchematic },
+  { key: "panel", label: "Alarm panel", View: MapAnnunciator },
+  { key: "timeline", label: "Timeline", View: MapTimeline },
+  { key: "current", label: "Current", View: SiteMap },
+] as const;
+type MapKey = (typeof MAPS)[number]["key"];
 
 /** True on phone-sized screens, where the pump ends above the map instead of beside it. */
 function useCompact() {
@@ -46,6 +58,19 @@ export default function Welcome() {
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
   const concern = useConcern(site, selected);
+  const [mapKey, setMapKey] = useState<MapKey>("schematic");
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("map");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the address bar is only readable after mount
+    if (MAPS.some((m) => m.key === wanted)) setMapKey(wanted as MapKey);
+  }, []);
+  const pickMap = (key: MapKey) => {
+    setMapKey(key);
+    const url = new URL(window.location.href);
+    url.searchParams.set("map", key);
+    window.history.replaceState(null, "", url);
+  };
+  const MapView = MAPS.find((m) => m.key === mapKey)!.View;
   // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
   const [solid, setSolid] = useState(false);
   useEffect(() => {
@@ -117,11 +142,31 @@ export default function Welcome() {
 
           {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
           <div className="welcome-map absolute inset-x-0 top-[34svh] bottom-0 flex flex-col px-5 pt-2 md:inset-y-0 md:top-0 md:right-auto md:w-1/2 md:justify-center md:px-10 md:pt-16 lg:px-16">
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted md:mb-4">02 &middot; Site map</p>
-            <SiteMap site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />
+            <MapView site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />
           </div>
 
           <PumpCard id={selected} site={site} onClose={close} />
+
+          {/* Temporary: compare the site map alternatives, then keep one. */}
+          <div
+            role="group"
+            aria-label="Site map style"
+            className={`welcome-mapswitch absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-mz-line bg-white/95 p-1 text-[13px] shadow-[0_8px_24px_-12px_rgb(11_16_20/0.35)] backdrop-blur ${mapReady ? "" : "pointer-events-none"}`}
+          >
+            <span className="hidden px-2.5 text-mz-muted sm:inline">Map</span>
+            {MAPS.map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                aria-pressed={mapKey === m.key}
+                tabIndex={mapReady ? 0 : -1}
+                onClick={() => pickMap(m.key)}
+                className={`min-h-9 rounded-full px-2.5 whitespace-nowrap transition-colors sm:px-3.5 ${mapKey === m.key ? "bg-mz-ink text-white" : "hover:bg-mz-panel"}`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

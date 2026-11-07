@@ -18,11 +18,12 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Phones: one column, pump above the map, pump card as a bottom sheet, step list as a plain list.
 - The pump dashboard replaced the step list: every pump, and one report at a time with what's wrong, evidence, how sure, what to do and Acknowledge, Dismiss or Escalate. Results, cards and closing are set aside for now.
 - The pump turn is shorter: a quarter turn at the same pace.
+- Three site map alternatives to compare, with a switch under the map (`?map=schematic`, `panel`, `timeline`, `current`): a piping schematic, an alarm panel and a week timeline. Each names what is wrong and since when.
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona's look at the pump dashboard.
+Nothing. Waiting for Jona to pick a site map alternative. Then remove the others and the switch, and fit the chosen one to phones.
 
 ## Next
 
