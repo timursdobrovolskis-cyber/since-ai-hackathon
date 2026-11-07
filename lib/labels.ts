@@ -23,7 +23,24 @@ export const TIER_LABEL: Record<string, string> = {
   T2_FULL: "Full sensors",
 };
 
-/** Day and hour on the aligned replay clock. Hour 0 is Day 1 00:00. */
+// The app shows one fixed shift from the test week: Day 3 evening. Change this one number after swapping in new alerts,
+// then rerun `npm run handover`. Screens use only data at or before it.
+export const SHIFT_HOUR = 66;
+
+const whole = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
+
+/** "5 hours ago" or "3 days ago". */
+export function ago(hours: number) {
+  if (hours < 1) return "less than an hour ago";
+  return hours < 48 ? `${whole(Math.round(hours), "hour")} ago` : `${whole(Math.round(hours / 24), "day")} ago`;
+}
+
+/** Clock time a decision was recorded, on this device. */
+export function timeOf(iso: string) {
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+/** Day and hour across the test week, for the Review timeline. Hour 0 is Day 1 00:00. */
 export function clock(hour: number) {
   if (hour >= 168) return "End of week";
   const h = Math.max(0, hour);

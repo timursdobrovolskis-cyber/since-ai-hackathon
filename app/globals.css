@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* Calm industrial, after ISA-101: greys carry everything, and colour means something needs attention.
    Normal has no colour on purpose. */
 :root {
@@ -18,6 +20,54 @@
   --sensor: #5a3fb0;
   --unknown: #3d4a52;
   --cursor: #1f2629;
+
+  /* Landing page (/welcome), after meuze.ai: ink and white, one accent blue. */
+  --mz-ink: #0b1014;
+  --mz-panel: #f6f6f8;
+  --mz-line: #e6e7ec;
+  --mz-muted: #6e7180;
+  --mz-accent: #2c63ff;
+  /* The accent lightened for small text on the ink background, where #2c63ff falls below 4.5:1. */
+  --mz-accent-soft: #86a6ff;
+  /* Site map lights, the only colours besides ink, white and the accent. */
+  --site-red: #e5484d;
+  --site-orange: #f08c00;
+  --site-green: #30a46c;
+  --chart-1: oklch(0.585 0.233 277.117);
+  --chart-2: oklch(0.852 0.199 91.936);
+  --chart-3: oklch(0.667 0.295 322.15);
+  --chart-4: oklch(0.56 0.021 213.5);
+  --chart-5: oklch(0 0 0);
+  --chart-positive: oklch(0.696 0.17 162.48);
+  --chart-negative: oklch(0.637 0.237 25.331);
+  --chart-background: oklch(1 0 0);
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: oklch(0.55 0.014 260);
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: var(--popover);
+  --chart-tooltip-foreground: var(--popover-foreground);
+  --chart-tooltip-muted: var(--muted-foreground);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: oklch(0.45 0.01 260);
+  --chart-scale-mix: oklch(1 0 0);
+  --chart-scale-01: oklch(0.922 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(1 0 0);
+  --chart-indicator-color: oklch(0.21 0.006 285);
+  --chart-indicator-secondary-color: oklch(0.913 0 0);
+  --chart-marker-badge-background: oklch(0 0 0);
+  --chart-marker-badge-foreground: oklch(0.84 0 0);
+  --chart-segment-background: oklch(0.756 0 0 / 0.06);
+  --chart-segment-line: oklch(0.5 0 0 / 0.25);
 }
 
 @theme inline {
@@ -30,23 +80,76 @@
   --color-line: var(--line);
   --color-machine: var(--machine);
   --color-sensor: var(--sensor);
-  --font-sans: var(--font-barlow);
-  --font-cond: var(--font-barlow-cond);
+  --color-mz-ink: var(--mz-ink);
+  --color-mz-panel: var(--mz-panel);
+  --color-mz-line: var(--mz-line);
+  --color-mz-muted: var(--mz-muted);
+  --color-mz-accent: var(--mz-accent);
+  --color-mz-accent-soft: var(--mz-accent-soft);
+  --color-site-red: var(--site-red);
+  --font-sans: var(--ff-geist);
+  --font-geist: var(--ff-geist);
+  --font-mono: var(--ff-mono);
+  --color-chart-line-primary: var(--chart-line-primary);
+  --color-chart-line-secondary: var(--chart-line-secondary);
+  --color-chart-brush-border: var(--chart-brush-border);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-segment-line: var(--chart-segment-line);
+  --color-chart-segment-background: var(--chart-segment-background);
+  --color-chart-marker-badge-foreground: var(--chart-marker-badge-foreground);
+  --color-chart-marker-badge-background: var(--chart-marker-badge-background);
+  --color-chart-indicator-secondary-color: var(--chart-indicator-secondary-color);
+  --color-chart-indicator-color: var(--chart-indicator-color);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --chart-scale-05: var(--chart-scale-05);
+  --chart-scale-04: var(--chart-scale-04);
+  --chart-scale-03: var(--chart-scale-03);
+  --chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-scale-mix: var(--chart-scale-mix);
+  --color-chart-label: var(--chart-label);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --chart-tooltip-muted: var(--chart-tooltip-muted);
+  --chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --chart-tooltip-background: var(--chart-tooltip-background);
+  --chart-brush-border: var(--chart-brush-border);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --chart-line-secondary: var(--chart-line-secondary);
+  --chart-line-primary: var(--chart-line-primary);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --color-chart-negative: var(--chart-negative);
+  --color-chart-positive: var(--chart-positive);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
 }
 
 html, body { height: 100%; }
 
 body {
-  background: var(--deck);
-  color: var(--ink);
-  font-family: var(--font-barlow), system-ui, sans-serif;
+  background: white;
+  color: var(--mz-ink);
+  font-family: var(--ff-geist), system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
 
 button { cursor: pointer; }
 
@@ -56,28 +159,220 @@ input[type="range"] { accent-color: var(--ink); }
   * { animation: none !important; transition: none !important; }
 }
 
-/* uPlot hover readout */
-.uplot .u-legend { display: none; }
 
-/* Isometric case board, in the app's greys */
-.case-board {
-  --ik-panel: var(--panel);
-  --ik-top: var(--raised);
-  --ik-front: #e0e3e5;
-  --ik-side: var(--line-soft);
-  --ik-line: var(--ink-3);
-  --ik-detail: var(--line);
-  --ik-live: var(--ink);
-  --ik-ink: var(--ink-2);
-  --ik-screen: var(--ink);
-  --ik-screen-ink: var(--raised);
-  --ik-border: transparent;
-  --ik-screen-font: var(--font-barlow-cond), sans-serif;
-  border: 0;
-  background: none;
+
+/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame.
+   --g is the ink-to-white fade, 0 until p = 0.6 and 1 from p = 0.72. It is kept short because the middle of any
+   fade is mid grey, where no line colour reads well. PumpStage uses the same window for the pump's lines. */
+.welcome-stage {
+  --g: clamp(0, (var(--p) - 0.6) * 8.333, 1);
+  background: color-mix(in srgb, var(--mz-ink), white calc(var(--g) * 100%));
+}
+.welcome-grid {
+  opacity: calc(1 - var(--g));
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: center;
+}
+.welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
+.welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
+/* The realistic engine room hands over to the line work between room 0.86 and 0.97. */
+.welcome-room { opacity: calc(1 - (var(--r) - 0.86) * 9); }
+.welcome-map {
+  opacity: calc((var(--p) - 0.74) * 6);
+  transform: translateX(calc((1 - clamp(0, (var(--p) - 0.7) * 5, 1)) * -40px));
 }
 
-.case-board .slab { transition: opacity 180ms ease; transition-delay: calc(var(--day) * 20ms); }
-.case-board .slab[data-on="false"] { opacity: 0; }
-.case-board .board-led { fill: var(--ik-line); }
-.case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
+/* Site map (part 2). The label "01" fades out as the map arrives, so only one section number shows. */
+.site-red { fill: var(--site-red); background: var(--site-red); }
+.site-orange { fill: var(--site-orange); background: var(--site-orange); }
+.site-green { fill: var(--site-green); background: var(--site-green); }
+.site-swatch-empty { border: 1px dashed var(--mz-muted); }
+
+
+/* Pump card: slides in from the right when a pump is picked. */
+.pump-card {
+  opacity: 0;
+  transform: translateX(32px);
+  pointer-events: none;
+  transition: opacity 220ms ease-out, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pump-card[data-open="true"] { opacity: 1; transform: none; pointer-events: auto; }
+/* Keyboard users see where focus went when the card opens. A mouse click shows no ring. */
+.pump-card:focus-visible { outline: 1.5px solid var(--mz-accent); outline-offset: -1px; }
+.card-sensor-flagged { background: var(--mz-accent); }
+.card-sensor-has { background: var(--mz-ink); }
+.card-sensor-missing { border: 1px dashed var(--mz-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .pump-card { transition: opacity 150ms linear; transform: none; }
+}
+
+.dark {
+  --chart-1: oklch(0.585 0.233 277.117);
+  --chart-2: oklch(0.852 0.199 91.936);
+  --chart-3: oklch(0.667 0.295 322.15);
+  --chart-4: oklch(0.56 0.021 213.5);
+  --chart-5: oklch(1 0 0);
+  --chart-positive: oklch(0.765 0.177 163.223);
+  --chart-negative: oklch(0.704 0.191 22.216);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-mix: oklch(0.25 0 0);
+  --chart-scale-01: oklch(0.3 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
+  --chart-indicator-color: oklch(1 0 0);
+  --chart-indicator-secondary-color: oklch(0.145 0 0);
+  --chart-marker-badge-background: oklch(1 0 0);
+  --chart-marker-badge-foreground: oklch(0.15 0 0);
+  --chart-segment-background: oklch(0.41 0.0127 248.14 / 0.25);
+  --chart-segment-line: oklch(1 0 0 / 0.25);
+}
+
+/* Charts on the landing page (bklit-ui): its tokens mapped to the landing page palette. */
+.welcome {
+  --chart-1: var(--mz-accent);
+  --chart-line-primary: var(--mz-accent);
+  --chart-grid: var(--mz-line);
+  --chart-label: var(--mz-muted);
+  --chart-foreground: var(--mz-ink);
+  --chart-foreground-muted: var(--mz-muted);
+  --chart-crosshair: var(--mz-ink);
+  --chart-indicator-color: var(--mz-ink);
+  --chart-background: white;
+  --chart-tooltip-background: white;
+  --chart-tooltip-foreground: var(--mz-ink);
+  --chart-tooltip-muted: var(--mz-muted);
+  --chart-marker-background: white;
+  --chart-marker-border: var(--mz-accent);
+  --chart-marker-foreground: var(--mz-accent);
+  --popover: white;
+  --popover-foreground: var(--mz-ink);
+  --muted-foreground: var(--mz-muted);
+  /* The expected band behind a reading. */
+  --welcome-band: rgb(11 16 20 / 0.07);
+  --welcome-band-edge: rgb(11 16 20 / 0.28);
+}
+
+/* Phones: the pump card is a sheet that slides up from the bottom. */
+@media (max-width: 767px) {
+  .pump-card { transform: translateY(40px); }
+  .pump-card[data-open="true"] { transform: none; }
+}
+
+
+/* Alarm panel: one window per pump. Solid red needs you, amber tint is a reading to check, the rest stay quiet. */
+.ann {
+  cursor: pointer; min-height: 5.25rem; padding: 11px 12px;
+  background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line);
+  transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease, opacity 160ms ease;
+}
+.ann:hover { box-shadow: inset 0 0 0 1px rgb(11 16 20 / 0.32); }
+.ann:focus-visible, .ann-on { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
+.ann-text { color: var(--mz-muted); }
+.ann-since { color: var(--mz-muted); }
+.ann-wait .ann-text { color: var(--mz-ink); }
+.ann-needs { background: #b42318; color: white; box-shadow: none; }
+.ann-needs:hover { background: #9c1d13; box-shadow: none; }
+.ann-needs .ann-text, .ann-needs .ann-since { color: rgb(255 255 255 / 0.88); }
+.ann-check { background: #fff4e2; box-shadow: inset 0 0 0 1px #e7a64a; }
+.ann-check:hover { box-shadow: inset 0 0 0 1px #b86e00; }
+.ann-check svg { color: #9a5300; }
+.ann-check .ann-text { color: #4d2a00; }
+.ann-check .ann-since { color: #7a4300; }
+.ann-nodata { background: transparent; box-shadow: none; border: 1px dashed rgb(11 16 20 / 0.22); color: var(--mz-muted); }
+.ann-needs .ann-face, .ann-check .ann-face { animation: ann-flash 1.2s steps(1, end) 1; }
+@keyframes ann-flash { 0%, 33%, 66% { opacity: 0.3; } 16%, 50%, 83%, 100% { opacity: 1; } }
+.ann-key { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
+.ann-key-needs { background: #b42318; color: white; }
+.ann-key-check { background: #fff4e2; box-shadow: inset 0 0 0 1px #e7a64a; color: #9a5300; }
+.ann-key-normal { background: white; box-shadow: inset 0 0 0 1px var(--mz-line); }
+.ann-key-nodata { border: 1px dashed rgb(11 16 20 / 0.3); }
+@media (prefers-reduced-motion: reduce) {
+  .ann-needs .ann-face, .ann-check .ann-face { animation: none; }
+}
+
+/* The 3D pump flickers out when a pump card opens, like a display losing its picture, and fades back when it closes. */
+.pump-stage { transition: opacity 260ms ease-out; }
+.pump-stage[data-gone="true"] { opacity: 0; animation: pump-flicker 420ms steps(1, end) 1; }
+@keyframes pump-flicker { 0% { opacity: 1; } 14% { opacity: 0.25; } 28% { opacity: 0.9; } 42% { opacity: 0.1; } 60% { opacity: 0.55; } 78%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pump-stage[data-gone="true"] { animation: none; }
+}
+.ann-decided { color: var(--mz-accent); }
+.ann-needs .ann-decided { color: white; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Results: the faults behind a row open in place. */
+.results-detail { animation: results-open 220ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes results-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .results-detail { animation: none; } }
+
+/* Pump card: a reading under "Readings now" that can be shown in the evidence chart. */
+.reading-pick { cursor: pointer; transition: background-color 120ms ease; padding-inline: 6px; margin-inline: -6px; width: calc(100% + 12px); }
+.reading-pick:hover, .reading-pick:focus-visible { background: var(--mz-panel); }
+.reading-pick[aria-pressed="true"] { background: var(--mz-panel); box-shadow: inset 2px 0 0 var(--mz-accent); }
+.reading-pick:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 0; }
+
+/* Alarm panel filter: pumps that do not match are dimmed, not hidden, so each pump keeps its place. */
+.ann[data-dim] { opacity: 0.22; }
+.ann[data-dim]:hover, .ann[data-dim]:focus-visible, .ann[data-dim].ann-on { opacity: 0.6; }
+.ann-filter { box-shadow: inset 0 0 0 1px rgb(11 16 20 / 0.18); transition: background-color 120ms ease, box-shadow 120ms ease, color 120ms ease; }
+.ann-filter:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--mz-ink); }
+.ann-filter-on { background: var(--mz-ink); color: white; box-shadow: none; }
+.ann-filter-on:hover:not(:disabled) { box-shadow: none; }
+.ann-filter:disabled { cursor: default; }
+
+/* Top bar: solid in both tones, with the current section underlined in the accent along the bar's bottom edge. */
+.top-bar { transition: background-color 240ms ease, box-shadow 240ms ease, color 240ms ease; backdrop-filter: blur(10px); }
+.top-bar[data-tone="ink"] { background: rgb(11 16 20 / 0.9); color: white; box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.12); }
+.top-bar[data-tone="white"] { background: rgb(255 255 255 / 0.92); color: var(--mz-ink); box-shadow: inset 0 -1px 0 var(--mz-line); }
+.top-bar-link { opacity: 0.68; }
+.top-bar-link:hover, .top-bar-on { opacity: 1; }
+.top-bar-on::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: var(--mz-accent); }
+@media (prefers-reduced-motion: reduce) { .top-bar { transition: none; } }
+
+/* Scroll progress (components/welcome/ScrollProgress.tsx): the rail fills from --page, the frame trace from --t on <html>. */
+.progress-rail-track { background: rgb(127 127 127 / 0.35); }
+.progress-rail-fill { background: var(--mz-accent); height: calc(var(--page, 0) * 100%); }
+.progress-rail-dot { background: var(--mz-accent); box-shadow: 0 0 0 3px var(--rail-bg); transition: transform 160ms ease; }
+.progress-rail-point[aria-current] .progress-rail-dot { transform: scale(1.5); }
+.progress-rail[data-tone="ink"] { --rail-bg: var(--mz-ink); }
+.progress-rail[data-tone="white"] { --rail-bg: white; }
+.progress-rail-label { transition: opacity 160ms ease; }
+.progress-rail[data-tone="ink"] .progress-rail-label { background: var(--mz-ink); color: white; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28); }
+.progress-rail[data-tone="white"] .progress-rail-label { background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line); }
+.progress-frame { stroke: var(--mz-accent); stroke-width: 1.5; stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--t, 0)); vector-effect: non-scaling-stroke; }
+
+/* Square corners everywhere (Jona, 7 Nov): no pills, rounded cards or dots on the site. This also covers the chart
+   library's own parts (tooltip panel, date pill, marker), which set their radius inline. SVG circles are handled in
+   SignalChart (square tooltip ring) and components/charts/markers/marker-group.tsx (square markers). */
+.welcome :is(*, *::before, *::after) { border-radius: 0 !important; }
+
+/* Press feedback on pointer-down, before the click lands. */
+.press { transition: scale 90ms ease-out, background-color 120ms ease, box-shadow 120ms ease, color 120ms ease; }
+.press:active:not(:disabled) { scale: 0.97; }
+.ann:active { scale: 0.985; }
+@media (prefers-reduced-motion: reduce) { .press:active:not(:disabled), .ann:active { scale: none; } }
+
+/* Pump card on a phone: a sheet moved by script (PumpCard.tsx), so its transform has no CSS transition. Collapsed,
+   it shows the top part only and does not scroll. */
+.pump-card[data-sheet] { transition: opacity 220ms ease-out; touch-action: pan-y; }
+.pump-card[data-sheet]:not([data-expanded]) { overflow-y: hidden; }
+.pump-card[data-sheet] .sheet-grip { touch-action: none; cursor: grab; }
+/* A reading the evidence already charts. */
+.reading-named { box-shadow: inset 2px 0 0 var(--mz-accent); padding-inline: 6px; margin-inline: -6px; width: calc(100% + 12px); }

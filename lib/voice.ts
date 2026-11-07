@@ -1,4 +1,4 @@
-// What the voice assistant is told about one pump. Built only from what is known at the replay hour, and never from labels.
+// What the voice assistant is told about one pump. Built only from what is known at this shift, and never from labels.
 import { plainAlert, pumpName } from "./plain.ts";
 import type { TrackRecord } from "./trust.ts";
 import type { Case, Fleet, PumpData, PumpMeta } from "./types.ts";

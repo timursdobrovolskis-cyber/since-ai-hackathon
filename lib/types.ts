@@ -107,9 +107,11 @@ export type Case = {
   latest: Alert;
 };
 
-export type DecisionKind = "approved" | "rejected" | "watching";
+/** approved: I'll check it. rejected: not a problem. watching: remind me later. escalated: passed to the duty engineer. */
+export type DecisionKind = "approved" | "rejected" | "watching" | "escalated";
 
-export type Finding = "found" | "other" | "nothing";
+/** What the worker found on site after acknowledging: the named fault, another one, nothing, or not sure yet. */
+export type Finding = "found" | "other" | "nothing" | "unsure";
 
 export type Decision = {
   caseId: string;
@@ -120,7 +122,9 @@ export type Decision = {
   followUpHour?: number;
   /** What the worker found when they checked. */
   finding?: Finding;
-  /** Replay hour when the decision was made. */
+  /** The fault type the worker found instead, when finding is "other". */
+  foundType?: string;
+  /** The shift hour when the decision was made. */
   atHour: number;
   decidedAt: string;
 };

@@ -1,5 +1,5 @@
 // The Today list: one line per pump. Newest first by a simple rule, not a claim about true urgency, and a detector that
-// estimates time to the limit can replace this later. Works only on cases known at the replay hour.
+// estimates time to the limit can replace this later. Works only on cases known at this shift.
 import { TRUST_RANK, trustFor, type TrackRecord } from "./trust.ts";
 import type { Case, Decision, PumpData } from "./types.ts";
 import { workSince } from "./worker.ts";
