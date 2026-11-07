@@ -32,7 +32,8 @@ export function CaseEvidence({ item, meta }: { item: Case; meta: PumpMeta }) {
     <>
       <section aria-labelledby="evidence">
         <h2 id="evidence" className="font-cond text-lg font-semibold">What the sensors show</h2>
-        <p>{alert.evidence.sensor_check ?? alert.evidence.summary}</p>
+        <p>{alert.evidence.summary}</p>
+        {alert.evidence.sensor_check && <p className="text-ink-2">{alert.evidence.sensor_check}</p>}
         <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 md:grid-cols-2">
           {charts.map((c, index) => (
             <EvidenceChart

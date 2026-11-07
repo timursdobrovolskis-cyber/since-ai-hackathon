@@ -64,7 +64,7 @@ export function DecisionPanel({ item }: { item: Case }) {
         <button type="button" aria-expanded={mode === "later"} className={`${button} border-line bg-raised`} onClick={() => setMode(mode === "later" ? "none" : "later")}>Remind me later</button>
         <button type="button" aria-expanded={mode === "reject"} className={`${button} border-line bg-raised`} onClick={() => setMode(mode === "reject" ? "none" : "reject")}>Not a problem</button>
       </div>
-      <p className="mt-1.5 text-[13px] text-ink-3">This only records your decision. Nothing is sent to the machine.</p>
+      <p className="mt-1.5 text-[13px] text-ink-3">Confirm the alert by taking it, set a reminder, or dismiss it with a reason. This only records your decision; nothing is sent to the machine.</p>
       {mode === "reject" && (
         <div className="mt-3 flex flex-wrap items-end gap-2">
           <label className="flex flex-col text-[13px] text-ink-2">

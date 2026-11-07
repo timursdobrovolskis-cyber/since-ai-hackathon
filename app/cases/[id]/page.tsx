@@ -10,6 +10,7 @@ import { DecisionPanel } from "@/components/DecisionPanel";
 import { ExplanationPanel } from "@/components/ExplanationPanel";
 import { CaseMark, classLabel } from "@/components/Marks";
 import { TrustLine } from "@/components/ui/trust-line";
+import { certainty } from "@/lib/cases";
 import { clock } from "@/lib/labels";
 import { JOB_HOURS, plainAlert, pumpName } from "@/lib/plain";
 import { lastDone, nextStop, workSince } from "@/lib/worker";
@@ -78,6 +79,18 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
           </ul>
         </section>
       )}
+
+      <section aria-label="Why this alert" className="rounded-md border border-line bg-panel px-4 py-3">
+        <h2 className="font-cond text-lg font-semibold">Why this alert</h2>
+        <p>{item.latest.evidence.summary}</p>
+        {item.latest.evidence.sensor_check && <p className="mt-1 text-ink-2">{item.latest.evidence.sensor_check}</p>}
+        {item.latest.what_would_settle_it && <p className="mt-1"><span className="font-medium">To settle it: </span>{item.latest.what_would_settle_it}</p>}
+        <p className="mt-1 text-[13px] text-ink-3">
+          {certainty(item.latest.confidence, item.latest.confidence_calibrated)
+            ? `${certainty(item.latest.confidence, item.latest.confidence_calibrated)} certainty: this cause was right ${Math.round(item.latest.confidence * 100)} % of the time on the pumps the detector learned from.`
+            : "Certainty not calibrated for this cause."}
+        </p>
+      </section>
 
       <DecisionPanel item={item} />
 

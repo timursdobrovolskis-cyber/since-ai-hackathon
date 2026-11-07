@@ -70,7 +70,9 @@ def write_json(pred: pd.DataFrame, path: Path, calib: dict) -> None:
                     "event_class": r.event_class, "fault_type": r.fault_type, "confidence": round(top, 2),
                     "recommended_action": r.recommended_action, "detector_version": VERSION,
                     "confidence_calibrated": r.fault_type in calib["by_type"],
-                    "hypotheses": ranked, "evidence": {"summary": r.evidence}})
+                    "hypotheses": ranked, "what_would_settle_it": getattr(r, "what_would_settle_it", None),
+                    "evidence": {"summary": r.evidence, "channels": r.channels if isinstance(r.channels, list) else [],
+                                 "sensor_check": getattr(r, "sensor_check", None)}})
     path.write_text(json.dumps({"source": VERSION, "calibration": calib, "alerts": out}, indent=1), encoding="utf-8")
 
 

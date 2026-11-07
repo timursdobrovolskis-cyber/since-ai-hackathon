@@ -112,4 +112,13 @@ One command: `.venv/bin/python detector/run.py` (mode `own`) writes `detector/re
   `detector/results/final_scores.md`.
 - Causality: `detector/causality_check.py --cuts 3` passes on all 9 labelled pumps (27 cuts).
 
+## App mapping (done)
+
+The detector now fills every field the case screen expects (docs/spec.md section 8): ranked hypotheses with calibrated
+probabilities, `evidence.channels` (measured, expected, deviation for the signals the rule read), `evidence.sensor_check`
+(whether related signals moved together or one instrument moved alone) and `what_would_settle_it` (what the operator can
+check on the spot). The case page shows a "Why this alert" block with these, right above the operator's decision
+(I'll check it / Remind me later / Not a problem, then "what did you find"), so every alarm is confirmed or dismissed
+with the explanation in view. Checked in the browser on PUMP-08's strainer case at replay hour 90.
+
 ## Done = beats B1 on train + validation combined (84.4 vs 63.4), is causal, and the app runs with our alerts.

@@ -127,6 +127,13 @@ def physics_frame(g: pd.DataFrame, a: pd.Series) -> pd.DataFrame:
         g[f"res_{k}"] = s - med
         g[f"pz_{k}"] = g[f"res_{k}"] / max(mad if pd.notna(mad) else 0.0, FLOOR.get(k, 1.0))
 
+    # ---- expected value for channels without a physics prediction: the regime median of the learning period (B1's recipe)
+    for k in CH:
+        if have[k] and f"pred_{k}" not in g:
+            col = f"{CH[k]}__mean"
+            med = g.loc[base].groupby("regime")[col].median()
+            g[f"exp_{k}"] = g["regime"].map(med).fillna(g.loc[base, col].median())
+
     # ---- system curves: each pressure against a + b Q^2 fitted on the baseline, at the load-side flow --------------------
     # A clogged strainer pulls the suction pressure below its system curve while the pump stays on its own curve;
     # a discharge restriction pushes the discharge pressure above its system curve at the same flow.
