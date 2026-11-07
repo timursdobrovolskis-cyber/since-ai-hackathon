@@ -55,7 +55,7 @@ function unknownNumbers(text: string, input: string) {
   return (text.match(/\d+(?:\.\d+)?/g) ?? []).filter((n) => !inInput.has(n));
 }
 
-const { alerts } = read<{ alerts: Alert[] }>("alerts.json");
+const { alerts, source } = read<{ alerts: Alert[]; source: string }>("alerts.json");
 const fleet = read<{ pumps: Pump[]; channelMeta: Record<string, { label: string; unit: string }> }>("fleet.json");
 const chosen = DEMO_ALERTS.map((id) => {
   const alert = alerts.find((a) => a.alert_id === id);
@@ -106,6 +106,6 @@ for (const { alert, prompt } of chosen) {
 }
 
 writeFileSync(new URL("../public/data/explanations.json", import.meta.url),
-  JSON.stringify({ model: MODEL, detector: "B1 baseline", items }, null, 1));
+  JSON.stringify({ model: MODEL, detector: source, items }, null, 1));
 const cost = (input * 4 + output * 20) / 1e6;
 console.log(`Stored ${Object.keys(items).length} of ${chosen.length}. ${input} input and ${output} output tokens, about USD ${cost.toFixed(3)} at list price.`);

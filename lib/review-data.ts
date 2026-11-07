@@ -43,7 +43,7 @@ export type PerEvent = {
 
 export type Scorecard = {
   alertSource: string;
-  totals: Record<"plant" | "current", Record<"all" | "train" | "validation", Scores>>;
+  totals: Record<"plant" | "baseline" | "current", Record<"all" | "train" | "validation", Scores>>;
   pumps: Record<string, {
     perEvent: PerEvent[];
     falseAlertIds: string[];

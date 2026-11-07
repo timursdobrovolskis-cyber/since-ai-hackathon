@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import type { Case } from "@/lib/types";
+import { useApp } from "./AppProvider";
 
-type Stored = { items: Record<string, { text: string }> };
+type Stored = { detector: string; items: Record<string, { text: string }> };
 
 /**
  * Plain-language explanation stored by tools/build_explanations.ts. Most alerts have none, so the panel stays hidden.
  * A case only holds alerts up to the replay time, so the newest match can never come from the future.
  */
 export function ExplanationPanel({ item }: { item: Case }) {
+  const { alertSource } = useApp();
   const [stored, setStored] = useState<Stored | null>(null);
 
   useEffect(() => {
@@ -25,8 +27,10 @@ export function ExplanationPanel({ item }: { item: Case }) {
     };
   }, []);
 
-  const match = [...item.alerts].reverse().find((a) => stored?.items[a.alert_id]);
-  if (!match || !stored) return null;
+  // Alert ids restart when the alerts change, so text written for another detector must never attach to these alerts.
+  if (!stored || stored.detector !== alertSource) return null;
+  const match = [...item.alerts].reverse().find((a) => stored.items[a.alert_id]);
+  if (!match) return null;
 
   return (
     <section aria-labelledby="plain">

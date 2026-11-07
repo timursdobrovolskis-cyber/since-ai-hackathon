@@ -25,6 +25,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+# B1's diagnosis loops over a Python set, so its order, and so some named causes, change from run to run.
+# A fixed hash seed makes every build identical. It only takes effect at startup, so restart once if needed.
+if os.environ.get("PYTHONHASHSEED") != "0":
+    os.execve(sys.executable, [sys.executable, *sys.argv], {**os.environ, "PYTHONHASHSEED": "0"})
+
 REPO = Path(__file__).resolve().parent.parent
 ROOT = Path(os.environ.get("RETROFIT_DATA_ROOT", REPO.parent / "RETROFIT_AI_PARTICIPANTS_2026"))
 sys.path.insert(0, str(ROOT / "src"))

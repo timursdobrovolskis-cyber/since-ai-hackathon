@@ -65,7 +65,8 @@ export default function ReviewPage() {
   const firstAlerts = Object.fromEntries(score.perEvent.map((r) => [r.eventId, r.firstAlertHour]));
   const scored = events.filter((e) => e.observable);
   const hidden = events.filter((e) => !e.observable);
-  const { plant, current } = card.totals;
+  const { plant, baseline, current } = card.totals;
+  const placeholder = card.alertSource === "B1 baseline";
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4">
@@ -75,7 +76,7 @@ export default function ReviewPage() {
           This view opens the labelled faults, which the live screens never load. Every result comes from the challenge&rsquo;s official scorer, on the {fleet.pumps.length} labelled pumps.
         </p>
         <p className="mt-1 text-ink-2">
-          Current alerts come from the {card.alertSource}, a placeholder until the team&rsquo;s detector is connected. All data is simulated, so these results are not evidence of performance on real pumps.
+          {placeholder ? "Current alerts come from the B1 baseline, a placeholder until the team\u2019s detector is connected." : `Current alerts come from ${card.alertSource}.`} All data is simulated, so these results are not evidence of performance on real pumps.
         </p>
       </header>
 
@@ -86,6 +87,7 @@ export default function ReviewPage() {
             <tr className="border-b border-line">
               <th className="py-1 font-medium">All {current.all.events_scored} scored faults</th>
               <th className="py-1 text-right font-medium">Plant alarms today</th>
+              {!placeholder && <th className="py-1 text-right font-medium">B1 baseline</th>}
               <th className="py-1 text-right font-medium">Current alerts</th>
             </tr>
           </thead>
@@ -94,6 +96,7 @@ export default function ReviewPage() {
               <tr key={r.label} className="border-b" style={{ borderColor: "var(--line-soft)" }}>
                 <td className="py-1.5">{r.label}</td>
                 <td className="py-1.5 text-right">{r.show(plant.all)}</td>
+                {!placeholder && <td className="py-1.5 text-right">{r.show(baseline.all)}</td>}
                 <td className="py-1.5 text-right font-semibold">{r.show(current.all)}</td>
               </tr>
             ))}

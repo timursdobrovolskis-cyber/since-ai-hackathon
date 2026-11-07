@@ -106,7 +106,7 @@ export default function PaybackPage() {
         <h1 className="font-cond text-3xl font-semibold">Would this pay back on one pump?</h1>
         <p className="font-medium">Illustrative only, not a realised or expected saving.</p>
         <p className="text-ink-2">
-          Every input is an assumption or a benchmark result on simulated data. Change them to match a real site. Measured values come from the {card.alertSource}, a placeholder until the team&rsquo;s detector is connected.
+          Every input is an assumption or a benchmark result on simulated data. Change them to match a real site. {card.alertSource === "B1 baseline" ? "Measured values come from the B1 baseline, a placeholder until the team\u2019s detector is connected." : `Measured values come from ${card.alertSource}.`}
         </p>
       </header>
 

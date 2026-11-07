@@ -85,7 +85,7 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
             </ul>
           ) : (
             <p className="mt-1 text-ink-2">
-              One cause named: {faultLabel(item.faultType)}. {level ? `${level} certainty.` : "Certainty not calibrated."} This placeholder detector does not rank alternatives yet.
+              One cause named: {faultLabel(item.faultType)}. {level ? `${level} certainty.` : "Certainty not calibrated."} This detector does not rank alternatives.
             </p>
           )}
         </section>

@@ -32,6 +32,17 @@ uv pip install --python .venv/bin/python numpy pandas pyarrow scipy scikit-learn
 
 Restart `npm run dev` after running `npm run build`. Building next to a running dev server can leave it serving old pages.
 
+## Swap in new alerts
+
+The app shows the organizers' B1 baseline until you give it a detector's alerts. Use the official prediction CSV, or JSON in the format in section 8 of `docs/spec.md`, which also carries ranked causes and calibrated confidence.
+
+```bash
+.venv/bin/python tools/build_ui_data.py --alerts team_alerts.csv --name "Team detector v3"
+.venv/bin/python tools/build_what_if.py
+```
+
+Cases, lead times, the Review view and payback all update with no code change. Stored AI explanations belong to one detector, so they stay hidden until you run `npm run explain` again, which spends a small amount of paid credit. A bad file stops with a clear reason and leaves the app's data as it was.
+
 ## How it works
 
 - `tools/build_ui_data.py` turns the organizer data into small JSON files for the browser.
