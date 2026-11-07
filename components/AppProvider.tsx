@@ -26,6 +26,8 @@ type App = {
   /** How often each named cause has been right. Totals only. */
   record: TrackRecord | undefined;
   clearDecisions: () => void;
+  /** Takes back one decision, for an undo straight after it was made. */
+  undoDecision: (caseId: string) => void;
 };
 
 const Ctx = createContext<App | null>(null);
@@ -84,11 +86,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const clearDecisions = () => save({});
 
+  const undoDecision = (caseId: string) => {
+    const rest = { ...decisions };
+    delete rest[caseId];
+    save(rest);
+  };
+
   const cases = useMemo(() => buildCases(alerts, SHIFT_HOUR), [alerts]);
   const alertsToShift = useMemo(() => alerts.filter((a) => a.offset_hours <= SHIFT_HOUR), [alerts]);
 
   return (
-    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, alertsToShift, decisions, decide, recordFinding, record, clearDecisions }}>
+    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, alertsToShift, decisions, decide, recordFinding, record, clearDecisions, undoDecision }}>
       {children}
     </Ctx.Provider>
   );

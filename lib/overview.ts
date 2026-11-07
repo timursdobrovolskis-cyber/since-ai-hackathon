@@ -42,7 +42,7 @@ export function flaggedOverTime(cases: Case[], pumps: PumpData[], hour: number) 
 
 export type Activity = { key: string; hour: number; assetId: string; kind: "case" | "update" | "alarm" | "work" | "decision"; text: string; eventClass?: EventClass; faultType?: string };
 
-const DECIDED: Record<Decision["kind"], string> = { approved: "You will check", rejected: "Marked not a problem", watching: "Reminder set" };
+const DECIDED: Record<Decision["kind"], string> = { approved: "You will check", rejected: "Marked not a problem", watching: "Reminder set", escalated: "Escalated" };
 const shortName = (type: string) => PLAIN[type]?.short ?? "needs a look";
 
 export function recentActivity(cases: Case[], pumps: PumpData[], decisions: Record<string, Decision>, hour: number, limit = 8): Activity[] {

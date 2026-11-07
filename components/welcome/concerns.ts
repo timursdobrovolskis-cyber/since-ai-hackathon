@@ -72,11 +72,17 @@ export function useConcern(site: SiteState, id: string | null): Concern | null {
   return useMemo(() => (id ? concernFor(site, id, { fleet, pumps, record }) : null), [fleet, pumps, record, site, id]);
 }
 
-/** Every concern at the site's hour, in Today's order: needs you today first, then check the reading. */
-export function useConcerns(site: SiteState): Concern[] {
+/**
+ * Concerns at the site's hour. By default the ones on Today's list, in its order: needs you today first, then check
+ * the reading. Pass `ids` for any other set, such as every pump with a line.
+ */
+export function useConcerns(site: SiteState, ids?: string[]): Concern[] {
   const { fleet, pumps, record } = useApp();
+  const list = ids ?? [...site.order.red, ...site.order.orange];
+  const key = list.join(",");
   return useMemo(
-    () => [...site.order.red, ...site.order.orange].map((id) => concernFor(site, id, { fleet, pumps, record })).filter((c): c is Concern => c !== null),
-    [fleet, pumps, record, site],
+    () => list.map((id) => concernFor(site, id, { fleet, pumps, record })).filter((c): c is Concern => c !== null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` stands in for the list's contents
+    [fleet, pumps, record, site, key],
   );
 }

@@ -5,22 +5,18 @@
 //       turns and moves aside while the page fades from ink to white.
 //   02  The site map. Scrolling runs the week's clock to the evening shift, and each light follows Today's rule.
 //       Clicking a pump opens its card and lights up the area of the 3D pump it concerns.
-//   03  What needs you: every concern at the shift, with its reading drawn against its expected band.
-//   04  How well it works, as counting figures.
-//   05  The case for a retrofit, as four cards with charts.
-//   06  A call to action into the working app.
+//   03  The pump dashboard: every pump at the shift, and one pump's report: what's wrong, the evidence, how sure, what
+//       to do, and Acknowledge, Dismiss or Escalate.
+// Results, the retrofit cards and the closing call to action are set aside for now (see the note in the page).
 // Live parts only use data up to the shift. Results use totals only.
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Closing } from "@/components/welcome/Closing";
 import { useConcern } from "@/components/welcome/concerns";
-import { MetricCards } from "@/components/welcome/MetricCards";
 import { PumpCard } from "@/components/welcome/PumpCard";
 import { PumpStage } from "@/components/welcome/PumpStage";
-import { Results } from "@/components/welcome/Results";
 import { RoomStage } from "@/components/welcome/RoomStage";
 import { SiteMap, useSite } from "@/components/welcome/SiteMap";
-import { StepList } from "@/components/welcome/StepList";
+import { PumpDashboard } from "@/components/welcome/PumpDashboard";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
 
@@ -46,8 +42,6 @@ export default function Welcome() {
   const track = useRef<HTMLElement>(null);
   const { phases, hour, mapReady } = useScrollPhases(track, SHIFT_HOUR);
   const site = useSite(hour, SHIFT_HOUR);
-  // The sections after the map always show the evening shift, whatever hour the map is at.
-  const shift = useSite(SHIFT_HOUR, SHIFT_HOUR);
   const compact = useCompact();
   const [selected, setSelected] = useState<string | null>(null);
   const close = useCallback(() => setSelected(null), []);
@@ -70,15 +64,14 @@ export default function Welcome() {
   }, [mapReady]);
 
   /** Header links: the top, the map at the evening shift, and the sections below. */
-  const jump = (to: "top" | "map" | "needs-you" | "results") => {
+  const jump = (to: "top" | "map" | "pumps") => {
     const el = track.current;
     if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
     if (to === "map" && el) {
       const top = el.getBoundingClientRect().top + window.scrollY;
       return window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * 0.95, behavior: "smooth" });
     }
-    const id = to === "needs-you" && compact ? "needs-you-list" : to;
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(to)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -92,18 +85,17 @@ export default function Welcome() {
         <button type="button" onClick={() => jump("top")} className="text-lg font-medium tracking-[-0.02em]">
           Retrofit Assist
         </button>
-        <nav aria-label="Sections" className="ml-10 hidden gap-7 font-mono text-[12px] uppercase tracking-[0.14em] md:flex">
+        <nav aria-label="Sections" className="ml-10 hidden gap-7 text-[15px] md:flex">
           <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Site map</button>
-          <button type="button" onClick={() => jump("needs-you")} className="hover:underline underline-offset-4">What needs you</button>
-          <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
+          <button type="button" onClick={() => jump("pumps")} className="hover:underline underline-offset-4">Pumps</button>
         </nav>
-        <Link href="/" className="ml-auto font-mono text-[12px] uppercase tracking-[0.14em] underline-offset-4 hover:underline">
+        <Link href="/" className="ml-auto text-[15px] underline-offset-4 hover:underline">
           Today&rsquo;s shift
         </Link>
       </header>
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} aria-label="Engine room and site map" className="relative h-[780vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
+      <section ref={track} aria-label="Engine room and site map" className="relative h-[670vh]" style={{ "--r": 0, "--p": 0, "--t": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           {/* The engine room covers the grid until it fades out at the hand-off. */}
@@ -133,10 +125,13 @@ export default function Welcome() {
         </div>
       </section>
 
-      <StepList site={shift} />
-      <Results />
-      <MetricCards site={shift} />
-      <Closing site={shift} />
+      <PumpDashboard shiftHour={SHIFT_HOUR} />
+      {/* Results, the retrofit cards and the closing call to action (Results.tsx, MetricCards.tsx, Closing.tsx) are
+          set aside while the dashboard is reworked, and come back one step at a time. */}
+      <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
+        Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
+        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The site layout is fictional.
+      </footer>
     </div>
   );
 }

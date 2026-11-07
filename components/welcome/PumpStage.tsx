@@ -175,8 +175,9 @@ export function PumpStage({ phases, selected = false, highlight = null, compact 
       const pumpScale = lerp(lerp(hero.scale, fit(1.55, 1.45), zoom), endScale, glide);
       pump.scale.setScalar(pumpScale * lerp(1, small ? 0.8 : 0.46, shrink));
       pump.position.set(lerp(0, endX, glide), lerp(hero.y, endY, glide) + (small ? 0 : halfH * 0.66 * shrink), 0);
-      // Turn: the scroll turns the pump half way round.
-      const turn = reduced ? 0 : Math.PI * ease(0, 0.6, p);
+      // Turn: a little over a quarter of the way round, at the same pace per scroll as before, the other way round so
+      // it ends at a three-quarter view of the far side rather than end-on.
+      const turn = reduced ? 0 : -0.55 * Math.PI * ease(0, 0.6, p);
       pump.rotation.set(lerp(lerp(hero.rotation.x, 0.18, zoom), 0.32, glide), hero.rotation.y + turn, 0);
 
       lines.render(scene, camera);

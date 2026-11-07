@@ -61,6 +61,17 @@ Like Meuze, which opens inside a restaurant, the page opens inside a ship's engi
 - **Scroll:** the camera walks in from the forward corner of the room to Pump 8, with labels on Pump 8, Pump 7, the strainer and the header. Then everything but Pump 8 dims away, in exactly the pose where the moving pump takes over (`heroPose.ts`).
 - **One style throughout:** the moving pump is drawn by the same hidden-line renderer (`lineRender.ts`), not as see-through line work, so it looks the same from the room to the site map. Jona rejected the see-through look on 7 Nov.
 
+## Pump dashboard (7 Nov, evening)
+
+Jona asked to step back and work on a dashboard where you can see the different pumps. It replaces the step list. The results, retrofit cards and closing call to action are set aside, not deleted, and come back one step at a time.
+
+- **List:** every pump at the evening shift, grouped Needs you today, Check the reading, Can wait, Normal, and Test pumps. Arrow keys move through it. On phones it is a plain picker.
+- **Report, in this order:** what's wrong (fault type, tagged Machine or Sensor with its own icon), the evidence (the detector's summary sentence, the reading now against expected, and one chart against the expected band), how sure (Unsure for an UNKNOWN cause, a calibrated band where the detector gives one, otherwise "Not calibrated" with the raw score and the past record), what to do (the plain check, the next stop, advice only), and the review.
+- **Review:** Acknowledge (I will check it), Dismiss with a reason, or Escalate to the duty engineer, a new decision kind that shows in My decisions and the export. Undo straight after.
+- **Style:** sentence-case labels, no section numbers, no arrows on buttons, no middle-dot strings, monospace only for measurements, status never by colour alone.
+
+The pump turn was shortened: a little over a quarter turn at the same pace, ending at a three-quarter view.
+
 ## Parts
 
 1. **Hero and scroll.** Built on 7 Nov: ferry engine room in hidden-line work, walk-in to Pump 8, zoom, turn, fade to white.

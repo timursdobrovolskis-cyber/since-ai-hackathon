@@ -21,11 +21,13 @@ type Props = {
   replayKey: string;
   aspectRatio?: string;
   axes?: boolean;
+  /** Labels along the time axis. */
+  ticks?: number;
 };
 
 const fmt = (v: number) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2));
 
-export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "2 / 1", axes = true }: Props) {
+export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "2 / 1", axes = true, ticks = 4 }: Props) {
   // The chart's scale starts at zero for positive data, which flattens a reading into a thin line. Centring each
   // reading on its midpoint makes the scale fit the data. Axis labels and the tooltip add the midpoint back, so every
   // number shown is the real reading.
@@ -58,11 +60,11 @@ export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "
   if (rows.length < 2) return <p className="p-6 text-center text-sm text-mz-muted">No reading recorded for this concern.</p>;
 
   return (
-    <LineChart data={data} aspectRatio={aspectRatio} revealSignature={replayKey} margin={axes ? { top: 28, right: 16, bottom: 32, left: 56 } : { top: 20, right: 8, bottom: 8, left: 8 }}>
+    <LineChart data={data} aspectRatio={aspectRatio} revealSignature={replayKey} margin={axes ? { top: 28, right: 44, bottom: 32, left: 56 } : { top: 20, right: 8, bottom: 8, left: 8 }}>
       <Grid horizontal numTicksRows={4} />
       <Band upperKey="hi" lowerKey="lo" label="Expected" fill="var(--welcome-band)" fillOpacity={1} stroke="var(--welcome-band-edge)" strokeWidth={1} />
       <Line dataKey="value" stroke="var(--mz-accent)" strokeWidth={1.75} />
-      {axes && <XAxis labels={labels} numTicks={4} />}
+      {axes && <XAxis labels={labels} numTicks={ticks} />}
       {axes && <YAxis numTicks={4} formatValue={(v) => fmt(v + mid)} />}
       <ChartMarkers items={markers} size={20} />
       <ChartTooltip

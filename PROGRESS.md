@@ -16,11 +16,13 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - The pump card names and lights up the area of the 3D pump the concern is about, and shows the last 12 hours of the reading.
 - A blue call to action into Today, the first job card and Review. Header links jump to each section.
 - Phones: one column, pump above the map, pump card as a bottom sheet, step list as a plain list.
+- The pump dashboard replaced the step list: every pump, and one report at a time with what's wrong, evidence, how sure, what to do and Acknowledge, Dismiss or Escalate. Results, cards and closing are set aside for now.
+- The pump turn is shorter: a quarter turn at the same pace.
 - `/welcome` has its own header and footer. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona to go through the finished page.
+Nothing. Waiting for Jona's look at the pump dashboard.
 
 ## Next
 

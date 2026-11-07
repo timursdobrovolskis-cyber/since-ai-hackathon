@@ -52,6 +52,7 @@ export function DecisionPanel({ item }: { item: Case }) {
         )}
         {decided.kind === "rejected" && <p>You marked this as not a problem. Reason: {decided.reason}.</p>}
         {decided.kind === "watching" && <p>Reminder set for {(decided.followUpHour ?? hour) - hour} hours from now.</p>}
+        {decided.kind === "escalated" && <p>You escalated this to the duty engineer. It stays open until they decide.</p>}
         <Link href="/log" className="mt-2 inline-block text-[13px] underline underline-offset-2">See my decisions</Link>
       </section>
     );

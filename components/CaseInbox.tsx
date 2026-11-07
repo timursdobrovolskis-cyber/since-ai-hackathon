@@ -12,6 +12,7 @@ const DECISION_LABEL: Record<Decision["kind"], string> = {
   approved: "You will check it",
   rejected: "Marked not a problem",
   watching: "Reminder set",
+  escalated: "Escalated to the duty engineer",
 };
 
 export function CaseCard({ item, active }: { item: Case; active?: boolean }) {

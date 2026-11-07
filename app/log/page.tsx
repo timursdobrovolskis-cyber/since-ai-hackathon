@@ -6,7 +6,7 @@ import { PLAIN, pumpName } from "@/lib/plain";
 import type { Decision, Finding } from "@/lib/types";
 
 const FOUND: Record<Finding, string> = { found: "Found it", other: "Found something else", nothing: "Nothing wrong" };
-const KIND: Record<Decision["kind"], string> = { approved: "I'll check it", rejected: "Not a problem", watching: "Remind me later" };
+const KIND: Record<Decision["kind"], string> = { approved: "I'll check it", rejected: "Not a problem", watching: "Remind me later", escalated: "Escalated to the duty engineer" };
 
 export default function LogPage() {
   const { clearDecisions, decisions, hour } = useApp();
