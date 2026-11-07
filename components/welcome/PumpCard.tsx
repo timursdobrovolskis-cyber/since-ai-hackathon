@@ -9,7 +9,6 @@
 // The fault names come from the app's labels for each fault type. Nothing here is an estimate of ours.
 // On phones it opens as a sheet from the bottom.
 import { Cog, Gauge, X } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import { useApp } from "@/components/AppProvider";
 import { stateAt } from "@/lib/cases";
@@ -234,10 +233,7 @@ export function PumpCard({ id, site, onClose }: { id: string | null; site: SiteS
                 <Section title="What to do">
                   <p className="text-[16px] leading-snug">{alert.recommended_action}</p>
                   <p className="mt-1 text-[13px] text-mz-muted">
-                    {c.stop ? `${c.stop} ` : ""}Advice only. Nothing is sent to the pump.{" "}
-                    <Link href={`/cases/${c.lead.id}`} className="text-mz-accent underline-offset-4 hover:underline">
-                      Open the job card
-                    </Link>
+                    {c.stop ? `${c.stop} ` : ""}Advice only. Nothing is sent to the pump.
                   </p>
                 </Section>
               )}

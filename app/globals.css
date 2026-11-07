@@ -84,10 +84,9 @@
   --color-mz-muted: var(--mz-muted);
   --color-mz-accent: var(--mz-accent);
   --color-site-red: var(--site-red);
-  --font-sans: var(--font-barlow);
+  --font-sans: var(--ff-geist);
   --font-geist: var(--ff-geist);
   --font-mono: var(--ff-mono);
-  --font-cond: var(--font-barlow-cond);
   --color-chart-line-primary: var(--chart-line-primary);
   --color-chart-line-secondary: var(--chart-line-secondary);
   --color-chart-brush-border: var(--chart-brush-border);
@@ -138,16 +137,16 @@
 html, body { height: 100%; }
 
 body {
-  background: var(--deck);
-  color: var(--ink);
-  font-family: var(--font-barlow), system-ui, sans-serif;
+  background: white;
+  color: var(--mz-ink);
+  font-family: var(--ff-geist), system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--mz-accent); outline-offset: 2px; }
 
 button { cursor: pointer; }
 
@@ -157,31 +156,7 @@ input[type="range"] { accent-color: var(--ink); }
   * { animation: none !important; transition: none !important; }
 }
 
-/* uPlot hover readout */
-.uplot .u-legend { display: none; }
 
-/* Isometric case board, in the app's greys */
-.case-board {
-  --ik-panel: var(--panel);
-  --ik-top: var(--raised);
-  --ik-front: #e0e3e5;
-  --ik-side: var(--line-soft);
-  --ik-line: var(--ink-3);
-  --ik-detail: var(--line);
-  --ik-live: var(--ink);
-  --ik-ink: var(--ink-2);
-  --ik-screen: var(--ink);
-  --ik-screen-ink: var(--raised);
-  --ik-border: transparent;
-  --ik-screen-font: var(--font-barlow-cond), sans-serif;
-  border: 0;
-  background: none;
-}
-
-.case-board .slab { transition: opacity 180ms ease; transition-delay: calc(var(--day) * 20ms); }
-.case-board .slab[data-on="false"] { opacity: 0; }
-.case-board .board-led { fill: var(--ik-line); }
-.case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
 
 /* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame.
    --g is the ink-to-white fade, 0 until p = 0.6 and 1 from p = 0.72. It is kept short because the middle of any
@@ -202,7 +177,6 @@ input[type="range"] { accent-color: var(--ink); }
 }
 .welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
 .welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
-.welcome-label { color: color-mix(in srgb, rgb(255 255 255 / 0.6), var(--mz-muted) calc(var(--g) * 100%)); }
 .welcome-cue { opacity: calc(1 - var(--r) * 8); }
 /* The realistic engine room hands over to the line work between room 0.86 and 0.97. */
 .welcome-room { opacity: calc(1 - (var(--r) - 0.86) * 9); }
@@ -212,7 +186,6 @@ input[type="range"] { accent-color: var(--ink); }
 }
 
 /* Site map (part 2). The label "01" fades out as the map arrives, so only one section number shows. */
-.welcome-label { opacity: calc(1 - (var(--p) - 0.74) * 6); }
 .site-red { fill: var(--site-red); background: var(--site-red); }
 .site-orange { fill: var(--site-orange); background: var(--site-orange); }
 .site-green { fill: var(--site-green); background: var(--site-green); }

@@ -1,7 +1,7 @@
 "use client";
 
 // The human review on a pump card: Acknowledge (I will check it), Dismiss with a reason, or Escalate to the duty
-// engineer, with undo. Decisions are saved like every other decision in the app, and show in My decisions.
+// engineer, with undo. Decisions are saved in this browser.
 import { RotateCcw } from "lucide-react";
 import { useId, useState } from "react";
 import { useApp } from "@/components/AppProvider";

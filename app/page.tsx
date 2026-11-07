@@ -1,96 +1,132 @@
 "use client";
 
-import { Activity, Calculator, ChevronRight, ClipboardCheck, ClipboardList, Gauge, type LucideIcon } from "lucide-react";
-import Link from "next/link";
-import { useApp } from "@/components/AppProvider";
-import { HandoverPlayer } from "@/components/HandoverPlayer";
-import { KeyNumbers } from "@/components/KeyNumbers";
-import { CaseMark } from "@/components/Marks";
-import { TrustLine } from "@/components/ui/trust-line";
-import { plainAlert, pumpName } from "@/lib/plain";
-import { groupByPump, type PumpLine } from "@/lib/today";
-import { workSince } from "@/lib/worker";
+// The site, from .plans/welcome-landing-spec.md: a dashboard you scroll through, styled after meuze.ai:
+//   01  A ferry engine room in hidden-line work. The camera walks in to Pump 8, the room dims away, and Pump 8 zooms,
+//       turns and moves aside while the page fades from ink to white.
+//   02  The alarm panel: one window per pump, as the evening shift stands, following Today's rule. Clicking a pump
+//       flickers the 3D pump away and shows that pump's card in its place, built from real data only.
+//       The card ends with the review: Acknowledge, Dismiss or Escalate.
+//   03  How well it works: faults caught against plant alarms, warning time and false alerts.
+// The retrofit cards and the closing call to action are set aside for now (see the note in the page).
+// Live parts only use data up to the shift. Results use totals only.
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PumpCard } from "@/components/welcome/PumpCard";
+import { PumpStage } from "@/components/welcome/PumpStage";
+import { RoomStage } from "@/components/welcome/RoomStage";
+import { AlarmPanel } from "@/components/welcome/AlarmPanel";
+import { MapHead, useSite } from "@/components/welcome/mapParts";
+import { Results } from "@/components/welcome/Results";
+import { useScrollPhases } from "@/components/welcome/useScrollPhases";
+import { SHIFT_HOUR } from "@/lib/labels";
 
-function Line({ line }: { line: PumpLine }) {
-  const { fleet, hour, pumps, record } = useApp();
-  const { lead, others } = line;
-  const words = plainAlert(lead.latest, fleet?.channelMeta ?? {}, record);
-  const done = workSince(lead, pumps[line.assetId], hour);
-  return (
-    <li className="border-b border-line last:border-b-0">
-      <Link href={`/cases/${lead.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-raised">
-        <span className="self-start pt-1.5"><CaseMark eventClass={lead.eventClass} faultType={lead.faultType} size={16} /></span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[17px] leading-snug"><span className="font-semibold">{pumpName(line.assetId)}:</span> {words.what}</p>
-          <p className="text-ink-2">{words.check}{others.length > 0 && <span className="text-ink-3"> Plus {others.length} more on this pump.</span>}</p>
-          {done && <p className="text-[13px] font-medium">{done}</p>}
-          <TrustLine trust={words.trust} alert={lead.latest} pump={pumps[line.assetId]} hour={hour} />
-        </div>
-        <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
-      </Link>
-    </li>
-  );
+/** Small square marker on a frame line, as on meuze.ai. */
+function Corner({ className }: { className: string }) {
+  return <span aria-hidden className={`welcome-corner absolute size-1.5 ${className}`} />;
 }
 
-function Group({ title, lines }: { title: string; lines: PumpLine[] }) {
-  if (lines.length === 0) return null;
-  return (
-    <section aria-label={title}>
-      <h2 className="mb-1.5 font-cond text-xl font-semibold">{title}</h2>
-      <ul className="rounded-md border border-line bg-panel">{lines.map((l) => <Line key={l.assetId} line={l} />)}</ul>
-    </section>
-  );
+/** True on phone-sized screens, where the pump ends above the map instead of beside it. */
+function useCompact() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const set = () => setCompact(mq.matches);
+    set();
+    mq.addEventListener("change", set);
+    return () => mq.removeEventListener("change", set);
+  }, []);
+  return compact;
 }
 
-const MORE: { href: string; label: string; about: string; icon: LucideIcon }[] = [
-  { href: "/week", label: "Week overview", about: "All cases and pumps so far this week", icon: Gauge },
-  { href: "/log", label: "My decisions", about: "What you have recorded, with an export", icon: ClipboardList },
-  { href: "/review", label: "Review", about: "Alerts compared with what really happened", icon: ClipboardCheck },
-  { href: "/sensors", label: "Sensor levels", about: "What each sensor upgrade can see", icon: Activity },
-  { href: "/payback", label: "Payback", about: "Costs and savings, with your own numbers", icon: Calculator },
-];
+export default function Welcome() {
+  const track = useRef<HTMLElement>(null);
+  const { phases, mapReady } = useScrollPhases(track);
+  // The panel and the pump card show the evening shift as it stands. There is no clock running.
+  const site = useSite(SHIFT_HOUR, SHIFT_HOUR);
+  const compact = useCompact();
+  const [selected, setSelected] = useState<string | null>(null);
+  const close = useCallback(() => setSelected(null), []);
+  // Past the pinned stage, the header gets a solid bar so it never runs over the sections' text.
+  const [solid, setSolid] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = track.current;
+      if (el) setSolid(el.getBoundingClientRect().bottom <= 64);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  // Scrolling back up to the pump closes any open card.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- follows the scroll position, which lives outside React
+    if (!mapReady) setSelected(null);
+  }, [mapReady]);
 
-export default function TodayPage() {
-  const { cases, decisions, hour, pumps, record } = useApp();
-  const { today, readings, wait, done } = groupByPump(cases, decisions, hour, record, pumps);
-  const nothing = today.length + readings.length + wait.length === 0;
-  const headline = nothing
-    ? "All pumps look normal. Nothing needs you right now."
-    : today.length === 0
-      ? "No pumps need you urgently right now."
-      : `${today.length} ${today.length === 1 ? "pump needs" : "pumps need"} you today.`;
+  /** Header links: the top, the map at the evening shift, and the sections below. */
+  const jump = (to: "top" | "map" | "results") => {
+    const el = track.current;
+    if (to === "top") return window.scrollTo({ top: 0, behavior: "smooth" });
+    if (to === "map" && el) {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      return window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * 0.95, behavior: "smooth" });
+    }
+    document.getElementById(to)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 p-4 sm:py-6">
-      <header>
-        <h1 className="font-cond text-3xl leading-tight font-semibold">{headline}</h1>
-        {!nothing && <p className="text-ink-2">Evening shift. One line per pump, newest first. Open a line for the job card.</p>}
+    <div className="welcome min-h-full bg-white font-geist text-mz-ink">
+      {/* Over the stage, difference blending keeps the header readable on both ink and white. Below it, a solid bar. */}
+      <header
+        className={`fixed inset-x-0 top-0 z-30 flex h-16 items-center px-5 transition-colors sm:px-10 ${
+          solid ? "border-b border-mz-line bg-white/92 text-mz-ink backdrop-blur" : "text-white mix-blend-difference"
+        }`}
+      >
+        <nav aria-label="Sections" className="flex gap-7 text-[15px]">
+          <button type="button" onClick={() => jump("top")} className="hover:underline underline-offset-4">Engine room</button>
+          <button type="button" onClick={() => jump("map")} className="hover:underline underline-offset-4">Alarm panel</button>
+          <button type="button" onClick={() => jump("results")} className="hover:underline underline-offset-4">Results</button>
+        </nav>
       </header>
-      <HandoverPlayer />
-      <Group title="Needs you today" lines={today} />
-      <Group title="Check the reading" lines={readings} />
-      {wait.length > 0 && (
-        <details className="rounded-md border border-line bg-panel">
-          <summary className="min-h-11 cursor-pointer px-4 py-2.5 font-medium">{wait.length} {wait.length === 1 ? "pump can" : "pumps can"} wait</summary>
-          <ul className="border-t border-line">{wait.map((l) => <Line key={l.assetId} line={l} />)}</ul>
-        </details>
+
+      {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
+      <section ref={track} aria-label="Engine room and site map" className="relative h-[485vh]" style={{ "--r": 0, "--p": 0 } as React.CSSProperties}>
+        <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
+          <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
+          {/* The engine room covers the grid until it fades out at the hand-off. */}
+          <RoomStage phases={phases} />
+          <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-4 inset-y-20 border sm:inset-x-10">
+            <Corner className="-left-[3.5px] -top-[3.5px]" />
+            <Corner className="-right-[3.5px] -bottom-[3.5px]" />
+          </div>
+
+
+          <PumpStage phases={phases} gone={selected !== null} compact={compact} />
+
+          <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
+            Scroll
+          </p>
+
+          {/* The site map: the left column on wide screens, below the pump on phones. Scrolling on runs its clock. */}
+          <div className="welcome-map absolute inset-x-0 top-[34svh] bottom-0 flex flex-col px-5 pt-2 md:inset-y-0 md:top-0 md:right-auto md:w-1/2 md:justify-center md:px-10 md:pt-16 lg:px-16">
+            {/* Phones show the ticking heading here, and the full panel right after the scroll section. */}
+            {compact ? <MapHead site={site} shiftHour={SHIFT_HOUR} panelBelow /> : <AlarmPanel site={site} shiftHour={SHIFT_HOUR} ready={mapReady} selected={selected} onSelect={setSelected} />}
+          </div>
+
+          <PumpCard id={selected} site={site} onClose={close} />
+        </div>
+      </section>
+
+      {compact && (
+        <section id="panel" aria-label="Alarm panel" className="bg-white px-5 pt-4 pb-14">
+          <AlarmPanel site={site} shiftHour={SHIFT_HOUR} ready selected={selected} onSelect={setSelected} columns={2} />
+        </section>
       )}
-      {done > 0 && <p className="text-[13px] text-ink-3">{done} already handled. <Link href="/log" className="underline underline-offset-2">See my decisions</Link></p>}
-      <KeyNumbers />
-      <nav aria-label="More detail">
-        <h2 className="mb-1.5 font-cond text-xl font-semibold">More detail</h2>
-        <ul className="grid divide-y divide-line rounded-md border border-line bg-panel">
-          {MORE.map((m) => (
-            <li key={m.href}>
-              <Link href={m.href} className="flex min-h-11 items-center gap-3 px-4 py-2 hover:bg-raised">
-                <m.icon aria-hidden className="size-4 shrink-0 text-ink-2" />
-                <span className="min-w-0 flex-1"><span className="font-medium">{m.label}</span> <span className="text-[13px] text-ink-2">{m.about}</span></span>
-                <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <Results />
+      {/* The retrofit cards and the closing call to action (MetricCards.tsx, Closing.tsx) are set aside for now. */}
+      <footer className="border-t border-mz-line px-5 py-6 text-[13px] leading-relaxed text-mz-muted sm:px-10 lg:px-16">
+        Advice only and read-only: nothing is ever sent to a pump, and plant alarms, trips and interlocks stay in charge. Simulated data from the
+        RETROFIT AI 2026 benchmark, with baseline alerts until the team&rsquo;s detector is in. The engine room is an illustration, and the vessel and plant names are fictional.
+      </footer>
     </div>
   );
 }

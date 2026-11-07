@@ -25,17 +25,21 @@ Spec: `.plans/welcome-landing-spec.md`. Built in parts, each shown to Jona befor
 - Every figure on the page traced to its source. Results now compare alerts with plant alarms on four checked figures (faults caught, warned before the limit, right cause, false alerts), in three layouts to compare. `lib/keynumbers.test.ts` ties each to the organizers' scorer.
 - The duplicate pump dashboard is gone. Its Acknowledge, Dismiss and Escalate moved into the pump card, and the panel shows the decision on the pump's window.
 - The panel heading no longer claims a real site or clock: it names hour 66 of each pump's simulated test week.
-- `/welcome` has its own header and footer. Every other page is unchanged.
+- The old app (Today, job cards, My decisions, Week overview, Review, Sensor levels, Payback, the voice route) is removed. The landing page is now the whole site, at `/`, and `/welcome` redirects there.
+- The product name is gone from the page for now. It was a placeholder from our own spec, not from the data.
+- Results stay as one table. Every other page is unchanged.
 
 ## In progress
 
-Nothing. Waiting for Jona to pick a results layout.
+Nothing. Next: Jona's answers on more interactivity.
 
 ## Next
 
 - The team's detector alerts, then rebuild the data and check the evening shift still tells the story.
 
 ## Blockers
+
+- Merging this branch removes the old app from `dashboard` too. Agree that with the team first. README, the video script and the technical note still describe the old app.
 
 - The pump model's source and licence are unknown. The branch was pushed on Jona's instruction, and the README marks the licence as unconfirmed.
 - This branch starts from PR 7 (`one-home-screen`), so PR 7 must merge into `dashboard` first.
