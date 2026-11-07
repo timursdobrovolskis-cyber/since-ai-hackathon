@@ -84,7 +84,7 @@ export function AlarmPanel({ columns, ...props }: MapProps & { columns?: 2 }) {
               aria-pressed={on}
               disabled={!props.ready}
               onClick={() => setFilter(on && f !== "all" ? "all" : f)}
-              className={`ann-filter inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] ${on ? "ann-filter-on" : ""}`}
+              className={`press ann-filter inline-flex min-h-9 items-center gap-1.5 px-3 text-[13px] ${on ? "ann-filter-on" : ""}`}
             >
               {FILTER_WORD[f]}
               <span className="font-mono text-[12px] tabular-nums opacity-70">

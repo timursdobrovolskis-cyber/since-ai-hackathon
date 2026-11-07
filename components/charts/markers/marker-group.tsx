@@ -265,10 +265,11 @@ export function MarkerGroup({
                   initial={{ scale: 0, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 >
-                  <circle
-                    cx={size / 2 + 2}
-                    cy={-size / 2 - 2}
-                    r={9}
+                  <rect
+                    height={18}
+                    width={18}
+                    x={size / 2 + 2 - 9}
+                    y={-size / 2 - 2 - 9}
                     style={{ fill: chartCssVars.badgeBackground }}
                   />
                   <text
@@ -424,12 +425,14 @@ function MarkerCircle({
   const inset = iconFill ? 0 : 4;
   return (
     <g>
-      <circle cx={0} cy={2} fill="black" opacity={0.15} r={size / 2} />
-      <circle
-        cx={0}
-        cy={0}
+      {/* Squares, not circles: the site uses no round shapes. */}
+      <rect fill="black" height={size} opacity={0.15} width={size} x={-size / 2} y={-size / 2 + 2} />
+      <rect
         fill={color || chartCssVars.markerBackground}
-        r={size / 2}
+        height={size}
+        width={size}
+        x={-size / 2}
+        y={-size / 2}
         stroke={borderColor ?? chartCssVars.markerBorder}
         strokeWidth={borderWidth}
       />
@@ -449,7 +452,6 @@ function MarkerCircle({
             color: chartCssVars.markerForeground,
             fontSize: size * 0.5,
             overflow: "hidden",
-            borderRadius: "50%",
           }}
         >
           {icon}

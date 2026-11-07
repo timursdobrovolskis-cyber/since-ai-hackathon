@@ -188,7 +188,7 @@ export function RoomStage({ phases }: { phases: React.RefObject<Phases> }) {
           {/* The tag sits on its own ink plate with a hairline edge, so the drawing's lines never run through the words. */}
           <span className="absolute -top-1 -left-1 size-2 bg-mz-accent" />
           <span className="absolute top-0 left-0 h-px w-10 bg-white/70 group-data-[flip=true]:-left-10" />
-          <span className="absolute top-0 left-10 flex -translate-y-1/2 items-baseline gap-2 whitespace-nowrap rounded-[4px] bg-mz-ink/95 px-2.5 py-1.5 text-[13px] leading-none text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.28)]">
+          <span className="absolute top-0 left-10 flex -translate-y-1/2 items-baseline gap-2 whitespace-nowrap bg-mz-ink/95 px-2.5 py-1.5 text-[13px] leading-none text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.28)]">
             <span className="font-medium">{a.label}</span>
             <span className="hidden text-white/60 sm:inline">{a.detail}</span>
           </span>

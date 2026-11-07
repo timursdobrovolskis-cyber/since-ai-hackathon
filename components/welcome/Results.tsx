@@ -73,9 +73,9 @@ function usePastFaults(want: boolean) {
 
 function Bar({ value, of, tone, seen }: { value: number; of: number; tone: "alerts" | "alarms"; seen: boolean }) {
   return (
-    <span className="block h-1.5 rounded-full bg-white/10">
+    <span className="block h-1.5 bg-white/10">
       <span
-        className={`block h-full rounded-full transition-[width] duration-[900ms] ease-out ${tone === "alerts" ? "bg-mz-accent" : "bg-white/55"}`}
+        className={`block h-full transition-[width] duration-[900ms] ease-out ${tone === "alerts" ? "bg-mz-accent" : "bg-white/55"}`}
         style={{ width: seen ? `${(value / of) * 100}%` : "0%" }}
       />
     </span>
@@ -194,11 +194,11 @@ function Table({ k, seen }: { k: KeyNumbers; seen: boolean }) {
             <span className="sr-only">Measure</span>
           </th>
           <th className="w-[30%] pb-3 font-normal">
-            <span aria-hidden className="mr-2 inline-block size-2 rounded-full bg-mz-accent align-middle" />
+            <span aria-hidden className="mr-2 inline-block size-2 bg-mz-accent align-middle" />
             Alerts
           </th>
           <th className="w-[30%] pb-3 font-normal">
-            <span aria-hidden className="mr-2 inline-block size-2 rounded-full bg-white/55 align-middle" />
+            <span aria-hidden className="mr-2 inline-block size-2 bg-white/55 align-middle" />
             Plant alarms
           </th>
         </tr>

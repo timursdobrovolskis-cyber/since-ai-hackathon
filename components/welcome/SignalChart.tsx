@@ -70,7 +70,11 @@ export function SignalChart({ rows, unit, alertHours, replayKey, aspectRatio = "
       {axes && <XAxis labels={labels} numTicks={ticks} />}
       {axes && <YAxis numTicks={4} formatValue={(v) => fmt(v + mid)} />}
       <ChartMarkers items={markers} size={20} />
+      {/* A square ring, not a dot: the site uses no round shapes. */}
       <ChartTooltip
+        dotVariant="ring"
+        dotRadiusFraction={0}
+        dotSize={4.5}
         showDatePill
         dateLabels={labels}
         rows={(p) => [

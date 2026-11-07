@@ -71,7 +71,7 @@ function FindingForm({ d }: { d: Decision }) {
   );
   const pick = useId();
   const btn =
-    "inline-flex min-h-11 items-center rounded-lg px-4 text-[15px] shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)] transition-colors hover:shadow-[inset_0_0_0_1px_var(--mz-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
+    "press inline-flex min-h-11 items-center px-4 text-[15px] shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)] transition-colors hover:shadow-[inset_0_0_0_1px_var(--mz-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
 
   if (d.finding)
     return (
@@ -129,7 +129,7 @@ function FindingForm({ d }: { d: Decision }) {
         </button>
       </div>
       {other && (
-        <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mz-panel p-4">
+        <div className="mt-3 flex flex-wrap items-end gap-2 bg-mz-panel p-4">
           <label htmlFor={pick} className="w-full text-[15px]">
             Which fault did you find?
           </label>
@@ -137,7 +137,7 @@ function FindingForm({ d }: { d: Decision }) {
             id={pick}
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="min-h-11 rounded-lg bg-white px-3 text-[15px] shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)]"
+            className="min-h-11 bg-white px-3 text-[15px] shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)]"
           >
             <optgroup label="Machine">
               {TYPES.filter((t) => !isSensor(t)).map((t) => (
@@ -182,7 +182,7 @@ export function PumpReview({ c }: { c: Concern }) {
     faultType: c.lead.faultType,
   };
   const btn =
-    "inline-flex min-h-11 items-center rounded-lg px-4 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
+    "press inline-flex min-h-11 items-center px-4 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent";
 
   if (done) {
     return (
@@ -241,7 +241,7 @@ export function PumpReview({ c }: { c: Concern }) {
         engineer.
       </p>
       {dismissing && (
-        <fieldset className="mt-3 rounded-xl bg-mz-panel p-4">
+        <fieldset className="mt-3 bg-mz-panel p-4">
           <legend className="sr-only">Why is it not a problem?</legend>
           <p aria-hidden className="mb-2 text-[15px]">
             Why is it not a problem?

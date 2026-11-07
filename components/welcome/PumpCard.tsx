@@ -202,7 +202,7 @@ export function PumpCard({
       aria-hidden={!open}
       inert={!open}
       data-open={open}
-      className="pump-card fixed inset-x-0 bottom-0 z-40 max-h-[82svh] overflow-y-auto rounded-t-2xl bg-white px-5 pt-5 pb-2 shadow-[0_-12px_40px_-16px_rgb(11_16_20/0.35)] outline-none md:absolute md:inset-x-auto md:top-24 md:right-10 md:bottom-24 md:left-1/2 md:z-auto md:ml-8 md:max-h-none md:rounded-xl md:shadow-[0_0_0_1px_var(--mz-line),0_24px_48px_-28px_rgb(11_16_20/0.3)]"
+      className="pump-card fixed inset-x-0 bottom-0 z-40 max-h-[82svh] overflow-y-auto bg-white px-5 pt-5 pb-2 shadow-[0_-12px_40px_-16px_rgb(11_16_20/0.35)] outline-none md:absolute md:inset-x-auto md:top-24 md:right-10 md:bottom-24 md:left-1/2 md:z-auto md:ml-8 md:max-h-none md:shadow-[0_0_0_1px_var(--mz-line),0_24px_48px_-28px_rgb(11_16_20/0.3)]"
     >
       {id && (
         <>
@@ -213,7 +213,7 @@ export function PumpCard({
                 <span className="flex items-center gap-1.5 text-[13px] tracking-normal text-mz-muted">
                   <span
                     aria-hidden
-                    className={`size-2 rounded-full ${light === "none" ? "site-swatch-empty" : `site-${light}`}`}
+                    className={`size-2 ${light === "none" ? "site-swatch-empty" : `site-${light}`}`}
                   />
                   {LIGHT_WORDS[light].charAt(0).toUpperCase() +
                     LIGHT_WORDS[light].slice(1)}
@@ -230,7 +230,7 @@ export function PumpCard({
               type="button"
               onClick={close}
               aria-label="Close and show the pump"
-              className="-mt-1 -mr-1 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-mz-muted hover:bg-mz-panel hover:text-mz-ink focus-visible:outline-2 focus-visible:outline-mz-accent"
+              className="press -mt-1 -mr-1 inline-flex size-10 shrink-0 items-center justify-center text-mz-muted hover:bg-mz-panel hover:text-mz-ink focus-visible:outline-2 focus-visible:outline-mz-accent"
             >
               <X aria-hidden className="size-4" />
             </button>
@@ -264,7 +264,7 @@ export function PumpCard({
                   <>
                     <p className="flex flex-wrap items-center gap-2.5 text-[20px] leading-tight tracking-[-0.015em]">
                       {faultLabel(c.lead.faultType)}
-                      <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[13px] tracking-normal shadow-[inset_0_0_0_1px_var(--mz-line)]">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[13px] tracking-normal shadow-[inset_0_0_0_1px_var(--mz-line)]">
                         {sensor ? (
                           <Gauge
                             aria-hidden
@@ -387,7 +387,7 @@ export function PumpCard({
                                 r.channel === c.channel ? null : r.channel,
                               )
                             }
-                            className={`${row} reading-pick rounded-sm`}
+                            className={`${row} reading-pick`}
                           >
                             {inner}
                           </button>

@@ -279,7 +279,7 @@ input[type="range"] { accent-color: var(--ink); }
 
 /* Alarm panel: one window per pump. Solid red needs you, amber tint is a reading to check, the rest stay quiet. */
 .ann {
-  cursor: pointer; min-height: 5.25rem; padding: 11px 12px; border-radius: 10px;
+  cursor: pointer; min-height: 5.25rem; padding: 11px 12px;
   background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line);
   transition: background-color 200ms ease, box-shadow 200ms ease, color 200ms ease, opacity 160ms ease;
 }
@@ -299,7 +299,7 @@ input[type="range"] { accent-color: var(--ink); }
 .ann-nodata { background: transparent; box-shadow: none; border: 1px dashed rgb(11 16 20 / 0.22); color: var(--mz-muted); }
 .ann-needs .ann-face, .ann-check .ann-face { animation: ann-flash 1.2s steps(1, end) 1; }
 @keyframes ann-flash { 0%, 33%, 66% { opacity: 0.3; } 16%, 50%, 83%, 100% { opacity: 1; } }
-.ann-key { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 4px; }
+.ann-key { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
 .ann-key-needs { background: #b42318; color: white; }
 .ann-key-check { background: #fff4e2; box-shadow: inset 0 0 0 1px #e7a64a; color: #9a5300; }
 .ann-key-normal { background: white; box-shadow: inset 0 0 0 1px var(--mz-line); }
@@ -347,13 +347,7 @@ input[type="range"] { accent-color: var(--ink); }
 .top-bar-on::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; background: var(--mz-accent); }
 @media (prefers-reduced-motion: reduce) { .top-bar { transition: none; } }
 
-/* Scroll progress versions (components/welcome/ScrollProgress.tsx). Fills come from --page, --s0..2 and --t on <html>. */
-.progress-bar { background: var(--mz-accent); transform-origin: left; transform: scaleX(var(--page, 0)); }
-.top-bar-fill::before, .top-bar-fill::after { content: ""; position: absolute; inset: auto 0 0 0; height: 2px; }
-.top-bar[data-tone="ink"] .top-bar-fill::before { background: rgb(255 255 255 / 0.14); }
-.top-bar[data-tone="white"] .top-bar-fill::before { background: var(--mz-line); }
-.top-bar-fill::after { background: var(--mz-accent); transform-origin: left; transform: scaleX(var(--fill, 0)); }
-.top-bar-fill.top-bar-on::after { content: ""; }
+/* Scroll progress (components/welcome/ScrollProgress.tsx): the rail fills from --page, the frame trace from --t on <html>. */
 .progress-rail-track { background: rgb(127 127 127 / 0.35); }
 .progress-rail-fill { background: var(--mz-accent); height: calc(var(--page, 0) * 100%); }
 .progress-rail-dot { background: var(--mz-accent); box-shadow: 0 0 0 3px var(--rail-bg); transition: transform 160ms ease; }
@@ -364,3 +358,14 @@ input[type="range"] { accent-color: var(--ink); }
 .progress-rail[data-tone="ink"] .progress-rail-label { background: var(--mz-ink); color: white; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28); }
 .progress-rail[data-tone="white"] .progress-rail-label { background: white; color: var(--mz-ink); box-shadow: inset 0 0 0 1px var(--mz-line); }
 .progress-frame { stroke: var(--mz-accent); stroke-width: 1.5; stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--t, 0)); vector-effect: non-scaling-stroke; }
+
+/* Square corners everywhere (Jona, 7 Nov): no pills, rounded cards or dots on the site. This also covers the chart
+   library's own parts (tooltip panel, date pill, marker), which set their radius inline. SVG circles are handled in
+   SignalChart (square tooltip ring) and components/charts/markers/marker-group.tsx (square markers). */
+.welcome :is(*, *::before, *::after) { border-radius: 0 !important; }
+
+/* Press feedback on pointer-down, before the click lands. */
+.press { transition: scale 90ms ease-out, background-color 120ms ease, box-shadow 120ms ease, color 120ms ease; }
+.press:active:not(:disabled) { scale: 0.97; }
+.ann:active { scale: 0.985; }
+@media (prefers-reduced-motion: reduce) { .press:active:not(:disabled), .ann:active { scale: none; } }

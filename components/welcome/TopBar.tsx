@@ -15,13 +15,13 @@ const LINKS: { to: Place; label: string }[] = [
   { to: "results", label: "Results" },
 ];
 
-export function TopBar({ tone, place, site, onJump, fill = false }: { tone: "ink" | "white"; place: Place; site: SiteState; onJump: (to: Place) => void; fill?: boolean }) {
+export function TopBar({ tone, place, site, onJump }: { tone: "ink" | "white"; place: Place; site: SiteState; onJump: (to: Place) => void }) {
   const ink = tone === "ink";
   return (
     <header data-tone={tone} className="top-bar fixed inset-x-0 top-0 z-30 h-14 sm:h-16">
       <div className="flex h-full items-stretch justify-between gap-4 px-5 sm:px-10">
         <nav aria-label="Sections" className="flex items-stretch gap-6 text-[15px] sm:gap-8">
-          {LINKS.map((l, i) => {
+          {LINKS.map((l) => {
             const on = place === l.to;
             return (
               <button
@@ -29,8 +29,7 @@ export function TopBar({ tone, place, site, onJump, fill = false }: { tone: "ink
                 type="button"
                 aria-current={on ? "location" : undefined}
                 onClick={() => onJump(l.to)}
-                style={fill ? ({ "--fill": `var(--s${i})` } as React.CSSProperties) : undefined}
-                className={`top-bar-link relative flex items-center transition-colors ${on ? "top-bar-on" : ""} ${fill ? "top-bar-fill" : ""}`}
+                className={`top-bar-link relative flex items-center transition-colors ${on ? "top-bar-on" : ""}`}
               >
                 {l.label}
               </button>
@@ -41,7 +40,7 @@ export function TopBar({ tone, place, site, onJump, fill = false }: { tone: "ink
           <button
             type="button"
             onClick={() => onJump("map")}
-            className={`my-auto hidden min-h-9 items-center gap-2 rounded-full px-3.5 text-[14px] transition-colors sm:inline-flex ${
+            className={`press my-auto hidden min-h-9 items-center gap-2 px-3.5 text-[14px] transition-colors sm:inline-flex ${
               ink ? "bg-white/10 text-white hover:bg-white/16" : "bg-mz-panel text-mz-ink hover:bg-[#ececf0]"
             }`}
           >

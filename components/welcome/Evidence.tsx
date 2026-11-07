@@ -110,7 +110,7 @@ export function Evidence({ c, pump, meta, shiftHour, channel, onBack }: Props) {
 
   return (
     <>
-      <div ref={box} className="relative mt-3 rounded-lg bg-mz-panel px-1 pt-1">
+      <div ref={box} className="relative mt-3 bg-mz-panel px-1 pt-1">
         <SignalChart
           rows={rows}
           unit={unit}
@@ -149,7 +149,7 @@ export function Evidence({ c, pump, meta, shiftHour, channel, onBack }: Props) {
           <button
             type="button"
             onClick={play}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-[14px] font-medium shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)] transition-colors hover:shadow-[inset_0_0_0_1px_var(--mz-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent"
+            className="press inline-flex min-h-10 items-center gap-1.5 px-3 text-[14px] font-medium shadow-[inset_0_0_0_1px_rgb(11_16_20/0.25)] transition-colors hover:shadow-[inset_0_0_0_1px_var(--mz-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mz-accent"
           >
             {t === null ? (
               <Play aria-hidden className="size-3.5" strokeWidth={2} />
