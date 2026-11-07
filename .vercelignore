@@ -1,9 +1,0 @@
-# Leading slashes matter: an unanchored "data" would also drop public/data and break the app.
-/.venv
-/.claude
-/.playwright-cli
-/data
-/docs
-/tools
-/scripts
-*.test.ts
