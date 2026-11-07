@@ -22,12 +22,13 @@ import pandas as pd  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from detector.baseline_b1 import B1_PARAMS, b1_frame  # noqa: E402
 from detector.common import COLS, REPO, RESULTS, load_assets, load_features, write_predictions  # noqa: E402
+from detector import calibrate  # noqa: E402
 from detector.detect import detect  # noqa: E402
 from detector.diagnose import diagnose, state_at  # noqa: E402
 from detector.features import physics_frame  # noqa: E402
 from retrofit_sim import baselines as B  # noqa: E402
 
-VERSION = "Team detector v3"
+VERSION = "Team detector v4"
 
 
 def build_frames(assets: pd.DataFrame, feat: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -52,6 +53,27 @@ def rediagnose(times: pd.DataFrame, frames: dict, assets: pd.DataFrame) -> pd.Da
     return pd.DataFrame(rows, columns=COLS)
 
 
+def write_json(pred: pd.DataFrame, path: Path, calib: dict) -> None:
+    """docs/spec.md section 8 format: ranked hypotheses with the calibrated rate for the named cause and the rest of the
+    probability shared among the alternatives in proportion to their rule strength."""
+    import json
+    out = []
+    for i, r in enumerate(pred.sort_values(["asset_id", "alert_time_utc"]).itertuples(), 1):
+        hyps = r.hypotheses if isinstance(r.hypotheses, list) else []
+        top = float(r.confidence)
+        alts = [h for h in hyps if h["fault_type"] != r.fault_type][:2]
+        total = sum(h["strength"] for h in alts) or 1.0
+        ranked = [{"event_class": r.event_class, "fault_type": r.fault_type, "probability": round(top, 2)}]
+        ranked += [{"event_class": h["event_class"], "fault_type": h["fault_type"],
+                    "probability": round(min(top, (1 - top) * h["strength"] / total), 2)} for h in alts]
+        out.append({"asset_id": r.asset_id, "alert_time_utc": pd.Timestamp(r.alert_time_utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "event_class": r.event_class, "fault_type": r.fault_type, "confidence": round(top, 2),
+                    "recommended_action": r.recommended_action, "detector_version": VERSION,
+                    "confidence_calibrated": r.fault_type in calib["by_type"],
+                    "hypotheses": ranked, "evidence": {"summary": r.evidence}})
+    path.write_text(json.dumps({"source": VERSION, "calibration": calib, "alerts": out}, indent=1), encoding="utf-8")
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--mode", choices=["b1times", "own"], default="own")
@@ -65,11 +87,18 @@ def main(argv=None) -> int:
         pred = rediagnose(times, frames, assets)
     else:
         pred = detect(frames, assets)
+        # confidence = how often this fault name was right on the training pumps (fitted on train only)
+        train_ids = set(assets[assets["split"] == "train"]["asset_id"])
+        calib = calibrate.fit(pred[pred["asset_id"].isin(train_ids)], assets)
+        calibrate.save(calib, RESULTS / "calibration.json")
+        pred = calibrate.apply(pred, calib)
     out_all = RESULTS / f"predictions_team_{a.mode}.csv"
     write_predictions(pred, out_all)
     labelled = set(assets[assets["split"].isin(("train", "validation"))]["asset_id"])
     write_predictions(pred[pred["asset_id"].isin(labelled)], REPO / "team_alerts.csv")
     write_predictions(pred[~pred["asset_id"].isin(labelled)], REPO / "predictions_test.csv")
+    if "hypotheses" in pred and a.mode == "own":
+        write_json(pred[pred["asset_id"].isin(labelled)], REPO / "team_alerts.json", calib)
     print(f"{len(pred)} alerts -> {out_all}, team_alerts.csv ({int(pred['asset_id'].isin(labelled).sum())}), predictions_test.csv ({int((~pred['asset_id'].isin(labelled)).sum())})")
     return 0
 

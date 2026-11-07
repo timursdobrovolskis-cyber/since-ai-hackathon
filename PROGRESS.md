@@ -21,6 +21,9 @@ scores any file; `detector/causality_check.py` reruns the detector on truncated 
 | Team v3: own alert times | validation | 91.8 | 0.94 | 0.89 | 1.00 | 0.89 | 0.89 | 0.89 | 0.00 | 9 | 8 |
 | Team v3: own alert times | both | 84.4 | 0.91 | 0.83 | 1.00 | 0.77 | 0.83 | 0.75 | 0.00 | 35 | 29 |
 
+Team v4 (final) = v3 alerts with calibrated confidence; the scorer ignores confidence, so the numbers are the same.
+Full tables with confusion matrices: `detector/results/final_scores.md`. Notes, method and limitations: `detector/README.md`.
+
 ## Phase 1: reproduce B1 (done)
 
 - `detector/baseline_b1.py` reruns B1 with the organizers' chosen settings (k=6, 15 min) for all 12 pumps and checks the
@@ -94,6 +97,19 @@ One command: `.venv/bin/python detector/run.py` (mode `own`) writes `detector/re
   the alerts before the cut with the full run (3 cuts per labelled pump).
 - Test pumps: 28 alerts (PUMP-10: 8, PUMP-11: 6, PUMP-12: 14). Only counts were looked at.
 
-## Next
+## Phase 4: calibrated confidence, final files, notes (done)
 
-- Phase 4: calibrated confidence from train-only hit rates per fault type, final files, notes.
+- `detector/calibrate.py`: confidence(X) = (hits + 1) / (alerts + 2) over the TRAIN alerts that named X, hit = the alert
+  fell inside a labelled event of type X. Fitted on train only, written to `detector/results/calibration.json`, applied
+  to every pump. UNKNOWN is 0.5 and flagged as not calibrated. On validation the observed hit rate is at or above the
+  stated confidence for every type (bearing 1.00 vs 0.95, misalignment 1.00 vs 0.43, restriction 1.00 vs 0.86,
+  clog 1.00 vs 0.90, stuck 1.00 vs 0.86), so the numbers are conservative rather than flattering.
+- `team_alerts.json`: the docs/spec.md section 8 format with ranked hypotheses (the named cause at its calibrated
+  rate, alternatives sharing the rest in proportion to rule strength), `confidence_calibrated`, and the evidence
+  sentence. `tools/build_ui_data.py --alerts team_alerts.json --name "Team detector v4"` rebuilt `public/data`.
+- Final files: `team_alerts.csv` / `.json` (85 alerts, train + validation), `predictions_test.csv` (28 alerts,
+  PUMP-10..12, official format, top cause only), `detector/results/predictions_team_v4.csv` (all pumps),
+  `detector/results/final_scores.md`.
+- Causality: `detector/causality_check.py --cuts 3` passes on all 9 labelled pumps (27 cuts).
+
+## Done = beats B1 on train + validation combined (84.4 vs 63.4), is causal, and the app runs with our alerts.
