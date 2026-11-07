@@ -1,21 +1,21 @@
-# Progress: today-screen
+# Progress: voice-handover
 
 ## Done
 
-- Today screen is the new home page, with three plain groups.
-- Case page leads with what's happening and what to do, with evidence behind "Why does it think this?".
-- Plain wording for all 14 alert types, with a test that bans engineering terms.
-- The old overview moved to Week overview, under "For planners" in the sidebar.
-- Remind me later brings a case back to the top when due.
+- Spoken shift handover recorded and playing from Today.
+- Ask about this pump, by voice or typing, behind an access code.
+- Typed tests: it hedges causes, refuses machine commands, sends emergencies to plant procedure and says when it doesn't know.
 
 ## In progress
 
-Spoken shift handover, on the next branch.
+Nothing.
 
 ## Next
 
-- Ask at the pump, behind an access code.
-- Update the technical note and video script.
+- A person tests hold-to-talk with a real microphone.
+- Set `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE` in Vercel before deploying.
+- Run `npm run explain` once `ANTHROPIC_API_KEY` is available, which is optional now.
+- After swapping in detector alerts, rerun `npm run handover`.
 
 ## Blockers
 

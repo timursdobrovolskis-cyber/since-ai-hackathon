@@ -4,6 +4,7 @@ import { ChevronDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 import { useApp } from "@/components/AppProvider";
+import { AskPump } from "@/components/AskPump";
 import { CaseEvidence } from "@/components/CaseEvidence";
 import { DecisionPanel } from "@/components/DecisionPanel";
 import { ExplanationPanel } from "@/components/ExplanationPanel";
@@ -50,6 +51,8 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
       </section>
 
       <DecisionPanel item={item} />
+
+      <AskPump key={item.latest.alert_id} item={item} meta={meta} />
 
       <section aria-label="Details">
         <button

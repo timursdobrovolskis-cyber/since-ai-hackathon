@@ -7,3 +7,8 @@
 /tools
 /scripts
 *.test.ts
+
+# Never upload local secrets. Set them in Vercel instead.
+.env
+.env.*
+!.env.example

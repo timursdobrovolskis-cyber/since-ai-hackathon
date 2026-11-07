@@ -55,6 +55,7 @@ Cases, lead times, the Review view and payback all update with no code change. S
 - The sensor comparison counts a fault as visible at a level when that level has a channel that carried the fault's earliest evidence. It comes from the labels, not a detector, because B1 cannot use wireless channels and its scoring credits unrelated alerts on long faults. Hardware totals come from the organizers' feasibility document, and the low-cost retrofit total is our own sum of its parts.
 - The payback calculator ports the organizers' business case, and `npm test` checks it against their published figures. It defaults to results from all labelled pumps. Their worked example uses only the 2 validation pumps, which gives a shorter payback. Results are illustrative, not a realised or expected saving.
 - Spoken shift handovers are recorded in advance with `npm run handover`, using a stock ElevenLabs voice, and stored in `public/audio`. They use the same rules as the Today list, and only what was known at that shift.
+- Ask about this pump uses an ElevenLabs Agent. It only receives that pump's facts up to the replay time, never labels, and it only starts through `app/api/voice`, which checks an access code and keeps the key on the server. Conversations are capped at 90 seconds, 40 a day and 2 at a time. `npm run voice-agent` creates or updates it. It needs `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE`, and internet.
 - AI explanations are generated in advance by `npm run explain` and stored, so the app needs no key and works offline. The model sees one alert and its pump sheet, never labels or later data, and any text containing a number that is not in its input is rejected.
 - The what-if panel shows pre-computed results from the organizers' sandbox, so it works offline. Its severity levels are our assumptions, not measurements, and it never touches a machine. An inspection is never shown as blocked, because it does not change the pump: a problem found there appears as a warning.
 
@@ -73,7 +74,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
-| Voice | ElevenLabs SDK | MIT |
+| Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
 | Simulator and baselines | `retrofit_sim` from the organizer pack | MIT |
