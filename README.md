@@ -1,4 +1,4 @@
-# Retrofit Assist
+# Retrosense
 
 Early, explainable warnings for existing cooling-water pumps, with a human deciding every action.
 
@@ -62,6 +62,9 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 
 ## Technology
 
+The look is defined in [DESIGN.md](DESIGN.md).
+
+
 | Component | Tool or library | Licence |
 |---|---|---|
 | Web app | Next.js, React | MIT |
@@ -69,7 +72,10 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Charts | uPlot | MIT |
 | Isometric case board | react-isokit | MIT |
 | Icons | Lucide | ISC |
-| Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
+| Display typeface | Clash Display by Indian Type Foundry, via Fontshare, self-hosted in `app/fonts` | ITF Free Font License (free for commercial use) |
+| Body typeface | Satoshi by Indian Type Foundry, via Fontshare, self-hosted in `app/fonts` | ITF Free Font License (free for commercial use) |
+| Monospace typeface | JetBrains Mono, via `next/font/google` | SIL Open Font License 1.1 |
+| Smooth scrolling | Lenis | MIT |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
@@ -87,6 +93,7 @@ Anything that existed before the event, kept separate from what was built there.
 
 - This README and repo scaffolding were prepared before the event from a blank template.
 - The organizer data pack and its `retrofit_sim` code are supplied by the challenge and are not stored in this repo.
+- The font files in `app/fonts` (Clash Display, Satoshi) are third-party typefaces from Fontshare, used unchanged under the ITF Free Font License.
 
 ## Data
 

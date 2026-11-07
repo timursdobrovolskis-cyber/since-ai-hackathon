@@ -120,7 +120,7 @@ export default function ReviewPage() {
                   onClick={() => setSelected(p.id)}
                   className={`min-h-11 border px-2.5 py-1 text-left text-[13px] leading-tight ${p.id === selected ? "border-ink bg-ink text-raised" : "border-line bg-raised"}`}
                 >
-                  <span className="block font-cond text-[15px] font-semibold">{p.id}</span>
+                  <span className="block font-mono text-[13px] font-semibold">{p.id}</span>
                   {s.currentCaught} of {s.eventsScored} caught
                 </button>
               </li>

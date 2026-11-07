@@ -1,23 +1,45 @@
 @import "tailwindcss";
 
-/* Calm industrial, after ISA-101: greys carry everything, and colour means something needs attention.
-   Normal has no colour on purpose. */
+/* Retrosense: dark, precise, technical. Greys carry everything; colour means "look here".
+   Token names are shared with every screen, so change values here, not names. See DESIGN.md.
+   Contrast (WCAG 2.1) is checked against deck, panel and raised. Lowest pairs:
+   ink-3 on raised 5.15:1, machine on raised 5.35:1, unknown on raised 4.83:1, deck text on accent 6.35:1. */
 :root {
-  --deck: #d5d8da;
-  --panel: #e6e8e9;
-  --raised: #f1f2f3;
-  --ink: #1f2629;
-  --ink-2: #4a5358;
-  --ink-3: #68727a;
-  --line: #bcc2c6;
-  --line-soft: #cdd2d5;
-  --run: #c3c8cb;
-  --stop: #9aa2a7;
-  --band: #c9ced1;
-  --machine: #b0440c;
-  --sensor: #5a3fb0;
-  --unknown: #3d4a52;
-  --cursor: #1f2629;
+  /* Surfaces, darkest to lightest */
+  --deck: #0a0a0a;
+  --panel: #171717;
+  --raised: #1e1e1e;
+  /* Text */
+  --ink: #f2f2f2;
+  --ink-2: #b0b0b0;
+  --ink-3: #8f8f8f;
+  /* Hairlines, decorative only, never the sole carrier of meaning */
+  --line: #333333;
+  --line-soft: #262626;
+  /* Data marks */
+  --run: #3d3d3d;
+  --stop: #737373;
+  --band: #363636;
+  --cursor: #f2f2f2;
+  /* Meaning. Orange = machine problem / the one primary action. Ice blue = sensor or data problem. */
+  --machine: #ff5a1f;
+  --accent: var(--machine);
+  --sensor: #7cc7ff;
+  --unknown: #8a8a8a;
+
+  /* Type. --font-clash, --font-satoshi and --font-jetbrains come from next/font in app/layout.tsx. */
+  --font-display: var(--font-clash), "Arial Narrow", system-ui, sans-serif;
+  --font-body: var(--font-satoshi), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 220ms;
+  --dur-slow: 300ms;
+  --stagger: 40ms;
+
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -28,10 +50,23 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
   --color-machine: var(--machine);
   --color-sensor: var(--sensor);
-  --font-sans: var(--font-barlow);
-  --font-cond: var(--font-barlow-cond);
+  --color-unknown: var(--unknown);
+  --color-accent: var(--accent);
+  /* Literal stacks, same as :root, so no variable refers to itself. */
+  --font-sans: var(--font-satoshi), system-ui, sans-serif;
+  --font-body: var(--font-satoshi), system-ui, sans-serif;
+  --font-display: var(--font-clash), "Arial Narrow", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Older screens use font-cond for headings and IDs; it now means the display face. */
+  --font-cond: var(--font-clash), "Arial Narrow", system-ui, sans-serif;
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 html, body { height: 100%; }
@@ -39,45 +74,109 @@ html, body { height: 100%; }
 body {
   background: var(--deck);
   color: var(--ink);
-  font-family: var(--font-barlow), system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
-  line-height: 1.4;
+  line-height: 1.45;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Display face is tight; keep headings set close. */
+:where(.font-display, .font-cond) { letter-spacing: -0.01em; }
+
+::selection { background: var(--accent); color: var(--deck); }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  transition: outline-offset var(--dur-fast) var(--ease-out);
+}
 
 button { cursor: pointer; }
 
 input[type="range"] { accent-color: var(--ink); }
 
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+/* Small mono label for indices, tags and units: 01, {02}, FLOW m3/h. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
+
+/* ---------- Motion layer ----------
+   ease-out, 150 to 300 ms, never move text someone is reading, and everything off for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Card hover lift: opt in with .lift, so static panels never move. */
+  .lift { transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+  .lift:hover { transform: translateY(-2px); border-color: var(--ink-3); }
+
+  /* Button press */
+  button:not(:disabled), .press {
+    transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  button:not(:disabled):active, .press:active { transform: scale(0.97); }
+
+  :focus-visible { outline-offset: 3px; }
+
+  /* Lists entering: children fade up one after another, 40 ms apart, capped at 8 steps. */
+  .reveal > * { animation: reveal var(--dur-slow) var(--ease-out) both; }
+  .reveal > *:nth-child(2) { animation-delay: calc(var(--stagger) * 1); }
+  .reveal > *:nth-child(3) { animation-delay: calc(var(--stagger) * 2); }
+  .reveal > *:nth-child(4) { animation-delay: calc(var(--stagger) * 3); }
+  .reveal > *:nth-child(5) { animation-delay: calc(var(--stagger) * 4); }
+  .reveal > *:nth-child(6) { animation-delay: calc(var(--stagger) * 5); }
+  .reveal > *:nth-child(7) { animation-delay: calc(var(--stagger) * 6); }
+  .reveal > *:nth-child(n + 8) { animation-delay: calc(var(--stagger) * 7); }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Lenis smooth scrolling (components/SmoothScroll.tsx) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
 
 /* uPlot hover readout */
 .uplot .u-legend { display: none; }
+.uplot { font-family: var(--font-mono); }
 
 /* Isometric case board, in the app's greys */
 .case-board {
   --ik-panel: var(--panel);
-  --ik-top: var(--raised);
-  --ik-front: #e0e3e5;
-  --ik-side: var(--line-soft);
-  --ik-line: var(--ink-3);
+  --ik-top: #2a2a2a;
+  --ik-front: var(--raised);
+  --ik-side: var(--panel);
+  --ik-well: var(--deck);
+  --ik-line: #5c5c5c;
   --ik-detail: var(--line);
   --ik-live: var(--ink);
-  --ik-ink: var(--ink-2);
-  --ik-screen: var(--ink);
-  --ik-screen-ink: var(--raised);
+  --ik-ink: var(--ink-3);
+  --ik-ink-hi: var(--ink);
+  --ik-screen: var(--deck);
+  --ik-screen-ink: var(--ink);
   --ik-border: transparent;
-  --ik-screen-font: var(--font-barlow-cond), sans-serif;
+  --ik-glow: var(--accent);
+  --ik-mono: var(--font-mono);
+  --ik-screen-font: var(--font-mono);
   border: 0;
+  border-radius: 0;
   background: none;
 }
 
-.case-board .slab { transition: opacity 180ms ease; transition-delay: calc(var(--day) * 20ms); }
+.case-board .slab { transition: opacity 180ms var(--ease-out); transition-delay: calc(var(--day) * 20ms); }
 .case-board .slab[data-on="false"] { opacity: 0; }
 .case-board .board-led { fill: var(--ik-line); }
-.case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
+.case-board .board-key[data-on="true"] .board-led { fill: var(--ink); }

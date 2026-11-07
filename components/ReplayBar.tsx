@@ -13,11 +13,11 @@ export function ReplayBar() {
           if (hour >= 168) setHour(0);
           setPlaying(!playing);
         }}
-        className="min-h-9 min-w-20 border border-ink bg-ink px-3 font-medium text-raised"
+        className="min-h-9 min-w-20 rounded-sm border border-ink bg-ink px-3 font-medium text-deck"
       >
         {playing ? "Pause" : hour >= 168 ? "Replay" : "Play"}
       </button>
-      <output className="min-w-28 font-cond text-lg font-semibold" aria-live="off">{clock(hour)}</output>
+      <output className="min-w-28 font-mono text-[15px] font-medium" aria-live="off">{clock(hour)}</output>
       <input
         type="range"
         min={0}

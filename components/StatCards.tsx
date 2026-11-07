@@ -17,14 +17,14 @@ export function StatCards() {
   ];
   return (
     <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      {stats.map((stat) => (
+      {stats.map((stat, i) => (
         <Card key={stat.label} className="px-4 py-3">
           <div className="flex items-start justify-between gap-2">
-            <h2 className="text-[13px] font-medium text-ink-2">{stat.label}</h2>
-            <stat.icon aria-hidden className={`size-4 shrink-0 ${stat.tone ?? "text-ink-3"}`} />
+            <h2 className="label-mono"><span aria-hidden className="mr-2 text-ink-3">{`{${String(i + 1).padStart(2, "0")}}`}</span><span className="text-ink-2">{stat.label}</span></h2>
+            <stat.icon aria-hidden strokeWidth={1.75} className={`size-4 shrink-0 ${stat.tone ?? "text-ink-3"}`} />
           </div>
-          <p className={`font-cond text-3xl leading-tight font-semibold ${stat.tone ?? ""}`}>{stat.value}</p>
-          <p className="text-[13px] text-ink-3">{stat.hint}</p>
+          <p className={`mt-2 font-display text-4xl leading-none font-semibold tabular-nums ${stat.tone ?? ""}`}>{stat.value}</p>
+          <p className="mt-2 text-[13px] text-ink-3">{stat.hint}</p>
         </Card>
       ))}
     </div>

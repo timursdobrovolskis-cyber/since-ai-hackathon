@@ -11,7 +11,7 @@ export function CardHeader({ className = "", ...props }: Props) {
 }
 
 export function CardTitle({ className = "", ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={`font-cond text-lg leading-tight font-semibold ${className}`} {...props} />;
+  return <h2 className={`font-display text-lg leading-tight font-semibold ${className}`} {...props} />;
 }
 
 export function CardDescription({ className = "", ...props }: HTMLAttributes<HTMLParagraphElement>) {

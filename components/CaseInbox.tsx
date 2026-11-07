@@ -29,8 +29,8 @@ export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
         <span className="mt-1"><CaseMark eventClass={item.eventClass} faultType={item.faultType} /></span>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="font-cond font-semibold">{item.assetId}</span>
-            <span className="text-[13px] text-ink-2">{age(hour - item.first.offset_hours)}</span>
+            <span className="font-mono text-[13px] font-semibold tracking-[0.04em]">{item.assetId}</span>
+            <span className="font-mono text-[12px] text-ink-2">{age(hour - item.first.offset_hours)}</span>
           </div>
           <p className="font-medium">{faultLabel(item.faultType)}</p>
           <p className="text-[13px] text-ink-2">
