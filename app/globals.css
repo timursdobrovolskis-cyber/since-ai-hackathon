@@ -19,9 +19,12 @@
   --unknown: #3d4a52;
   --cursor: #1f2629;
 
-  /* Landing page (/welcome): a blueprint, white line work on blue. Colours only, no logo. */
-  --bp-blue: #0d3b8e;
-  --bp-blue-deep: #08306f;
+  /* Landing page (/welcome), after meuze.ai: ink and white, one accent blue. */
+  --mz-ink: #0b1014;
+  --mz-panel: #f6f6f8;
+  --mz-line: #e6e7ec;
+  --mz-muted: #6e7180;
+  --mz-accent: #2c63ff;
 }
 
 @theme inline {
@@ -34,7 +37,14 @@
   --color-line: var(--line);
   --color-machine: var(--machine);
   --color-sensor: var(--sensor);
+  --color-mz-ink: var(--mz-ink);
+  --color-mz-panel: var(--mz-panel);
+  --color-mz-line: var(--mz-line);
+  --color-mz-muted: var(--mz-muted);
+  --color-mz-accent: var(--mz-accent);
   --font-sans: var(--font-barlow);
+  --font-geist: var(--ff-geist);
+  --font-mono: var(--ff-mono);
   --font-cond: var(--font-barlow-cond);
 }
 
@@ -86,20 +96,26 @@ input[type="range"] { accent-color: var(--ink); }
 .case-board .board-led { fill: var(--ik-line); }
 .case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
 
-/* Landing page. A blueprint: fine grid every 24 px, stronger line every 120 px, slight vignette. */
-.blueprint {
-  background-color: var(--bp-blue);
-  background-image:
-    radial-gradient(ellipse at center, transparent 55%, var(--bp-blue-deep) 130%),
-    linear-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.13) 1px, transparent 1px),
-    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-  background-size: 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px;
-  background-attachment: fixed;
+/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame.
+   --g is the ink-to-white fade, 0 until p = 0.6 and 1 from p = 0.72. It is kept short because the middle of any
+   fade is mid grey, where no line colour reads well. PumpStage uses the same window for the pump's lines. */
+.welcome-stage {
+  --g: clamp(0, (var(--p) - 0.6) * 8.333, 1);
+  background: color-mix(in srgb, var(--mz-ink), white calc(var(--g) * 100%));
 }
-
-/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame. */
+.welcome-grid {
+  opacity: calc(1 - var(--g));
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: center;
+}
+.welcome-frame { border-color: color-mix(in srgb, rgb(255 255 255 / 0.22), var(--mz-line) calc(var(--g) * 100%)); }
+.welcome-corner { background: color-mix(in srgb, white, var(--mz-ink) calc(var(--g) * 100%)); }
+.welcome-label { color: color-mix(in srgb, rgb(255 255 255 / 0.6), var(--mz-muted) calc(var(--g) * 100%)); }
 .welcome-cue { opacity: calc(1 - var(--p) * 12); }
 .welcome-map {
   opacity: calc((var(--p) - 0.74) * 6);

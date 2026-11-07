@@ -6,7 +6,7 @@
 // the CSS variable --p on `track`, so the page can fade things with plain CSS and React never re-renders.
 //
 //   0.00-0.50  the pump zooms in and turns
-//   0.55-0.90  it glides into the right column, and the left column appears
+//   0.55-0.90  it glides into the right column while the page fades from ink to white, and the left column appears
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
@@ -15,6 +15,9 @@ const CAMERA_Z = 16;
 const MODEL_URL = "/models/pump-edges.bin";
 /** Longest side of the model after scaling. The build tool scales it to span -1 to 1. */
 const MODEL_LENGTH = 2;
+/** Line colour on ink, and on white once the page has faded. */
+const LINE_ON_INK = new THREE.Color(0xffffff);
+const LINE_ON_WHITE = new THREE.Color(0x0b1014);
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 /** 0 before a, 1 after b, smooth in between. */
@@ -63,7 +66,7 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
     camera.position.set(0, 0, CAMERA_Z);
     const pump = new THREE.Group();
     scene.add(pump);
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
+    const material = new THREE.LineBasicMaterial({ color: LINE_ON_INK, transparent: true, opacity: 0.88 });
 
     const controller = new AbortController();
     fetch(MODEL_URL, { signal: controller.signal })
@@ -113,15 +116,19 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
       const t = (performance.now() - start) / 1000;
       const zoom = ease(0, 0.5, p);
       const glide = ease(0.55, 0.9, p);
+      // --g in globals.css fades the background over p 0.6 to 0.72. The lines flip at its middle, so they never
+      // sit grey on grey for long.
+      const g = clamp01((p - 0.6) / 0.12);
+      material.color.lerpColors(LINE_ON_INK, LINE_ON_WHITE, ease(0.45, 0.55, g));
 
       // Size: fit the pump to a share of the screen width, capped by the height.
       const fit = (share: number, heightShare: number) =>
         Math.min((share * 2 * halfW) / MODEL_LENGTH, (heightShare * 2 * halfH) / MODEL_LENGTH);
-      const scale = lerp(lerp(fit(0.8, 0.8), fit(1.1, 1.1), zoom), fit(0.46, 0.55), glide);
+      const scale = lerp(lerp(fit(1.25, 1.1), fit(1.55, 1.45), zoom), fit(0.47, 0.64), glide);
       pump.scale.setScalar(scale);
 
       // Place: centred in the hero, then into the middle of the right column.
-      pump.position.set(lerp(0, halfW * 0.5, glide), lerp(-halfH * 0.02, -halfH * 0.04, glide), 0);
+      pump.position.set(lerp(0, halfW * 0.48, glide), lerp(-halfH * 0.02, -halfH * 0.04, glide), 0);
 
       // Turn: the scroll turns the pump half way round. A slow sway keeps the hero alive.
       const sway = reduced ? 0 : Math.sin(t * 0.35) * 0.22 * (1 - ease(0, 0.12, p));

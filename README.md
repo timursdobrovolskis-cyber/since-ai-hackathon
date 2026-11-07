@@ -79,6 +79,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Pump model on the landing page | `pump.obj`, downloaded by the team, stored only as line work in `public/models/pump-edges.bin` | **Source and licence to confirm** |
 | Icons | Lucide | ISC |
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
+| Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |

@@ -1,10 +1,10 @@
 # Welcome landing page: spec
 
-Written 7 Nov 2026 from an interview with Jona. Inspiration: https://www.zeggo.com.sg/ and Jona's sketch (`random.pdf`, one page).
+Written 7 Nov 2026 from an interview with Jona. Inspiration: https://www.zeggo.com.sg/, https://www.meuze.ai (from 7 Nov afternoon) and Jona's sketch (`random.pdf`, one page).
 
 ## Goal
 
-A separate landing page at `/welcome` that shows, in one glance, a site of 12 pumps with a light at each, and lets a visitor click a pump to see what is wrong with it. It sits in the same Next.js app as the worker screens and does not replace Today.
+An interactive dashboard you scroll through. A separate landing page at `/welcome` that shows, in one glance, a site of 12 pumps with a light at each, and lets a visitor click a pump to see what is wrong with it. It sits in the same Next.js app as the worker screens and does not replace Today.
 
 Built in parts. Each part is shown to Jona before the next starts.
 
@@ -14,14 +14,16 @@ Built in parts. Each part is shown to Jona before the next starts.
 |---|---|
 | Route | `/welcome` in the same app and deploy. Today stays at `/` |
 | Branch | New branch `welcome-landing` from `one-home-screen` (PR 7), because the lights must use PR 7's fixed evening shift. Its PR targets `dashboard` and merges after PR 7 |
-| Look | A blueprint: white line work on blueprint blue `#0d3b8e`, a fine white grid, a thin frame and a small title block. Style taken from a blueprint reference image, none of its content |
-| Logo | No Business Turku logo anywhere. Colours only. The name top left is Retrofit Assist |
+| Look | Meuze's palette: ink `#0B1014`, white, panel `#F6F6F8`, line `#E6E7EC`, muted `#6E7180`, one accent blue `#2C63FF`. Sections alternate dark, white, white, dark, white. A faint grid behind dark sections only. The lights, red, orange and green, are the only other colours |
+| Logo | No Business Turku logo anywhere. The name top left is Retrofit Assist |
+| Fonts | Geist for text and big numbers, JetBrains Mono for labels and readings. Both SIL Open Font License. Loaded only on `/welcome` |
 | Hero | No headline or text for now, by Jona's choice. Only the pump, the header and a Scroll cue |
 | Hero art | A downloaded pump model (`pump.obj`, 3ds Max, one object), turned into line work by `tools/build_pump_edges.mjs`. It is one piece, so it does not pull apart. Source and licence still to confirm |
-| Scroll | Scroll scrubs the animation. The pump zooms in and turns as you scroll, then glides into the right column while the map slides in on the left. Scrolling back reverses it. No cut, the same pump all the way |
+| Scroll | Scroll scrubs the animation. The pump zooms in and turns, then glides into the right column. Meanwhile the background fades from ink to white and the pump's lines turn from white to ink. Scrolling back reverses it |
 | Map | Left side. A flat schematic of one fictional site, labelled as fictional, in four zones by system. No pump drawings, only a name and a light per pump, joined by thin pipe lines |
 | Pumps on the map | 12. Pumps 1 to 9 are live. Pumps 10, 11 and 12 are the hidden test pumps and show dimmed, marked "No data yet", with no light colour |
-| Lights | Same rule as Today at `SHIFT_HOUR`: red = Needs you today, orange = Check the reading, green = Can wait or no alert. Computed with `groupByPump` from `lib/today.ts`, so map and Today never disagree |
+| Lights | Same rule as Today: red = Needs you today, orange = Check the reading, green = Can wait or no alert. Computed with `groupByPump` from `lib/today.ts` at the hour shown |
+| Time | The map section pins, and scrolling runs the clock from hour 0 to `SHIFT_HOUR`. Lights change as alerts arrive, and a clock and counters tick. At the shift the map unpins and pumps become clickable. Never shows data past `SHIFT_HOUR` |
 | Alerts | No separate alert list. The light is the alert. Clicking a pump shows its alerts |
 | Click | The 3D pump shrinks and moves up in the right column, and a small dashboard card slides in under it. The map does not change except the selected pump is marked. A close button restores the pump |
 | 14 sensors | The 14 kinds of reading across the fleet show in the clicked pump's dashboard: which it has, which it cannot measure, and which one the alert is about. Nothing about sensors on the map |
@@ -39,12 +41,24 @@ From `profile` in the organizer `assets.csv`. Site names stay fictional.
 | Cooling-water circulation | 4, 5, 9, 11 |
 | Process water | 6, 12 |
 
+## Sections, top to bottom
+
+| # | Section | Background | What it does |
+|---|---|---|---|
+| 1 | Pump hero | Ink, fading to white | The line-work pump zooms, turns and glides right |
+| 2 | Site map | White | Pinned. Scroll runs time to the evening shift, lights change. Then click a pump for its dashboard, with the pump shrinking above it |
+| 3 | Step list | White | Pinned. Today's red and orange pumps listed on the left, highlighting one by one as you scroll. On the right, that pump's real signal draws in, leaving its grey normal band, with the alert marked |
+| 4 | Results counter | Ink | Big counting numbers: faults caught against plant alarms, median warning. Baseline figures, labelled |
+| 5 | Payback and sensors | White | A row of four cards lighting up one by one, each with a mini chart |
+
 ## Parts
 
-1. **Hero and scroll.** Built on 7 Nov, branch `welcome-landing`. `/welcome` with the line-work pump, the heading and button, and the scroll zoom, turn and glide to the right. The left column is an empty placeholder where the map will go. No pump data used.
-2. **Map.** Zones, labels, pipe lines and lights from real alerts at `SHIFT_HOUR`. Test pumps dimmed. Clicks do nothing yet.
-3. **Click and dashboard.** Pump shrinks, card slides in with the problem, what to do and the sensor list. Links to the full job card.
-4. **Later, not agreed yet.** The "estimate" in the dashboard, the phone layout, and any link into the video.
+1. **Hero and scroll.** Built on 7 Nov. Restyled the same day: Meuze colours and fonts, bigger pump, ink-to-white fade.
+2. **Map with time.** Zones, labels, pipe lines and lights, with scroll running the clock to `SHIFT_HOUR`. Test pumps dimmed.
+3. **Click and dashboard.** Pump shrinks, card slides in with the problem, what to do and the sensor list.
+4. **Step list** with drawing signal charts.
+5. **Results counter and cards.**
+6. **Later, not agreed yet.** The "estimate" in the dashboard and the phone layout.
 
 ## 3D pump (first version, replaced by the downloaded model)
 
