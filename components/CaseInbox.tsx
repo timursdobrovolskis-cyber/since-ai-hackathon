@@ -44,7 +44,7 @@ export function CaseCard({ item, active }: { item: Case; active?: boolean }) {
   );
 }
 
-export function CaseInbox({ activeId }: { activeId?: string }) {
+export function CaseInbox({ activeId, scroll = false }: { activeId?: string; scroll?: boolean }) {
   const { cases, decisions } = useApp();
   const sorted = [...cases].sort((a, b) => Number(!!decisions[a.id]) - Number(!!decisions[b.id]) || b.latest.offset_hours - a.latest.offset_hours);
   const open = cases.filter((c) => !decisions[c.id]).length;
@@ -56,7 +56,7 @@ export function CaseInbox({ activeId }: { activeId?: string }) {
       {sorted.length === 0 ? (
         <p className="px-3 py-3 text-ink-2">No alerts yet. Press Play to run the week.</p>
       ) : (
-        <ul>
+        <ul className={scroll ? "max-h-[26rem] overflow-y-auto lg:max-h-[33rem]" : undefined}>
           {sorted.map((c) => (
             <li key={c.id}><CaseCard item={c} active={c.id === activeId} /></li>
           ))}

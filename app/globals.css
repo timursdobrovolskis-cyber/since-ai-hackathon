@@ -58,3 +58,26 @@ input[type="range"] { accent-color: var(--ink); }
 
 /* uPlot hover readout */
 .uplot .u-legend { display: none; }
+
+/* Isometric case board, in the app's greys */
+.case-board {
+  --ik-panel: var(--panel);
+  --ik-top: var(--raised);
+  --ik-front: #e0e3e5;
+  --ik-side: var(--line-soft);
+  --ik-line: var(--ink-3);
+  --ik-detail: var(--line);
+  --ik-live: var(--ink);
+  --ik-ink: var(--ink-2);
+  --ik-screen: var(--ink);
+  --ik-screen-ink: var(--raised);
+  --ik-border: transparent;
+  --ik-screen-font: var(--font-barlow-cond), sans-serif;
+  border: 0;
+  background: none;
+}
+
+.case-board .slab { transition: opacity 180ms ease; transition-delay: calc(var(--day) * 20ms); }
+.case-board .slab[data-on="false"] { opacity: 0; }
+.case-board .board-led { fill: var(--ik-line); }
+.case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }

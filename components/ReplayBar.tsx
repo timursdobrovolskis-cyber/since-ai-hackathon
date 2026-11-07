@@ -6,7 +6,7 @@ import { SPEEDS, useApp } from "./AppProvider";
 export function ReplayBar() {
   const { hour, setHour, playing, setPlaying, speed, setSpeed, resetDemo } = useApp();
   return (
-    <section aria-label="Replay" className="sticky top-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line bg-panel px-4 py-1.5">
+    <section aria-label="Replay" className="sticky top-13 z-20 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-line bg-panel px-4 py-1.5">
       <button
         type="button"
         onClick={() => {
