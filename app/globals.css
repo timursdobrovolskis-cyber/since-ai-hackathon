@@ -19,10 +19,9 @@
   --unknown: #3d4a52;
   --cursor: #1f2629;
 
-  /* Landing page (/welcome): Business Turku colours on calm grey. Colours only, no logo. */
-  --bt-navy: #003266;
-  --bt-blue: #2e60ff;
-  --bt-bg: #e3e6e9;
+  /* Landing page (/welcome): a blueprint, white line work on blue. Colours only, no logo. */
+  --bp-blue: #0d3b8e;
+  --bp-blue-deep: #08306f;
 }
 
 @theme inline {
@@ -35,9 +34,6 @@
   --color-line: var(--line);
   --color-machine: var(--machine);
   --color-sensor: var(--sensor);
-  --color-bt-navy: var(--bt-navy);
-  --color-bt-blue: var(--bt-blue);
-  --color-bt-bg: var(--bt-bg);
   --font-sans: var(--font-barlow);
   --font-cond: var(--font-barlow-cond);
 }
@@ -90,11 +86,20 @@ input[type="range"] { accent-color: var(--ink); }
 .case-board .board-led { fill: var(--ik-line); }
 .case-board .board-key[data-on="true"] .board-led { fill: var(--machine); }
 
-/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame. */
-.welcome-hero {
-  opacity: calc(1 - var(--p) * 6);
-  transform: translateY(calc(var(--p) * -160px));
+/* Landing page. A blueprint: fine grid every 24 px, stronger line every 120 px, slight vignette. */
+.blueprint {
+  background-color: var(--bp-blue);
+  background-image:
+    radial-gradient(ellipse at center, transparent 55%, var(--bp-blue-deep) 130%),
+    linear-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.13) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-attachment: fixed;
 }
+
+/* Landing page scroll. --p (0 to 1) is set on the scroll section by PumpStage each frame. */
 .welcome-cue { opacity: calc(1 - var(--p) * 12); }
 .welcome-map {
   opacity: calc((var(--p) - 0.74) * 6);

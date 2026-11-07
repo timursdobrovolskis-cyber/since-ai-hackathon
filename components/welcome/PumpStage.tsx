@@ -1,17 +1,20 @@
 "use client";
 
-// Draws the line-work pump and moves it with the scroll position of `track`.
+// Draws the pump as white line work and moves it with the scroll position of `track`.
+// The line work comes from public/models/pump-edges.bin, built by tools/build_pump_edges.mjs.
 // Progress p runs from 0 (top of the section) to 1 (section fully scrolled). It is also written to
-// the CSS variable --p on `track`, so text can fade with plain CSS and React never re-renders.
+// the CSS variable --p on `track`, so the page can fade things with plain CSS and React never re-renders.
 //
-//   0.00-0.50  the pulled-apart pump comes together, zooms in and turns
-//   0.55-0.90  the assembled pump glides into the right column, and the left column appears
+//   0.00-0.50  the pump zooms in and turns
+//   0.55-0.90  it glides into the right column, and the left column appears
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { buildPump, PUMP_LENGTH, PUMP_LENGTH_APART } from "./pumpModel";
 
 const FOV = 30;
 const CAMERA_Z = 16;
+const MODEL_URL = "/models/pump-edges.bin";
+/** Longest side of the model after scaling. The build tool scales it to span -1 to 1. */
+const MODEL_LENGTH = 2;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 /** 0 before a, 1 after b, smooth in between. */
@@ -21,9 +24,23 @@ const ease = (a: number, b: number, x: number) => {
 };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+/** Reads the file layout written by tools/build_pump_edges.mjs. */
+function parseEdges(buf: ArrayBuffer) {
+  const view = new DataView(buf);
+  const tag = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+  if (tag !== "PEDG") throw new Error("Not a pump edge file");
+  const count = view.getUint32(4, true);
+  const ints = new Int16Array(buf, 8, count * 6);
+  const positions = new Float32Array(ints.length);
+  for (let i = 0; i < ints.length; i++) positions[i] = ints[i] / 32767;
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  return geometry;
+}
+
 export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null> }) {
   const holder = useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
 
   useEffect(() => {
     const el = holder.current;
@@ -33,7 +50,7 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
-      setFailed(true);
+      setProblem("This browser cannot draw the 3D pump. Everything else on the page still works.");
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -41,15 +58,23 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
     el.appendChild(renderer.domElement);
     renderer.domElement.setAttribute("aria-hidden", "true");
 
-    const css = getComputedStyle(document.documentElement);
-    const pump = buildPump({
-      line: css.getPropertyValue("--bt-navy").trim() || "#003266",
-      accent: css.getPropertyValue("--bt-blue").trim() || "#2e60ff",
-    });
     const scene = new THREE.Scene();
-    scene.add(pump.root);
     const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
     camera.position.set(0, 0, CAMERA_Z);
+    const pump = new THREE.Group();
+    scene.add(pump);
+    const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
+
+    const controller = new AbortController();
+    fetch(MODEL_URL, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .then((buf) => pump.add(new THREE.LineSegments(parseEdges(buf), material)))
+      .catch((e) => {
+        if (e.name !== "AbortError") setProblem("The pump drawing did not load. Everything else on the page still works.");
+      });
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -87,42 +112,36 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
 
       const t = (performance.now() - start) / 1000;
       const zoom = ease(0, 0.5, p);
-      const assemble = ease(0.08, 0.5, p);
       const glide = ease(0.55, 0.9, p);
 
-      // Size: fit the pump to the screen, so it reads the same on a laptop and a wide monitor.
-      // The hero pump is pulled apart, so it is fitted by its pulled-apart length instead.
-      const fitWidth = (share: number, length = PUMP_LENGTH) => (share * 2 * halfW) / length;
-      const heroScale = Math.min(fitWidth(0.5, PUMP_LENGTH_APART), (halfH * 1.1) / 3.6);
-      const zoomScale = Math.min(fitWidth(0.85), (halfH * 1.5) / 3.6);
-      const endScale = Math.min(fitWidth(0.4), (halfH * 1.2) / 3.6);
-      const scale = lerp(lerp(heroScale, zoomScale, zoom), endScale, glide);
-      pump.root.scale.setScalar(scale);
+      // Size: fit the pump to a share of the screen width, capped by the height.
+      const fit = (share: number, heightShare: number) =>
+        Math.min((share * 2 * halfW) / MODEL_LENGTH, (heightShare * 2 * halfH) / MODEL_LENGTH);
+      const scale = lerp(lerp(fit(0.8, 0.8), fit(1.1, 1.1), zoom), fit(0.46, 0.55), glide);
+      pump.scale.setScalar(scale);
 
-      // Place: right of the hero text, then centre, then the middle of the right column.
-      const x = lerp(lerp(halfW * 0.35, 0, zoom), halfW * 0.5, glide);
-      const y = lerp(lerp(-halfH * 0.05, 0, zoom), -halfH * 0.04, glide);
-      pump.root.position.set(x, y, 0);
+      // Place: centred in the hero, then into the middle of the right column.
+      pump.position.set(lerp(0, halfW * 0.5, glide), lerp(-halfH * 0.02, -halfH * 0.04, glide), 0);
 
       // Turn: the scroll turns the pump half way round. A slow sway keeps the hero alive.
       const sway = reduced ? 0 : Math.sin(t * 0.35) * 0.22 * (1 - ease(0, 0.12, p));
       const turn = reduced ? 0 : Math.PI * ease(0, 0.6, p);
-      pump.root.rotation.y = -0.62 + turn + sway;
-      pump.root.rotation.x = lerp(lerp(0.38, 0.18, zoom), 0.32, glide);
-
-      // Pull apart in the hero, then come together.
-      const apart = 1 - assemble;
-      for (const part of pump.parts) part.group.position.copy(part.explode).multiplyScalar(apart);
+      pump.rotation.y = -0.62 + turn + sway;
+      pump.rotation.x = lerp(lerp(0.38, 0.18, zoom), 0.32, glide);
 
       renderer.render(scene, camera);
     };
     tick();
 
     return () => {
+      controller.abort();
       cancelAnimationFrame(frame);
       ro.disconnect();
       io.disconnect();
-      pump.dispose();
+      pump.traverse((o) => {
+        if (o instanceof THREE.LineSegments) o.geometry.dispose();
+      });
+      material.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
@@ -130,11 +149,7 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
 
   return (
     <div ref={holder} className="absolute inset-0 [&>canvas]:block [&>canvas]:size-full">
-      {failed && (
-        <p className="absolute bottom-6 right-6 max-w-xs text-sm text-bt-navy/70">
-          This browser cannot draw the 3D pump. Everything else on the page still works.
-        </p>
-      )}
+      {problem && <p className="absolute bottom-24 left-1/2 max-w-xs -translate-x-1/2 text-center text-sm text-white/75">{problem}</p>}
     </div>
   );
 }

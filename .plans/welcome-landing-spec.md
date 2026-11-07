@@ -14,10 +14,10 @@ Built in parts. Each part is shown to Jona before the next starts.
 |---|---|
 | Route | `/welcome` in the same app and deploy. Today stays at `/` |
 | Branch | New branch `welcome-landing` from `one-home-screen` (PR 7), because the lights must use PR 7's fixed evening shift. Its PR targets `dashboard` and merges after PR 7 |
-| Look | Business Turku colours on a calm grey background. Navy `#003266` for text and line work, blue `#2E60FF` as the accent. Grey background from the app's `--deck` / `--panel` tokens |
+| Look | A blueprint: white line work on blueprint blue `#0d3b8e`, a fine white grid, a thin frame and a small title block. Style taken from a blueprint reference image, none of its content |
 | Logo | No Business Turku logo anywhere. Colours only. The name top left is Retrofit Assist |
-| Hero | Short heading, one sentence and one button, drafted by Claude in the app's plain style, edited by Jona |
-| Hero art | One 3D centrifugal pump in three.js, built from primitives and drawn as line work (edges only, no shading). In the hero it is pulled apart along the shaft, as in the sketch, and it comes together as you scroll |
+| Hero | No headline or text for now, by Jona's choice. Only the pump, the header and a Scroll cue |
+| Hero art | A downloaded pump model (`pump.obj`, 3ds Max, one object), turned into line work by `tools/build_pump_edges.mjs`. It is one piece, so it does not pull apart. Source and licence still to confirm |
 | Scroll | Scroll scrubs the animation. The pump zooms in and turns as you scroll, then glides into the right column while the map slides in on the left. Scrolling back reverses it. No cut, the same pump all the way |
 | Map | Left side. A flat schematic of one fictional site, labelled as fictional, in four zones by system. No pump drawings, only a name and a light per pump, joined by thin pipe lines |
 | Pumps on the map | 12. Pumps 1 to 9 are live. Pumps 10, 11 and 12 are the hidden test pumps and show dimmed, marked "No data yet", with no light colour |
@@ -46,7 +46,7 @@ From `profile` in the organizer `assets.csv`. Site names stay fictional.
 3. **Click and dashboard.** Pump shrinks, card slides in with the problem, what to do and the sensor list. Links to the full job card.
 4. **Later, not agreed yet.** The "estimate" in the dashboard, the phone layout, and any link into the video.
 
-## 3D pump
+## 3D pump (first version, replaced by the downloaded model)
 
 Built in code so each part is its own object and line work stays clean. A downloaded mesh shown as edges turns into a dense mess of triangles.
 
