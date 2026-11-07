@@ -7,6 +7,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, KeepTogether)
 from reportlab.graphics.shapes import Drawing, Rect, String, Line, Polygon
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.platypus import Image
 
 import os, sys
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,25 +19,27 @@ LIGHT = colors.HexColor("#e6f1ee"); RULE = colors.HexColor("#c9d1d9"); BASE = co
 ss = getSampleStyleSheet()
 st = {
     "title": ParagraphStyle("title", parent=ss["Title"], fontName="Helvetica-Bold", fontSize=26, leading=32, textColor=INK, alignment=TA_LEFT, spaceAfter=6),
-    "sub": ParagraphStyle("sub", parent=ss["Normal"], fontName="Helvetica", fontSize=13, leading=18, textColor=MUTED, spaceAfter=18),
+    "sub": ParagraphStyle("sub", parent=ss["Normal"], fontName="Helvetica", fontSize=13, leading=18, textColor=MUTED, spaceAfter=10),
     "h1": ParagraphStyle("h1", parent=ss["Heading1"], fontName="Helvetica-Bold", fontSize=20, leading=24, textColor=INK, spaceBefore=0, spaceAfter=10),
     "h2": ParagraphStyle("h2", parent=ss["Heading2"], fontName="Helvetica-Bold", fontSize=13, leading=17, textColor=ACCENT, spaceBefore=10, spaceAfter=4),
     "body": ParagraphStyle("body", parent=ss["Normal"], fontName="Helvetica", fontSize=10.5, leading=15, textColor=INK, spaceAfter=6),
     "small": ParagraphStyle("small", parent=ss["Normal"], fontName="Helvetica", fontSize=9, leading=12, textColor=MUTED),
     "cell": ParagraphStyle("cell", parent=ss["Normal"], fontName="Helvetica", fontSize=9.5, leading=12.5, textColor=INK),
     "cellb": ParagraphStyle("cellb", parent=ss["Normal"], fontName="Helvetica-Bold", fontSize=9.5, leading=12.5, textColor=INK),
+    "cs": ParagraphStyle("cs", parent=ss["Normal"], fontName="Helvetica", fontSize=8.8, leading=11, textColor=INK),
     "big": ParagraphStyle("big", parent=ss["Normal"], fontName="Helvetica-Bold", fontSize=30, leading=34, textColor=ACCENT),
     "biglab": ParagraphStyle("biglab", parent=ss["Normal"], fontName="Helvetica", fontSize=9.5, leading=12, textColor=MUTED),
     "quote": ParagraphStyle("quote", parent=ss["Normal"], fontName="Helvetica-Oblique", fontSize=11.5, leading=16, textColor=INK, leftIndent=12, borderPadding=6, spaceBefore=6, spaceAfter=10),
 }
 P = lambda t, s="body": Paragraph(t, st[s])
 C = lambda t: Paragraph(t, st["cell"])
+CS = lambda t: Paragraph(t, st["cs"])
 CB = lambda t: Paragraph(t, st["cellb"])
 
 def table(rows, widths, header=True, zebra=True, align_right_from=None):
     t = Table(rows, colWidths=widths, repeatRows=1 if header else 0)
     style = [("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -1), 0.4, RULE),
-             ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5), ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6)]
+             ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4), ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6)]
     if header:
         style += [("BACKGROUND", (0, 0), (-1, 0), LIGHT), ("LINEBELOW", (0, 0), (-1, 0), 0.8, ACCENT)]
     if align_right_from is not None:
@@ -48,7 +51,7 @@ def footer(canvas, doc):
     canvas.saveState()
     canvas.setFont("Helvetica", 8.5); canvas.setFillColor(MUTED)
     canvas.drawString(20 * mm, 12 * mm, "RETROFIT AI challenge, Since AI Hackathon 2026, Turku. Team detector brief.")
-    canvas.drawRightString(W - 20 * mm, 12 * mm, f"Page {doc.page} of 10")
+    canvas.drawRightString(W - 20 * mm, 12 * mm, f"Page {doc.page} of 12")
     canvas.setStrokeColor(RULE); canvas.setLineWidth(0.5); canvas.line(20 * mm, 16 * mm, W - 20 * mm, 16 * mm)
     canvas.restoreState()
 
@@ -90,41 +93,31 @@ def barchart():
     return d
 
 story = []
-# ---------------------------------------------------------------- 1 cover
-story += [Spacer(1, 30 * mm), P("An operator assistant for old cooling-water pumps", "title"),
+# ---------------------------------------------------------------- 1 cover + problem
+story += [P("An operator assistant for old cooling-water pumps", "title"),
           P("Team detector brief for the jury. RETROFIT AI challenge, Since AI Hackathon 2026, Turku. Challenge owner Business Turku, technical partner Elomatic.", "sub")]
 kp = Table([[P("84", "big"), P("63", "big"), P("0", "big"), P("27 / 35", "big")],
             [P("our composite score, all 9 labelled pumps", "biglab"), P("the organizers' baseline on the same pumps", "biglab"), P("false alerts and excess repeats", "biglab"), P("faults named with the right cause (baseline: 11 / 35)", "biglab")]],
            colWidths=[42 * mm] * 4)
 kp.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEABOVE", (0, 0), (-1, 0), 0.8, ACCENT), ("TOPPADDING", (0, 0), (-1, 0), 10)]))
-story += [kp, Spacer(1, 14 * mm),
+story += [kp, Spacer(1, 4 * mm),
           P("<b>In one paragraph.</b> Every pump comes with a factory data sheet saying how much pressure and power it should give at a given speed. Our program compares what the pump actually does with that sheet, every minute. When the two drift apart in a pattern an engineer would recognise, it raises one alert that names the likely cause, says how sure it is, and says what to go and check. Before blaming the pump, it checks whether one sensor is simply lying, by comparing it with the others. It never controls the machine."),
-          P("<b>What this document covers.</b> The problem (p. 2), the solution in plain words (p. 3), the physics behind it (p. 4), telling a bad sensor from a bad pump (p. 5), how alerts and confidence are kept honest (p. 6), measured results against the baseline (p. 7), the challenge criteria one by one (p. 8), limitations and safety (p. 9), and how anyone can reproduce every number in ten steps (p. 10)."),
-          Spacer(1, 10 * mm),
-          P("All data in this challenge is synthetic, produced by the organizers' documented simulator. Every number here comes from the organizers' own scoring tool on their published labels. Code: github.com/timursdobrovolskis-cyber/since-ai-hackathon, branch <i>detector</i>.", "small"),
-          PageBreak()]
-# ---------------------------------------------------------------- 2 problem
-story += [P("1. The problem", "h1"),
-          P("Ships and factories are full of pumps installed 10 to 30 years ago. They work, but they cannot say when they are starting to fail. Today an operator finds out when a fixed alarm limit is crossed, which is usually too late to plan the repair. A cooling-water pump that fails without warning overheats engines or stops a production line."),
-          P("The challenge", "h2"),
-          P("Build an assistant that reads the data an old pump already produces, or could produce with a few cheap extra sensors, notices developing problems early, explains the evidence, says how certain it is, and recommends what a human should check. It must never control the machine."),
-          P("The data", "h2"),
-          P("Twelve pumps, seven days each, one reading per second: speed, current, power, pressure before and after the pump, flow, temperatures and vibration. Three sensor levels, from a legacy pump with four signals to a fully instrumented one with fourteen. Nine pumps come with labelled faults; three are hidden and scored by the organizers."),
-          P("What goes wrong in the data", "h2"),
-          table([[CB("Problem"), CB("What happens"), CB("What an operator would see")],
-                 [C("Strainer clogging"), C("Debris blocks the inlet filter"), C("Inlet pressure and flow fall; a variable-speed drive speeds up to compensate")],
-                 [C("Bearing wear"), C("A rolling bearing is slowly damaged"), C("High-frequency vibration rises first, later overall vibration and heat")],
-                 [C("Cavitation"), C("Inlet pressure too low, vapour bubbles collapse"), C("Noisy vibration, lost pressure")],
-                 [C("Discharge restriction"), C("A valve left half shut, a fouled heat exchanger"), C("Outlet pressure up, flow and current down")],
-                 [C("Misalignment, imbalance"), C("Shafts not in line, deposits on the impeller"), C("Vibration up, especially with speed")],
-                 [C("Impeller wear, air in the water"), C("Lower head, erratic flow"), C("Pressure lower than the pump should give at that flow")],
-                 [C("Sensor problems"), C("Drift, frozen value, offset step, noise, data gaps"), C("One signal changes while related signals do not")]],
-                [35 * mm, 60 * mm, 75 * mm]),
-          Spacer(1, 4 * mm),
-          P("Telling a real machine fault from a misbehaving sensor is a large part of the challenge, and the part where the organizers' baseline is weakest: it names the right cause for only 27 % of the training faults."),
+          P("The problem", "h2"),
+          P("Pumps installed 10 to 30 years ago work, but cannot say when they are starting to fail; an operator finds out when a fixed alarm limit is crossed, usually too late to plan the repair. The challenge asks for an assistant that reads the data an old pump already produces, notices developing problems early, explains the evidence, says how certain it is, and recommends what a human should check. The data: twelve synthetic pumps, seven days each, one reading per second, sensor levels from four signals to fourteen. Nine pumps come with labelled faults; three are hidden and scored by the organizers."),
+          table([[CB("Problem"), CB("What an operator would see")],
+                 [C("Strainer clogging"), C("Inlet pressure and flow fall; a variable-speed drive speeds up to compensate")],
+                 [C("Bearing wear"), C("High-frequency vibration rises first, later overall vibration and heat")],
+                 [C("Cavitation"), C("Inlet pressure near the boiling point for that water; noisy vibration, lost pressure")],
+                 [C("Discharge restriction"), C("Outlet pressure up, flow and current down")],
+                 [C("Misalignment, imbalance"), C("Vibration up, especially with speed")],
+                 [C("Impeller wear, air in the water"), C("Pressure lower than the pump should give at that flow")],
+                 [C("Sensor problems"), C("One signal changes while related signals do not: drift, frozen value, offset step, noise, data gaps")]],
+                [45 * mm, 125 * mm]),
+          Spacer(1, 2 * mm),
+          P("Telling a machine fault from a misbehaving sensor is a large part of the challenge, and where the baseline is weakest: it names the right cause for 27 % of the training faults. All numbers here come from the organizers' scoring tool on their published labels. Code: github.com/timursdobrovolskis-cyber/since-ai-hackathon, branch <i>detector</i>.", "small"),
           PageBreak()]
 # ---------------------------------------------------------------- 3 solution
-story += [P("2. The solution in plain words", "h1"),
+story += [P("1. The solution in plain words", "h1"),
           P("There is no trained model inside. The detector is the pump's data sheet plus a dozen rules written the way an engineer would say them. That is deliberate: every alert can be explained in one sentence, it cannot peek into the future, and it transfers to any pump that has a data sheet."),
           flowchart(),
           P("Three examples of what it sees", "h2"),
@@ -138,7 +131,7 @@ story += [P("2. The solution in plain words", "h1"),
           P("Four phases, each scored on the same training and validation pumps with the organizers' tool before moving on. First reproduce the baseline exactly. Second, keep its alert times and replace only the diagnosis with physics. Third, replace its alert timing with our own. Fourth, calibrate the confidence. The score went 63, 76, 84 on all nine pumps, and the baseline's false alerts went to zero."),
           PageBreak()]
 # ---------------------------------------------------------------- 4 physics
-story += [P("3. The physics behind it", "h1"),
+story += [P("2. The physics behind it", "h1"),
           P("The organizers allow and encourage the use of the pump curve in the asset list. We use it as the reference for everything."),
           P("Expected readings from the data sheet", "h2"),
           P("A centrifugal pump's head (pressure rise) at a given flow and speed follows its curve: shut-off head, best-efficiency point and the affinity laws (flow scales with speed, head with speed squared, power with speed cubed). From the data sheet alone we compute, every minute, the head, power and current the pump should show at its current speed and flow. Motor and drive losses follow standard catalogue relations."),
@@ -159,7 +152,7 @@ story += [P("3. The physics behind it", "h1"),
                 [50 * mm, 120 * mm]),
           PageBreak()]
 # ---------------------------------------------------------------- 5 sensors
-story += [P("4. Telling a bad sensor from a bad pump", "h1"),
+story += [P("3. Telling a bad sensor from a bad pump", "h1"),
           P("A sensor fault changes one reading. A machine fault changes several readings together, in the way physics dictates. The watchdog uses that difference, and it runs before the machine rules, because a bad pressure transmitter would corrupt every head calculation downstream."),
           table([[CB("Instrument fault"), CB("How it is recognised"), CB("Example from the labelled data")],
                  [C("Frozen reading"), C("A run of identical values longer than twice the longest run seen while learning, while the pump runs and load varies"), C("PUMP-01 bearing temperature constant for hours; found 36 min after it froze")],
@@ -177,7 +170,7 @@ story += [P("4. Telling a bad sensor from a bad pump", "h1"),
           P("Temperatures are ignored for two hours after a restart, because they are still warming up. Load-side checks (flow versus power) are skipped under heavy vibration, because a failing bearing really does draw extra power. Liquid temperature alone is never called a sensor fault, because on a ship it follows the sea."),
           PageBreak()]
 # ---------------------------------------------------------------- 6 alerts and confidence
-story += [P("5. Alerts and confidence you can trust", "h1"),
+story += [P("4. Alerts and confidence you can trust", "h1"),
           P("The scorer penalises false alerts and constant re-alerting, and so does any crew. The alert policy is therefore as important as the diagnosis."),
           P("Alert policy", "h2"),
           table([[CB("Rule"), CB("Why")],
@@ -201,7 +194,7 @@ story += [P("5. Alerts and confidence you can trust", "h1"),
           P("Misalignment is a good example of honesty: on the training pumps two of five misalignment calls were wrong, so the detector says 0.43 even though it was right every time on validation. The app shows these as High, Medium or Low, and the alert file marks the one value that is not calibrated.", "small"),
           PageBreak()]
 # ---------------------------------------------------------------- 7 results
-story += [P("6. Measured results", "h1"),
+story += [P("5. Measured results", "h1"),
           P("All numbers are from the organizers' scorer on their published labels: seven training pumps with 26 scored faults and two validation pumps with 9. Settings were chosen on the training pumps only; validation was used to check, never to fit. Validation has few events, so the organizers ask teams to read both splits together."),
           barchart(),
           table([[CB("Metric"), CB("B1 train"), CB("Team train"), CB("B1 valid."), CB("Team valid."), CB("B1 all"), CB("Team all")],
@@ -219,6 +212,24 @@ story += [P("6. Measured results", "h1"),
           P("Where a conventional alarm limit exists in the labels, the detector warns before it in every case it catches: a cooling-tower pump's bearing 86 hours before the limit, a ship's strainer 19 hours before, a restriction 14 minutes before. On validation the median lead is 9.8 hours. The baseline found the training ship's bearing wear after 118 hours; we find it at 36."),
           P("The plant's existing alarms, for reference, score 27.6 on training and 23.1 on validation.", "small"),
           PageBreak()]
+# ---------------------------------------------------------------- 6 figures (two pages)
+def figure(path, caption):
+    img = Image(path, width=144 * mm, height=144 * mm * 5.6 / 9)
+    img.hAlign = "CENTER"
+    return [img, Spacer(1, 1 * mm), P(caption, "small"), Spacer(1, 3 * mm)]
+
+story += [P("6. Both detectors on the organizers' own figures", "h1"),
+          P("The organizers published figures of four labelled incidents. We redrew them with their code and added every alert: orange triangles are the baseline B1, green triangles are ours, each cause labelled at its first alert. Grey bands are the labelled events, the red dashed line the conventional action deadline.", "small"), Spacer(1, 2 * mm)]
+story += figure("docs/figures/cmp02_clogging_to_cavitation_PUMP-06.png",
+                "<b>PUMP-06, strainer clogging into cavitation (training).</b> Both name the clog, ours seven hours earlier (01:00 vs 07:54 on 9 Oct), 21 h before the action deadline. The baseline keeps repeating \"clog\" through the cavitation; ours raises a cavitation alert within 20 min of each of the first three episodes, from the NPSH margin and the acceleration. The 17-minute episode just before the cleaning is missed by both.")
+story += figure("docs/figures/cmp06_operator_timeline_PUMP-08.png",
+                "<b>PUMP-08, the validation ship pump.</b> The strainer alert comes at 09:36 on 10 Sep (baseline 12:38), 19 h before the limit, with no plant alarm at all. Our second finding is the bearing, which the baseline only ever calls \"unknown\". Both catch the network outage; ours names the transmitter spikes on 13 Sep, the baseline says \"unknown\". Reminders are 12 h apart, so none counts as excess.")
+story += [PageBreak()]
+story += figure("docs/figures/cmp03_bearing_wear_PUMP-04.png",
+                "<b>PUMP-04, bearing wear under a growing imbalance (training).</b> The baseline's first two alerts, inside its own learning window, call it a restriction and an imbalance; it names the bearing only on 19 Jun. Ours stays silent for the learning day, then names the bearing on 17 Jun from the acceleration alone, 86 h before the ISO limit and four days before the replacement. Honest note: after the replacement the remaining vibration is the imbalance, which we call misalignment because the pump had just been reassembled.")
+story += figure("docs/figures/cmp04_sensor_vs_machine_PUMP-03.png",
+                "<b>PUMP-03, machine fault vs instrument fault on a legacy pump (training).</b> Only pressure and current exist. Both catch the restriction at once (pressure up, current down). When the transmitter offset appears after the repair, the baseline says \"unknown\", then \"calibration shift\"; ours says \"calibration shift\" at once, because the pressure moved in one jump while the current did not. Neither finds the slow impeller wear present from day one.")
+story += [PageBreak()]
 # ---------------------------------------------------------------- 8 criteria
 story += [P("7. The challenge criteria, one by one", "h1"),
           P("The organizers' composite score (left) is the measured-performance evidence inside the jury's technical criterion. The jury criteria (right) cover the whole project; the detector contributes to each as described."),
@@ -242,8 +253,36 @@ story += [P("7. The challenge criteria, one by one", "h1"),
           Spacer(1, 3 * mm),
           P("Hard rules: alerts use only data up to their own time; no hand-labelling or tuning on PUMP-10 to 12; submission in the official format with one cause per alert; no control of any device; no secrets in the code.", "small"),
           PageBreak()]
+# ---------------------------------------------------------------- 8b journey
+story += [P("8. Where we came from, and why we changed course", "h1"),
+          P("The team's earlier experiments, documented in a separate engineering README, tried to <i>learn</i> the pump: gradient-boosted (CatBoost) regressors to predict healthy behaviour and flag residuals, then twelve CatBoost classifiers, one per fault, trained on the labelled minutes. All scored with the official tool on the same validation pumps."),
+          table([[CB("Approach (validation pumps)"), CB("Composite"), CB("Detected"), CB("Right cause")],
+                 [CS("Organizers' baseline B1"), CS("78.0"), CS("8 / 9"), CS("4 / 9")],
+                 [CS("B1 + CatBoost classifiers"), CS("65.1"), CS("7 / 9"), CS("3 / 9")],
+                 [CS("B1 + guarded classifiers"), CS("72.4"), CS("7 / 9"), CS("4 / 9")],
+                 [CS("Learned healthy model, residual detector"), CS("52.7"), CS("6 / 9"), CS("0 / 9")],
+                 [CS("Residual detector + CatBoost classifiers"), CS("51.1"), CS("5 / 9"), CS("2 / 9")],
+                 [CB("Physics detector (this brief)"), CB("91.8"), CB("8 / 9"), CB("8 / 9")]],
+                [80 * mm, 25 * mm, 30 * mm, 35 * mm], align_right_from=1),
+          Spacer(1, 1 * mm),
+          P("Why learning did not work here, in the README's own analysis", "h2"),
+          P("Only 5,639 minutes on four pumps qualified as healthy training data, none on a legacy pump, so the learned \"healthy\" model was extrapolating most of the time. The faults overlap (24 pairs on seven pumps), so one pattern carries several labels. Thirteen diagnoses from 26 incidents is too few independent examples for a classifier, and minute-level predictions are not the event-level alerts the scorer wants."),
+          P("Why the physics route answers each of those", "h2"),
+          P("The data sheet <i>is</i> the healthy model, for every pump including the legacy ones, with no training minutes. Rules work at the event level, one alert per case. Overlapping faults are handled because each rule reads its own physical signature (a clog in the suction line, a bearing in the acceleration), so two faults are named one after the other. And the rules are the explanation."),
+          P("The README asked for eight audits before trusting the 91.8", "h2"),
+          table([[CB("Audit item"), CB("Answer")],
+                 [CS("1. Code and dependencies"), CS("detector/ on branch detector; pandas, numpy, scipy from the organizers' requirements file")],
+                 [CS("2. Original files unchanged"), CS("Our rerun of B1 matches the organizers' shipped validation file row for row")],
+                 [CS("3. Official scorer unaltered"), CS("<i>python -m retrofit_sim score</i> from the organizers' package gives 91.8 and 81.8")],
+                 [CS("4. Validation used for tuning?"), CS("Thresholds swept on train only. Rule choices were checked against validation, as the rules allow for model selection, so validation is not fully independent; train (81.8) and the hidden pumps are")],
+                 [CS("5. Future data"), CS("None: silent learning window, backward-looking features, verified by 27 random truncations")],
+                 [CS("6. Labels as inputs"), CS("Never. Labels only score the result and calibrate the confidence numbers on train")],
+                 [CS("7. Reproducible"), CS("Ten documented steps, deterministic, byte-identical files on rerun")],
+                 [CS("8. Holds on hidden pumps?"), CS("Unknown until scored; nothing tuned on them, only alert counts looked at")]],
+                [42 * mm, 128 * mm]),
+          PageBreak()]
 # ---------------------------------------------------------------- 9 limitations
-story += [P("8. Limitations, honestly", "h1"),
+story += [P("9. Limitations, honestly", "h1"),
           P("The remaining gap to a perfect score is 18 points on training and 8 on validation. We know where each point went, and in most cases we chose to leave it there."),
           table([[CB("Where the points go"), CB("Train"), CB("Why, and why we left it")],
                  [C("Five faults never caught"), C("about 10"), C("Minor, slow faults on the pumps with the fewest sensors: pre-existing impeller wear on two legacy pumps that only report pressure and current, a bearing-temperature drift of a few degrees, a current transducer creeping a few tenths of an amp, and a 17-minute cavitation flare. Catching them means lowering the trigger, which adds false alerts on the training pumps, and the scorer penalises false alerts twice. A quieter detector is the better operator tool.")],
@@ -258,7 +297,7 @@ story += [P("8. Limitations, honestly", "h1"),
           P("The detector only advises. It cannot send a command. It prefers silence to a weak guess, says UNKNOWN when the pattern is unclear, and states a confidence that was conservative on pumps it had never seen. When a transmitter is found to be bad, hydraulic diagnoses are suppressed for twelve hours so a lying gauge cannot send a crew to clean a strainer that is fine."),
           PageBreak()]
 # ---------------------------------------------------------------- 10 reproduce
-story += [P("9. Reproduce every number in ten steps", "h1"),
+story += [P("10. Reproduce every number in ten steps", "h1"),
           P("The repository contains a verification sheet (detector/VERIFY.md) with each command and the output to expect. The whole run takes about ten minutes on a laptop with the organizers' data pack next to the repository."),
           table([[CB("Step"), CB("What it shows"), CB("Expected")],
                  [C("1. Create the Python environment"), C("Standard packages from the organizers' requirements file"), C("installs without error")],
