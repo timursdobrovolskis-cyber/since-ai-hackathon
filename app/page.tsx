@@ -18,6 +18,7 @@ import { MapHead, useSite } from "@/components/welcome/mapParts";
 import { Results } from "@/components/welcome/Results";
 import { CrewValue } from "@/components/welcome/CrewValue";
 import { ProgressFrame, ProgressRail, useProgress } from "@/components/welcome/ScrollProgress";
+import { Logo } from "@/components/Logo";
 import { TopBar, type Place } from "@/components/welcome/TopBar";
 import { useScrollPhases } from "@/components/welcome/useScrollPhases";
 import { SHIFT_HOUR } from "@/lib/labels";
@@ -103,6 +104,14 @@ export default function Welcome() {
 
 
           <ProgressFrame />
+          {/* The Vahti logo, just inside the frame's top-left corner: white on the engine room, ink once the stage turns
+              white. It scrolls away with the stage. On a phone the pump moves up into this corner beside the map, so
+              the logo fades out then. */}
+          <div
+            className={`welcome-logo pointer-events-none absolute top-20 left-4 p-5 transition-[color,opacity] duration-500 sm:left-10 sm:p-6 ${tone === "ink" ? "text-white" : "text-mz-ink"} ${compact && light ? "opacity-0" : ""}`}
+          >
+            <Logo className="h-[24px] w-auto sm:h-[30px]" />
+          </div>
           <PumpStage phases={phases} gone={selected !== null} compact={compact} />
 
 
