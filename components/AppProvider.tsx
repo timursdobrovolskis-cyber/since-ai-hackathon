@@ -18,6 +18,8 @@ type App = {
   hour: number;
   /** Cases known at `hour`. */
   cases: Case[];
+  /** Alerts raised at or before `hour`, for screens that step through the week up to the shift. */
+  alertsToShift: Alert[];
   decisions: Record<string, Decision>;
   decide: (decision: Omit<Decision, "decidedAt" | "atHour">) => void;
   recordFinding: (caseId: string, finding: Finding) => void;
@@ -83,9 +85,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const clearDecisions = () => save({});
 
   const cases = useMemo(() => buildCases(alerts, SHIFT_HOUR), [alerts]);
+  const alertsToShift = useMemo(() => alerts.filter((a) => a.offset_hours <= SHIFT_HOUR), [alerts]);
 
   return (
-    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, decisions, decide, recordFinding, record, clearDecisions }}>
+    <Ctx.Provider value={{ fleet, pumps, alertSource, error, hour: SHIFT_HOUR, cases, alertsToShift, decisions, decide, recordFinding, record, clearDecisions }}>
       {children}
     </Ctx.Provider>
   );

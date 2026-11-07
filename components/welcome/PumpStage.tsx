@@ -1,14 +1,13 @@
 "use client";
 
-// Draws the pump as white line work and moves it with the scroll position of `track`.
+// Draws the pump as line work and moves it with the pump phase from useScrollPhases (0 to 1).
 // The line work comes from public/models/pump-edges.bin, built by tools/build_pump_edges.mjs.
-// Progress p runs from 0 (top of the section) to 1 (section fully scrolled). It is also written to
-// the CSS variable --p on `track`, so the page can fade things with plain CSS and React never re-renders.
 //
 //   0.00-0.50  the pump zooms in and turns
 //   0.55-0.90  it glides into the right column while the page fades from ink to white, and the left column appears
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import type { Phases } from "./useScrollPhases";
 
 const FOV = 30;
 const CAMERA_Z = 16;
@@ -41,7 +40,7 @@ function parseEdges(buf: ArrayBuffer) {
   return geometry;
 }
 
-export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null> }) {
+export function PumpStage({ phases }: { phases: React.RefObject<Phases> }) {
   const holder = useRef<HTMLDivElement>(null);
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -105,13 +104,8 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
     let frame = 0;
     const tick = () => {
       frame = requestAnimationFrame(tick);
-      const section = track.current;
-      if (!section || !onScreen || document.hidden) return;
-
-      const rect = section.getBoundingClientRect();
-      const travel = Math.max(rect.height - window.innerHeight, 1);
-      const p = clamp01(-rect.top / travel);
-      section.style.setProperty("--p", p.toFixed(4));
+      if (!onScreen || document.hidden) return;
+      const p = phases.current.pump;
 
       const t = (performance.now() - start) / 1000;
       const zoom = ease(0, 0.5, p);
@@ -152,7 +146,7 @@ export function PumpStage({ track }: { track: React.RefObject<HTMLElement | null
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [track]);
+  }, [phases]);
 
   return (
     <div ref={holder} className="absolute inset-0 [&>canvas]:block [&>canvas]:size-full">

@@ -1,11 +1,14 @@
 "use client";
 
-// Landing page, part 1 of .plans/welcome-landing-spec.md, styled after meuze.ai: ink and white sections,
+// Landing page, parts 1 and 2 of .plans/welcome-landing-spec.md, styled after meuze.ai: ink and white sections,
 // Geist and JetBrains Mono, one accent blue. The pump zooms and turns as you scroll, then glides right while the
-// page fades from ink to white. The site map arrives in part 2.
+// page fades from ink to white. Then the site map appears, and further scrolling runs its clock to the shift.
 import Link from "next/link";
 import { useRef } from "react";
 import { PumpStage } from "@/components/welcome/PumpStage";
+import { SiteMap } from "@/components/welcome/SiteMap";
+import { useScrollPhases } from "@/components/welcome/useScrollPhases";
+import { SHIFT_HOUR } from "@/lib/labels";
 
 /** Small square marker on a frame line, as on meuze.ai. */
 function Corner({ className }: { className: string }) {
@@ -14,6 +17,7 @@ function Corner({ className }: { className: string }) {
 
 export default function Welcome() {
   const track = useRef<HTMLElement>(null);
+  const { phases, hour } = useScrollPhases(track, SHIFT_HOUR);
 
   return (
     <div className="welcome min-h-full bg-white font-geist text-mz-ink">
@@ -31,7 +35,7 @@ export default function Welcome() {
       </header>
 
       {/* Tall section: its height is the scroll distance. The stage inside stays pinned. */}
-      <section ref={track} className="relative h-[340vh]" style={{ "--p": 0 } as React.CSSProperties}>
+      <section ref={track} className="relative h-[540vh]" style={{ "--p": 0, "--t": 0 } as React.CSSProperties}>
         <div className="welcome-stage sticky top-0 h-svh overflow-hidden">
           <div aria-hidden className="welcome-grid pointer-events-none absolute inset-0" />
           <div aria-hidden className="welcome-frame pointer-events-none absolute inset-x-6 inset-y-20 border sm:inset-x-10">
@@ -43,18 +47,16 @@ export default function Welcome() {
             01 &middot; Centrifugal pump
           </p>
 
-          <PumpStage track={track} />
+          <PumpStage phases={phases} />
 
           <p aria-hidden className="welcome-cue absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">
             Scroll
           </p>
 
-          {/* Left column, where part 2 puts the site map. */}
-          <div className="welcome-map absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center px-10 sm:px-16">
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted">02 &middot; Site map</p>
-            <div className="mt-4 flex aspect-[4/3] w-full items-center justify-center border border-dashed border-mz-ink/25 bg-mz-panel">
-              <p className="max-w-[28ch] text-center text-mz-muted">Site map of 12 pumps goes here in part 2. Fictional layout.</p>
-            </div>
+          {/* Left column: the site map. Scrolling on runs its clock to the shift. */}
+          <div className="welcome-map absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center px-10 pt-16 sm:px-16">
+            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-mz-muted">02 &middot; Site map</p>
+            <SiteMap hour={hour} shiftHour={SHIFT_HOUR} />
           </div>
         </div>
       </section>

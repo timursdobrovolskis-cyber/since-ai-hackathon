@@ -25,6 +25,10 @@
   --mz-line: #e6e7ec;
   --mz-muted: #6e7180;
   --mz-accent: #2c63ff;
+  /* Site map lights, the only colours besides ink, white and the accent. */
+  --site-red: #e5484d;
+  --site-orange: #f08c00;
+  --site-green: #30a46c;
 }
 
 @theme inline {
@@ -120,4 +124,29 @@ input[type="range"] { accent-color: var(--ink); }
 .welcome-map {
   opacity: calc((var(--p) - 0.74) * 6);
   transform: translateX(calc((1 - clamp(0, (var(--p) - 0.7) * 5, 1)) * -40px));
+}
+
+/* Site map (part 2). The label "01" fades out as the map arrives, so only one section number shows. */
+.welcome-label { opacity: calc(1 - (var(--p) - 0.74) * 6); }
+.site-zone { fill: var(--mz-panel); stroke: var(--mz-line); }
+.site-zone-label { font-family: var(--ff-mono); font-size: 13px; letter-spacing: 0.14em; fill: var(--mz-muted); }
+.site-name { font-family: var(--ff-geist); font-size: 18px; font-weight: 500; fill: var(--mz-ink); }
+.site-pipe { stroke: var(--mz-ink); stroke-opacity: 0.35; stroke-width: 1.5; }
+.site-light { stroke: white; stroke-width: 2; transition: fill 250ms ease; }
+.site-halo { opacity: 0.16; transition: fill 250ms ease; }
+.site-light-empty { fill: white; stroke: var(--mz-muted); stroke-dasharray: 3 3; }
+.site-test .site-name { fill: var(--mz-muted); }
+.site-red { fill: var(--site-red); background: var(--site-red); }
+.site-orange { fill: var(--site-orange); background: var(--site-orange); }
+.site-green { fill: var(--site-green); background: var(--site-green); }
+.site-swatch-empty { border: 1px dashed var(--mz-muted); }
+.site-burst { fill: none; stroke-width: 2; animation: site-burst 900ms ease-out both; }
+.site-burst.site-red { stroke: var(--site-red); }
+.site-burst.site-orange { stroke: var(--site-orange); }
+.site-halo.site-red { animation: site-pulse 2.2s ease-in-out infinite; }
+@keyframes site-burst { from { r: 10px; opacity: 0.7; } to { r: 32px; opacity: 0; } }
+@keyframes site-pulse { 50% { opacity: 0.32; } }
+@media (prefers-reduced-motion: reduce) {
+  .site-burst { display: none; }
+  .site-halo.site-red { animation: none; }
 }
