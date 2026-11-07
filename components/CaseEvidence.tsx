@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { certainty } from "@/lib/cases";
-import { clock, faultLabel, formatUtc, TIER_LABEL } from "@/lib/labels";
+import { ago, faultLabel, formatUtc, TIER_LABEL } from "@/lib/labels";
 import type { Case, PumpMeta } from "@/lib/types";
 import { useApp } from "./AppProvider";
 import { EvidenceChart } from "./EvidenceChart";
@@ -49,7 +49,7 @@ export function CaseEvidence({ item, meta }: { item: Case; meta: PumpMeta }) {
           ))}
         </div>
         <p className="mt-2 text-[13px] text-ink-3">
-          Grey band: normal for this pump, learned from its first 24 hours, so it appears from Day 2. Coloured line: outside normal. Dashed line: alert.
+          Grey band: normal for this pump, learned from its first 24 hours, so it starts after the first day. Coloured line: outside normal. Dashed line: alert.
         </p>
         {order.length > MAX_CHARTS && (
           <button type="button" onClick={() => setShowAll(!showAll)} className="mt-2 min-h-9 border border-line bg-raised px-3 text-[13px]">
@@ -113,7 +113,7 @@ export function CaseEvidence({ item, meta }: { item: Case; meta: PumpMeta }) {
           ) : (
             <ul className="text-ink-2">
               {alarms.slice(-3).map((a) => (
-                <li key={`${a.tag}-${a.raisedHour}`}>{clock(a.raisedHour)}: {a.type} on {fleet.channelMeta[a.tag]?.label.toLowerCase() ?? a.tag.toLowerCase()}</li>
+                <li key={`${a.tag}-${a.raisedHour}`}>{ago(hour - a.raisedHour)}: {a.type} on {fleet.channelMeta[a.tag]?.label.toLowerCase() ?? a.tag.toLowerCase()}</li>
               ))}
             </ul>
           )}

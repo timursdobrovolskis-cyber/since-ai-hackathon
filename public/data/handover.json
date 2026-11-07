@@ -4,76 +4,10 @@
  "model": "eleven_v4",
  "items": [
   {
-   "hour": 30,
-   "label": "Day 2, morning shift",
-   "text": "Handover for Day 2, morning shift. 1 pump needs you today. Pump 4. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Also, check the readings on 1 pump.",
-   "file": "h030.mp3"
-  },
-  {
-   "hour": 42,
-   "label": "Day 2, evening shift",
-   "text": "Handover for Day 2, evening shift. 2 pumps need you today. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 9. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, check the readings on 1 pump.",
-   "file": "h042.mp3"
-  },
-  {
-   "hour": 54,
-   "label": "Day 3, morning shift",
-   "text": "Handover for Day 3, morning shift. 3 pumps need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 9. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, check the readings on 2 pumps.",
-   "file": "h054.mp3"
-  },
-  {
    "hour": 66,
-   "label": "Day 3, evening shift",
-   "text": "Handover for Day 3, evening shift. 3 pumps need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, check the readings on 4 pumps. 1 other pump can wait.",
+   "label": "evening shift",
+   "text": "Handover for the evening shift. 3 pumps need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, check the readings on 4 pumps. 1 other pump can wait.",
    "file": "h066.mp3"
-  },
-  {
-   "hour": 78,
-   "label": "Day 4, morning shift",
-   "text": "Handover for Day 4, morning shift. 4 pumps need you today. Pump 7. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. 1 more is on your list. Also, check the readings on 2 pumps. 2 other pumps can wait.",
-   "file": "h078.mp3"
-  },
-  {
-   "hour": 90,
-   "label": "Day 4, evening shift",
-   "text": "Handover for Day 4, evening shift. 4 pumps need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 6. Strainer is probably clogging. Check and clean it at the next stop. 1 more is on your list. Also, check the readings on 2 pumps. 3 other pumps can wait.",
-   "file": "h090.mp3"
-  },
-  {
-   "hour": 102,
-   "label": "Day 5, morning shift",
-   "text": "Handover for Day 5, morning shift. 3 pumps need you today. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 6. Strainer is probably clogging. Check and clean it at the next stop. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Also, check the readings on 3 pumps. 3 other pumps can wait.",
-   "file": "h102.mp3"
-  },
-  {
-   "hour": 114,
-   "label": "Day 5, evening shift",
-   "text": "Handover for Day 5, evening shift. 3 pumps need you today. Pump 3. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Also, check the readings on 3 pumps. 3 other pumps can wait.",
-   "file": "h114.mp3"
-  },
-  {
-   "hour": 126,
-   "label": "Day 6, morning shift",
-   "text": "Handover for Day 6, morning shift. 5 pumps need you today. Pump 4. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. Pump 9. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 2. Bearing is probably wearing out. Listen at the bearing housing and check lubrication. Plan a bearing change. 2 more are on your list. 4 other pumps can wait.",
-   "file": "h126.mp3"
-  },
-  {
-   "hour": 138,
-   "label": "Day 6, evening shift",
-   "text": "Handover for Day 6, evening shift. 5 pumps need you today. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 1. Strainer is probably clogging. Check and clean it at the next stop. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. 2 more are on your list. Also, check the readings on 1 pump. 3 other pumps can wait.",
-   "file": "h138.mp3"
-  },
-  {
-   "hour": 150,
-   "label": "Day 7, morning shift",
-   "text": "Handover for Day 7, morning shift. 5 pumps need you today. Pump 7. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. Pump 9. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. 2 more are on your list. Also, check the readings on 1 pump. 3 other pumps can wait.",
-   "file": "h150.mp3"
-  },
-  {
-   "hour": 162,
-   "label": "Day 7, evening shift",
-   "text": "Handover for Day 7, evening shift. 6 pumps need you today. Pump 9. Strainer is probably clogging. Check and clean it at the next stop. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Pump 2. Something looks unusual, but the cause is unclear. Walk past and inspect the pump. 3 more are on your list. 3 other pumps can wait.",
-   "file": "h162.mp3"
   }
  ]
 }
