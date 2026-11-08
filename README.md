@@ -41,7 +41,7 @@ The app shows the organizers' B1 baseline until you give it a detector's alerts.
 .venv/bin/python tools/build_what_if.py
 ```
 
-Cases, lead times, the Review view and payback all update with no code change. Stored AI explanations belong to one detector, so they stay hidden until you run `npm run explain` again, which spends a small amount of paid credit. A bad file stops with a clear reason and leaves the app's data as it was.
+Cases, lead times, the Review view and payback all update with no code change. A bad file stops with a clear reason and leaves the app's data as it was.
 
 ## How it works
 
@@ -58,7 +58,6 @@ Cases, lead times, the Review view and payback all update with no code change. S
 - Job card steps and time estimates are hand-written from the organizers' sandbox assumptions, not site figures, and still need an engineer's review. The next chance to stop reads ahead in the operating context, which stands in for a published timetable.
 - Corrective work done after the latest alert moves a pump to Can wait and says what was done. Routine work does not, and a new alert brings the pump back.
 - The main page holds what the shift needs and three key results from `key-numbers.json`, which holds totals only, so it loads nothing labelled. Everything else is one click away.
-- AI explanations are generated in advance by `npm run explain` and stored, so the app needs no key and works offline. The model sees one alert and its pump sheet, never labels or later data, and any text containing a number that is not in its input is rejected.
 - The what-if panel shows pre-computed results from the organizers' sandbox, so it works offline. Its severity levels are our assumptions, not measurements, and it never touches a machine. An inspection is never shown as blocked, because it does not change the pump: a problem found there appears as a warning.
 
 **Real and placeholder:** all pump data is synthetic. Alerts currently come from the organizers' B1 baseline, regenerated for training pumps, as a placeholder until the team's detector is connected. B1 confidence values are not calibrated, so the app does not show them as certainty.
@@ -80,7 +79,6 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Typeface | Barlow, Barlow Semi Condensed | SIL Open Font License |
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
 | Landing page charts | bklit-ui (copied into `components/charts/` by the shadcn CLI), with d3-array, d3-scale, d3-shape, Motion, NumberFlow, clsx and tailwind-merge | MIT |
-| AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
 | Jury brief PDF | reportlab (`tools/build_jury_brief.py`, output `docs/detector-jury-brief.pdf`) | BSD-3 |
@@ -90,7 +88,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 ## AI tools used
 
 - Main AI tools: Claude Code
-- Generative AI model or API used in the product: Claude Opus 5.5 through the Anthropic API for stored alert explanations
+- Generative AI model or API used in the product: none. The site and the detector run on rules and stored data, with no model call. The plain-language text on the pump cards is hand-written.
 
 ## Pre-existing work
 
