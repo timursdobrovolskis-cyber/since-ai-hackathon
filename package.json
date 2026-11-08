@@ -7,13 +7,10 @@
     "build": "next build",
     "start": "next start",
     "test": "node --test lib/*.test.ts",
-    "explain": "node --env-file-if-exists=.env tools/build_explanations.ts",
-    "handover": "node --env-file-if-exists=.env.local tools/build_handover.ts",
-    "voice-agent": "node --env-file-if-exists=.env.local tools/build_voice_agent.ts"
+    "explain": "node --env-file-if-exists=.env tools/build_explanations.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.6.0",
-    "@elevenlabs/elevenlabs-js": "^2.77.0",
     "@number-flow/react": "^0.6.2",
     "clsx": "^2.1.1",
     "d3-array": "^3.2.5",
