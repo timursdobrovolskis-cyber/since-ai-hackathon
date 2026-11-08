@@ -1,0 +1,13 @@
+{
+ "detector": "B1 baseline",
+ "voice": "onwK4e9ZLuTAKqWW03F9",
+ "model": "eleven_v4",
+ "items": [
+  {
+   "hour": 66,
+   "label": "evening shift",
+   "text": "Handover for the evening shift. 3 pumps need you today. Pump 3. Something is probably blocking flow after the pump. Check the discharge valves and the cooler. Pump 8. Strainer is probably clogging. Check and clean it at the next stop. Pump 4. Impeller is probably out of balance. Inspect the impeller for deposits or damage. Also, check the readings on 4 pumps. 1 other pump can wait.",
+   "file": "h066.mp3"
+  }
+ ]
+}

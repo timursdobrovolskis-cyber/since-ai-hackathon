@@ -1,14 +1,41 @@
-.DS_Store
-node_modules/
+# Secrets
 .env
 .env.*
-__pycache__/
-*.pyc
+!.env.example
+
+# Data (never commit challenge data)
+data/*
+!data/sample/
+!data/restricted/
+data/restricted/*
+!data/restricted/.gitkeep
+
+# Dependencies and builds
+node_modules/
 .venv/
-venv/
+__pycache__/
 dist/
 build/
+.next/
+.vercel/
+
+# Local files
+.DS_Store
+*.log
+submission.zip
+
+# Editors and Python
 .idea/
 .vscode/
-!.env.example
-.superset/
+*.pyc
+venv/
+
+# Disposable intermediates
+.tmp/
+
+# Next.js generated
+next-env.d.ts
+*.tsbuildinfo
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+.vercel
