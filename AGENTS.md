@@ -22,7 +22,7 @@ The event rules in `CLAUDE.md` also apply to every agent. Read them first.
 
 - API keys live in `.env` (gitignored). See `.env.example` for the variable names.
 - Never print, log, or commit secrets. Never commit `.env`.
-- New Paradev workspaces get `.env` copied from the main checkout and run `npm install` (`.paradev/config.toml`).
+- New workspaces get `.env` copied from the main checkout and run `npm install`.
 
 ## OpenCode (Featherless)
 
@@ -31,4 +31,4 @@ The event rules in `CLAUDE.md` also apply to every agent. Read them first.
 
 ## Skills
 
-Project skills are in `.claude/skills/` (mirrored in `.agents/skills/`): `impeccable` (UI design/polish), `agentation` (visual feedback toolbar), `bklit-ui` (charts), `playwright-cli` (browser testing).
+The agent skills used during the build (impeccable, agentation, bklit-ui, playwright-cli) were removed from the repo before submission. Install them in your own agent if you need them.

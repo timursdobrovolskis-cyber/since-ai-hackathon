@@ -1,6 +1,6 @@
 "use client";
 
-// The evidence on a pump card (.plans/pump-card-readability-spec.md):
+// The evidence on a pump card (from the pump card readability spec):
 //   one plain sentence per reading the alert names, worked out from the recorded rows up to the shift (lib/drift.ts)
 //   one small chart per named reading, stacked on one time axis, each headed with its name, unit, value now and normal
 //   range, and a legend for the band, the reading and the alerts

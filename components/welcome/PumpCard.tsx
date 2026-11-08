@@ -1,7 +1,7 @@
 "use client";
 
 // The pump card: opens from the alarm panel in place of the 3D pump, which flickers away. Laid out answer first
-// (.plans/pump-card-readability-spec.md):
+// (from the pump card readability spec):
 //   the top part: what's wrong (cause, Machine or Sensor, what it means in plain words, since when), what to do (the
 //   detector's recommended check and the next stop), and the review
 //   then the proof: state now, the evidence (plain sentences and stacked charts), every reading now on a range bar,

@@ -39,3 +39,10 @@ next-env.d.ts
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
 .vercel
+
+# Agent configuration and planning notes stay local.
+.agents/
+.claude/
+.paradev/
+.plans/
+skills-lock.json

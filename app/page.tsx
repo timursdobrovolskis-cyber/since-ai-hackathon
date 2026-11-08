@@ -1,6 +1,6 @@
 "use client";
 
-// The site, from .plans/welcome-landing-spec.md: a dashboard you scroll through, styled after meuze.ai:
+// The site, from the welcome landing spec: a dashboard you scroll through, styled after meuze.ai:
 //   01  A ferry engine room in hidden-line work. The camera walks in to Pump 8, the room dims away, and Pump 8 zooms,
 //       turns and moves aside while the page fades from ink to white.
 //   02  The alarm panel: one window per pump, as the evening shift stands, following Today's rule. Clicking a pump
