@@ -6,11 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test lib/*.test.ts",
-    "explain": "node --env-file-if-exists=.env tools/build_explanations.ts"
+    "test": "node --test lib/*.test.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.6.0",
     "@number-flow/react": "^0.6.2",
     "clsx": "^2.1.1",
     "d3-array": "^3.2.5",
