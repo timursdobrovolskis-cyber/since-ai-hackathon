@@ -46,7 +46,7 @@ Cases, lead times, the Review view and payback all update with no code change. S
 ## How it works
 
 - `tools/build_ui_data.py` turns the organizer data into small JSON files for the browser.
-- The app shows one fixed evening shift from the test week, set by `SHIFT_HOUR` in `lib/labels.ts`. All pumps are aligned to start together, because each pump's real 7-day window comes from a different month. After a detector swap, check that this shift still tells the story, then rerun `npm run handover`.
+- The app shows one fixed evening shift from the test week, set by `SHIFT_HOUR` in `lib/labels.ts`. All pumps are aligned to start together, because each pump's real 7-day window comes from a different month. After a detector swap, check that this shift still tells the story.
 - Live screens only draw data up to that shift. Labelled faults are kept in `public/data/review`, and only the Review view may load them.
 - Repeat alerts merge into one case, and a person approves, rejects or keeps watching.
 - Workers start on Today: a short list in plain words, grouped into Needs you today, Check the reading and Can wait. The wording is hand-written per fault type in `lib/plain.ts`, and the list rule in `lib/today.ts` means newest first, not true urgency.
@@ -58,8 +58,6 @@ Cases, lead times, the Review view and payback all update with no code change. S
 - Job card steps and time estimates are hand-written from the organizers' sandbox assumptions, not site figures, and still need an engineer's review. The next chance to stop reads ahead in the operating context, which stands in for a published timetable.
 - Corrective work done after the latest alert moves a pump to Can wait and says what was done. Routine work does not, and a new alert brings the pump back.
 - The main page holds what the shift needs and three key results from `key-numbers.json`, which holds totals only, so it loads nothing labelled. Everything else is one click away.
-- The spoken shift handover is recorded in advance with `npm run handover`, using a stock ElevenLabs voice, and stored in `public/audio`. It uses the same rules as the Today list, and only what was known at that shift.
-- Ask about this pump uses an ElevenLabs Agent. It only receives that pump's facts up to that shift, never labels, and it only starts through `app/api/voice`, which checks an access code and keeps the key on the server. Conversations are capped at 90 seconds, 40 a day and 2 at a time. `npm run voice-agent` creates or updates it. It needs `ELEVENLABS_API_KEY` and `VOICE_ACCESS_CODE`, and internet.
 - AI explanations are generated in advance by `npm run explain` and stored, so the app needs no key and works offline. The model sees one alert and its pump sheet, never labels or later data, and any text containing a number that is not in its input is rejected.
 - The what-if panel shows pre-computed results from the organizers' sandbox, so it works offline. Its severity levels are our assumptions, not measurements, and it never touches a machine. An inspection is never shown as blocked, because it does not change the pump: a problem found there appears as a warning.
 
@@ -83,7 +81,6 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 | Landing page typefaces | Geist, JetBrains Mono | SIL Open Font License |
 | Landing page charts | bklit-ui (copied into `components/charts/` by the shadcn CLI), with d3-array, d3-scale, d3-shape, Motion, NumberFlow, clsx and tailwind-merge | MIT |
 | AI explanations | Anthropic SDK, Claude Opus 5.5 | Apache-2.0 for the SDK |
-| Voice | ElevenLabs SDK and client | MIT |
 | Browser testing | Playwright CLI | Apache-2.0 |
 | Data tools | pandas, NumPy, PyArrow, SciPy, scikit-learn, PyYAML | BSD-3, BSD-3, Apache-2.0, BSD-3, BSD-3, MIT |
 | Jury brief PDF | reportlab (`tools/build_jury_brief.py`, output `docs/detector-jury-brief.pdf`) | BSD-3 |
@@ -93,7 +90,7 @@ See [docs/spec.md](docs/spec.md) for the full spec, including the alert format i
 ## AI tools used
 
 - Main AI tools: Claude Code
-- Generative AI model or API used in the product: ElevenLabs for speech, and Claude Opus 5.5 through the Anthropic API for stored alert explanations
+- Generative AI model or API used in the product: Claude Opus 5.5 through the Anthropic API for stored alert explanations
 
 ## Pre-existing work
 

@@ -23,8 +23,8 @@ export const TIER_LABEL: Record<string, string> = {
   T2_FULL: "Full sensors",
 };
 
-// The app shows one fixed shift from the test week: Day 3 evening. Change this one number after swapping in new alerts,
-// then rerun `npm run handover`. Screens use only data at or before it.
+// The app shows one fixed shift from the test week: Day 3 evening. Change this one number after swapping in new alerts.
+// Screens use only data at or before it.
 export const SHIFT_HOUR = 66;
 
 const whole = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
